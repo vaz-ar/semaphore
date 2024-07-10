@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.22-alpine3.18 as builder
+FROM --platform=$BUILDPLATFORM golang:1.22-alpine3.19 AS builder
 
 RUN apk add --no-cache -U \
     libc-dev curl nodejs npm git gcc zip unzip tar
@@ -77,7 +77,7 @@ RUN chown -R semaphore:0 /usr/local/bin/runner-wrapper && \
 WORKDIR /home/semaphore
 
 # renovate: datasource=pypi depName=ansible
-ENV ANSIBLE_VERSION 9.4.0
+ENV ANSIBLE_VERSION="9.7.0"
 ARG ANSIBLE_VENV_PATH=/opt/semaphore/apps/ansible/${ANSIBLE_VERSION}/venv
 
 RUN apk add --no-cache -U python3-dev build-base openssl-dev libffi-dev cargo && \

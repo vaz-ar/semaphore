@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.22-alpine3.18 as builder
+FROM --platform=$BUILDPLATFORM golang:1.22-alpine3.19 AS builder
 
 RUN apk add --no-cache -U \
     libc-dev curl nodejs npm git gcc zip unzip tar
@@ -36,20 +36,20 @@ RUN curl -O https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraf
     unzip terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip -d /tmp && \
     rm terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip
 
-#RUN if [ "$TARGETARCH" = "amd64" ]; then \
+# RUN if [ "$TARGETARCH" = "amd64" ]; then \
 #      export PULUMI_ARCH="x64"; \
 #    else \
 #      export PULUMI_ARCH="${TARGETARCH}"; \
 #    fi && \
 #    wget -O pulumi.tar.gz https://github.com/pulumi/pulumi/releases/download/v${PULUMI_VERSION}/pulumi-v${PULUMI_VERSION}-linux-${PULUMI_ARCH}.tar.gz
-#RUN tar xf pulumi.tar.gz --strip-components=1 -C /usr/local/bin
-#RUN rm pulumi.tar.gz
+# RUN tar xf pulumi.tar.gz --strip-components=1 -C /usr/local/bin
+# RUN rm pulumi.tar.gz
 
 FROM alpine:3.19
 
 ARG TARGETARCH="amd64"
 # renovate: datasource=pypi depName=ansible
-ENV ANSIBLE_VERSION 9.4.0
+ENV ANSIBLE_VERSION="9.7.0"
 ARG ANSIBLE_VENV_PATH=/opt/semaphore/apps/ansible/${ANSIBLE_VERSION}/venv
 
 RUN apk add --no-cache -U \

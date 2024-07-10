@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.22-alpine3.18 as builder
+FROM --platform=$BUILDPLATFORM golang:1.22-alpine3.19 AS builder
 
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
 
@@ -54,7 +54,7 @@ WORKDIR /home/semaphore
 USER 1001
 
 # renovate: datasource=pypi depName=ansible
-ENV ANSIBLE_VERSION 9.4.0
+ENV ANSIBLE_VERSION="9.7.0"
 
 RUN mkdir /opt/semaphore/venv
 
