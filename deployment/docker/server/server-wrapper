@@ -179,11 +179,6 @@ if [ ! -f "${SEMAPHORE_CONFIG_PATH}/config.json" ]; then
     }
 
 
-    # if [ -n "${SEMAPHORE_DB_PORT}" ]; then
-    #     SEMAPHORE_DB_HOST="${SEMAPHORE_DB_HOST}:${SEMAPHORE_DB_PORT}"
-    # fi
-
-
     case ${SEMAPHORE_DB_DIALECT} in
         mysql)
             SEMAPHORE_DB_DIALECT_ID=1
