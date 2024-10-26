@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ansible-semaphore/semaphore/util"
+	"github.com/semaphoreui/semaphore/util"
 )
 
 // contains checks if a slice contains a specific string
