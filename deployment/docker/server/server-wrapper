@@ -68,20 +68,8 @@ file_env 'SEMAPHORE_ACCESS_KEY_ENCRYPTION'
 
 
 #
-# Extract database host and port from config.json if they are not set
-#
-if [ -f "${SEMAPHORE_CONFIG_PATH}/config.json" ]; then
-    if [ -z "${SEMAPHORE_DB_DIALECT}" ]; then
-        SEMAPHORE_DB_DIALECT=$(cat "${SEMAPHORE_CONFIG_PATH}/config.json" | jq '.dialect // ""' -r)
-    fi
-
-    if [ -z "${SEMAPHORE_DB_HOST}" ]; then
-        SEMAPHORE_DB_HOST=$(cat "${SEMAPHORE_CONFIG_PATH}/config.json" | jq ".${SEMAPHORE_DB_DIALECT}.host // \"\"" -r)
-    fi
-fi
-
-#
-# Set default SEMAPHORE_DB_DIALECT and SEMAPHORE_DB_HOST if empty
+# Extract database host and port from config.json if they are not set.
+# Set default SEMAPHORE_DB_DIALECT and SEMAPHORE_DB_HOST if empty.
 #
 if [ -z "${SEMAPHORE_DB_DIALECT}" ]; then
     if [ -f "${SEMAPHORE_CONFIG_PATH}/config.json" ]; then
