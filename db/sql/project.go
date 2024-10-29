@@ -11,8 +11,8 @@ func (d *SqlDb) CreateProject(project db.Project) (newProject db.Project, err er
 
 	insertId, err := d.insert(
 		"id",
-		"insert into project(name, created, type) values (?, ?, ?)",
-		project.Name, project.Created, project.Type)
+		"insert into project(name, created, type, alert, alert_chat, max_parallel_tasks) values (?, ?, ?, ?, ?, ?)",
+		project.Name, project.Created, project.Type, project.Alert, project.AlertChat, project.MaxParallelTasks)
 
 	if err != nil {
 		return
@@ -110,11 +110,12 @@ func (d *SqlDb) DeleteProject(projectID int) error {
 
 func (d *SqlDb) UpdateProject(project db.Project) error {
 	_, err := d.exec(
-		"update project set name=?, alert=?, alert_chat=?, max_parallel_tasks=? where id=?",
+		"update project set name=?, alert=?, alert_chat=?, max_parallel_tasks=?, type=? where id=?",
 		project.Name,
 		project.Alert,
 		project.AlertChat,
 		project.MaxParallelTasks,
+		project.Type,
 		project.ID)
 	return err
 }
