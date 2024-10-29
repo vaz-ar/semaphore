@@ -123,6 +123,15 @@ func (b *BackupDB) load(projectID int, store db.Store) (err error) {
 		return
 	}
 
+	for i := range b.templates {
+		var vaults []db.TemplateVault
+		vaults, err = store.GetTemplateVaults(b.templates[i].ProjectID, b.templates[i].ID)
+		if err != nil {
+			return
+		}
+		b.templates[i].Vaults = vaults
+	}
+
 	b.repositories, err = store.GetRepositories(projectID, db.RetrieveQueryParams{})
 	if err != nil {
 		return
