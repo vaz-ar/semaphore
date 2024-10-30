@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/ansible-semaphore/semaphore/db"
-	"github.com/ansible-semaphore/semaphore/pkg/random"
+	"github.com/semaphoreui/semaphore/db"
+	"github.com/semaphoreui/semaphore/pkg/random"
 )
 
 func findNameByID[T db.BackupEntity](ID int, items []T) (*string, error) {
@@ -121,6 +121,15 @@ func (b *BackupDB) load(projectID int, store db.Store) (err error) {
 	b.templates, err = store.GetTemplates(projectID, db.TemplateFilter{}, db.RetrieveQueryParams{})
 	if err != nil {
 		return
+	}
+
+	for i := range b.templates {
+		var vaults []db.TemplateVault
+		vaults, err = store.GetTemplateVaults(b.templates[i].ProjectID, b.templates[i].ID)
+		if err != nil {
+			return
+		}
+		b.templates[i].Vaults = vaults
 	}
 
 	b.repositories, err = store.GetRepositories(projectID, db.RetrieveQueryParams{})
