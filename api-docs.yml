@@ -80,9 +80,14 @@ definitions:
         type: string
         x-example: test@ansiblesemaphore.test
         example: test@ansiblesemaphore.test
+      password:
+        type: string
+        format: password
       alert:
         type: boolean
       admin:
+        type: boolean
+      external:
         type: boolean
 
   UserPutRequest:
@@ -104,6 +109,7 @@ definitions:
         type: boolean
       admin:
         type: boolean
+
   User:
     type: object
     properties:
@@ -121,6 +127,8 @@ definitions:
       alert:
         type: boolean
       admin:
+        type: boolean
+      external:
         type: boolean
 
   ProjectUser:
