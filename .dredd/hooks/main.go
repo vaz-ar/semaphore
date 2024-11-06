@@ -101,6 +101,7 @@ func main() {
 	h.Before("project > /api/project/{project_id}/repositories/{repository_id} > Removes repository > 204 > application/json", capabilityWrapper("repository"))
 
 	h.Before("project > /api/project/{project_id}/inventory > create inventory > 201 > application/json", capabilityWrapper("inventory"))
+	h.Before("project > /api/project/{project_id}/inventory/{inventory_id} > Get inventory > 200 > application/json", capabilityWrapper("inventory"))
 	h.Before("project > /api/project/{project_id}/inventory/{inventory_id} > Updates inventory > 204 > application/json", capabilityWrapper("inventory"))
 	h.Before("project > /api/project/{project_id}/inventory/{inventory_id} > Removes inventory > 204 > application/json", capabilityWrapper("inventory"))
 

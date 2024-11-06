@@ -483,9 +483,12 @@ definitions:
       become_key_id:
         type: integer
         minimum: 1
+      repository_id:
+        type: integer
+        minimum: 1
       type:
         type: string
-        enum: [static, static-yaml, file]
+        enum: [static, static-yaml, file, terraform-workspace, tofu-workspace]
 
   Inventory:
     type: object
@@ -503,9 +506,11 @@ definitions:
         type: integer
       become_key_id:
         type: integer
+      repository_id:
+        type: integer
       type:
         type: string
-        enum: [static, static-yaml, file]
+        enum: [static, static-yaml, file, terraform-workspace, tofu-workspace]
 
   Integration:
     type: object
@@ -1883,6 +1888,15 @@ paths:
     parameters:
       - $ref: "#/parameters/project_id"
       - $ref: "#/parameters/inventory_id"
+    get:
+      tags:
+        - project
+      summary: Get inventory
+      responses:
+        200:
+          description: inventory object
+          schema:
+            $ref: "#/definitions/Inventory"
     put:
       tags:
         - project
