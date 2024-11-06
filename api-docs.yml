@@ -141,6 +141,9 @@ definitions:
         type: string
       username:
         type: string
+      role:
+        type: string
+        enum: [owner, manager, task_runner, guest]
 
   ProjectBackup:
     type: object
@@ -1510,6 +1513,8 @@ paths:
                 enum: [owner, manager, task_runner, guest]
                 example: owner
       summary: Update user role
+      tags:
+        - project
       responses:
         204:
           description: User updated
