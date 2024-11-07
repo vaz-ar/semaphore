@@ -368,6 +368,8 @@ definitions:
         type: integer
         minimum: 1
         x-example: 2
+      override_secret:
+        type: boolean
       login_password:
         type: object
         properties:
@@ -386,6 +388,10 @@ definitions:
             type: string
             x-example: user
             example: user
+          passphrase:
+            type: string
+            x-example: passphrase
+            example: passphrase
           private_key:
             type: string
             x-example: private key
@@ -1741,8 +1747,10 @@ paths:
           schema:
             $ref: "#/definitions/AccessKeyRequest"
       responses:
-        204:
+        201:
           description: Access Key created
+          schema:
+            $ref: "#/definitions/AccessKey"
         400:
           description: Bad type
   /project/{project_id}/keys/{key_id}:
