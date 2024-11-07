@@ -410,28 +410,6 @@ definitions:
         enum: [none, ssh, login_password]
       project_id:
         type: integer
-      login_password:
-        type: object
-        properties:
-          password:
-            type: string
-            x-example: password
-            example: password
-          login:
-            type: string
-            x-example: username
-            example: username
-      ssh:
-        type: object
-        properties:
-          login:
-            type: string
-            x-example: user
-            example: user
-          private_key:
-            type: string
-            x-example: private key
-            example: private key
 
   EnvironmentRequest:
     type: object
