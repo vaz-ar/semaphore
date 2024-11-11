@@ -114,12 +114,26 @@ func resolveCapability(caps []string, resolved []string, uid string) {
 		case "environment":
 			pwd := "test-pass"
 			env := "{}"
+			secret := db.EnvironmentSecret{
+				Type:      db.EnvironmentSecretEnv,
+				Name:      "TEST",
+				Secret:    "VALUE",
+				Operation: "create",
+			}
 			res, err := store.CreateEnvironment(db.Environment{
 				ProjectID: userProject.ID,
 				Name:      "ITI-" + uid,
 				JSON:      "{}",
 				Password:  &pwd,
 				ENV:       &env,
+			})
+			printError(err)
+			_, err = store.CreateAccessKey(db.AccessKey{
+				Name:          string(secret.Type) + "." + secret.Name,
+				String:        secret.Secret,
+				EnvironmentID: &res.ID,
+				ProjectID:     &userProject.ID,
+				Type:          db.AccessKeyString,
 			})
 			printError(err)
 			environmentID = res.ID

@@ -197,7 +197,16 @@ func AddEnvironment(w http.ResponseWriter, r *http.Request) {
 		//return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	// Reload env
+	env, err = helpers.Store(r).GetEnvironment(newEnv.ProjectID, newEnv.ID)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+	// Use empty array to avoid null in JSON
+	env.Secrets = []db.EnvironmentSecret{}
+
+	helpers.WriteJSON(w, http.StatusCreated, env)
 }
 
 // RemoveEnvironment deletes an environment from the database

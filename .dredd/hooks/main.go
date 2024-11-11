@@ -106,6 +106,8 @@ func main() {
 	h.Before("project > /api/project/{project_id}/inventory/{inventory_id} > Updates inventory > 204 > application/json", capabilityWrapper("inventory"))
 	h.Before("project > /api/project/{project_id}/inventory/{inventory_id} > Removes inventory > 204 > application/json", capabilityWrapper("inventory"))
 
+	h.Before("project > /api/project/{project_id}/environment > Add environment > 201 > application/json", capabilityWrapper("environment"))
+	h.Before("project > /api/project/{project_id}/environment/{environment_id} > Get environment > 200 > application/json", capabilityWrapper("environment"))
 	h.Before("project > /api/project/{project_id}/environment/{environment_id} > Update environment > 204 > application/json", capabilityWrapper("environment"))
 	h.Before("project > /api/project/{project_id}/environment/{environment_id} > Removes environment > 204 > application/json", capabilityWrapper("environment"))
 

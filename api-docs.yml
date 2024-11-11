@@ -411,9 +411,38 @@ definitions:
       project_id:
         type: integer
 
+  EnvironmentSecret:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+        enum: [env, var]
+
+  EnvironmentSecretRequest:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      secret:
+        type: string
+      type:
+        type: string
+        enum: [env, var]
+      operation:
+        type: string
+        enum: [create, update, delete]
+
   EnvironmentRequest:
     type: object
     properties:
+      id:
+        type: integer
       name:
         type: string
         example: Test
@@ -428,6 +457,10 @@ definitions:
       env:
         type: string
         example: '{}'
+      secrets:
+        type: array
+        items:
+          $ref: '#/definitions/EnvironmentSecretRequest'
 
   Environment:
     type: object
@@ -449,6 +482,10 @@ definitions:
       env:
         type: string
         example: '{}'
+      secrets:
+        type: array
+        items:
+          $ref: '#/definitions/EnvironmentSecret'
 
   InventoryRequest:
     type: object
@@ -1945,12 +1982,23 @@ paths:
           schema:
             $ref: "#/definitions/EnvironmentRequest"
       responses:
-        204:
+        201:
           description: Environment created
+          schema:
+            $ref: "#/definitions/Environment"
   /project/{project_id}/environment/{environment_id}:
     parameters:
       - $ref: "#/parameters/project_id"
       - $ref: "#/parameters/environment_id"
+    get:
+      tags:
+        - project
+      summary: Get environment
+      responses:
+        200:
+          description: environment object
+          schema:
+              $ref: "#/definitions/Environment"
     put:
       tags:
         - project
