@@ -652,6 +652,8 @@ definitions:
   RepositoryRequest:
     type: object
     properties:
+      id:
+        type: integer
       name:
         type: string
         example: Test
@@ -1835,12 +1837,24 @@ paths:
           schema:
             $ref: "#/definitions/RepositoryRequest"
       responses:
-        204:
+        201:
           description: Repository created
+          schema:
+              $ref: "#/definitions/Repository"
+
   /project/{project_id}/repositories/{repository_id}:
     parameters:
       - $ref: "#/parameters/project_id"
       - $ref: "#/parameters/repository_id"
+    get:
+      tags:
+          - project
+      summary: Get repository
+      responses:
+        200:
+          description: repository object
+          schema:
+              $ref: "#/definitions/Repository"
     put:
       tags:
         - project
