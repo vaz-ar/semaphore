@@ -356,6 +356,8 @@ definitions:
   AccessKeyRequest:
     type: object
     properties:
+      id:
+        type: integer
       name:
         type: string
         x-example: None
@@ -490,6 +492,8 @@ definitions:
   InventoryRequest:
     type: object
     properties:
+      id:
+        type: integer
       name:
         type: string
         example: Test
@@ -509,7 +513,7 @@ definitions:
         minimum: 1
       type:
         type: string
-        enum: [static, static-yaml, file, terraform-workspace, tofu-workspace]
+        enum: [static, static-yaml, file, terraform-workspace]
 
   Inventory:
     type: object
@@ -531,7 +535,7 @@ definitions:
         type: integer
       type:
         type: string
-        enum: [static, static-yaml, file, terraform-workspace, tofu-workspace]
+        enum: [static, static-yaml, file, terraform-workspace]
 
   Integration:
     type: object
