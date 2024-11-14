@@ -50,11 +50,18 @@ func updateEnvironmentSecrets(store db.Store, env db.Environment) error {
 				continue
 			}
 
-			err = store.UpdateAccessKey(db.AccessKey{
-				Name:   string(secret.Type) + "." + secret.Name,
-				String: secret.Secret,
-				Type:   db.AccessKeyString,
-			})
+			updateKey := db.AccessKey{
+				ID:        key.ID,
+				ProjectID: key.ProjectID,
+				Name:      string(secret.Type) + "." + secret.Name,
+				Type:      db.AccessKeyString,
+			}
+			if secret.Secret != "" {
+				updateKey.String = secret.Secret
+				updateKey.OverrideSecret = true
+			}
+
+			err = store.UpdateAccessKey(updateKey)
 		}
 	}
 
