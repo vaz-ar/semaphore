@@ -1,10 +1,12 @@
+//go:build !pro
+
 package bolt
 
 import (
 	"encoding/base64"
 
-	"github.com/semaphoreui/semaphore/db"
 	"github.com/gorilla/securecookie"
+	"github.com/semaphoreui/semaphore/db"
 	"go.etcd.io/bbolt"
 )
 
