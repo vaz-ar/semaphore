@@ -9,7 +9,7 @@
 
     <DashboardMenu
       :project-id="projectId"
-      project-type=""
+      :project-type="projectType"
       :can-update-project="can(USER_PERMISSIONS.updateProject)"
     />
 
