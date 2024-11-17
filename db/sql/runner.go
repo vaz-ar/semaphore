@@ -13,7 +13,7 @@ func (d *SqlDb) GetRunner(projectID int, runnerID int) (runner db.Runner, err er
 	return
 }
 
-func (d *SqlDb) GetRunners(projectID int) (runners []db.Runner, err error) {
+func (d *SqlDb) GetRunners(projectID int, activeOnly bool) (runners []db.Runner, err error) {
 	return
 }
 
