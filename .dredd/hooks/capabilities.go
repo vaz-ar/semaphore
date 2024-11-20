@@ -154,6 +154,7 @@ func resolveCapability(caps []string, resolved []string, uid string) {
 				ViewID:                  &view.ID,
 				App:                     db.AppAnsible,
 				GitBranch:               &branch,
+				SurveyVars:              []db.SurveyVar{},
 			})
 
 			printError(err)

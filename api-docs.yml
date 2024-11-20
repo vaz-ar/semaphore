@@ -732,6 +732,8 @@ definitions:
   TemplateRequest:
     type: object
     properties:
+      id:
+        type: integer
       project_id:
         type: integer
         minimum: 1
@@ -781,6 +783,16 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/TemplateSurveyVar"
+      type:
+        type: string
+        enum: ["", build, deploy]
+      start_version:
+        type: string
+      build_template_id:
+        type: integer
+      autorun:
+        type: boolean
+
   Template:
     type: object
     properties:
@@ -823,6 +835,28 @@ definitions:
       git_branch:
         type: string
         example: main
+      type:
+        type: string
+        enum: ["", build, deploy]
+      start_version:
+        type:
+          - string
+          - 'null'
+      build_template_id:
+        type:
+          - integer
+          - 'null'
+      autorun:
+        type: boolean
+      survey_vars:
+        type: array
+        items:
+          $ref: "#/definitions/TemplateSurveyVar"
+      vaults:
+        type: array
+        items:
+          $ref: "#/definitions/TemplateVault"
+
   TemplateSurveyVar:
     type: object
     properties:
@@ -834,12 +868,32 @@ definitions:
         type: string
       type:
         type: string
-        example: String => "", Integer => "int"
+        enum: ["", int, enum, secret] # String => "", Integer => "int"
+        example: int
       required:
         type: boolean
+      values:
+        type: array
+        items:
+          $ref: "#/definitions/TemplateSurveyVarValue"
+
+  TemplateSurveyVarValue:
+    type: object
+    properties:
+      name:
+        type: string
+      value:
+        type: string
+
   TemplateVault:
     type: object
     properties:
+      id:
+        type: integer
+      template_id:
+        type: integer
+      project_id:
+        type: integer
       name:
         type: string
         example: default
@@ -2078,7 +2132,7 @@ paths:
         - project
       summary: create template
       parameters:
-        - name: templateyes
+        - name: template
           in: body
           required: true
           schema:
@@ -2087,7 +2141,7 @@ paths:
         201:
           description: template created
           schema:
-            $ref: "#/definitions/TemplateRequest"
+            $ref: "#/definitions/Template"
   /project/{project_id}/templates/{template_id}:
     parameters:
       - $ref: "#/parameters/project_id"
