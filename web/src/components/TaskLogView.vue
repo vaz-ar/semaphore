@@ -123,6 +123,10 @@
   padding: 5px 10px 50px;
 }
 
+.v-dialog--fullscreen .task-log-records {
+  height: calc(100vh - 136px);
+}
+
 .task-log-view--with-message .task-log-records {
   height: calc(100vh - 300px);
 }
@@ -140,7 +144,7 @@
 
 .task-log-records__output {
   width: 100%;
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 @media #{map-get($display-breakpoints, 'sm-and-down')} {
