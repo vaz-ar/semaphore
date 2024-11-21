@@ -7,8 +7,8 @@
     >{{ item.message }}
     </v-alert>
 
-    <v-container class="pa-0 mb-2">
-      <v-row no-gutters>
+    <v-container class="pa-0 mb-2 overflow-auto">
+      <v-row no-gutters class="flex-nowrap">
         <v-col>
           <v-list two-line subheader class="pa-0">
             <v-list-item class="pa-0">
@@ -20,7 +20,7 @@
             </v-list-item>
           </v-list>
         </v-col>
-        <v-col>
+        <v-col class="pr-4">
           <v-list two-line subheader class="pa-0">
             <v-list-item class="pa-0">
               <v-list-item-content v-if="item.user_id != null">
@@ -33,7 +33,7 @@
             </v-list-item>
           </v-list>
         </v-col>
-        <v-col>
+        <v-col class="pr-4">
           <v-list two-line subheader class="pa-0">
             <v-list-item class="pa-0">
               <v-list-item-content>
