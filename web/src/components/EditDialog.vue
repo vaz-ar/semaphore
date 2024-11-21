@@ -8,7 +8,7 @@ Can use used in tandem with ItemFormBase.js. See KeyForm.vue for example.
     v-model="dialog"
     :max-width="maxWidth || 400"
     persistent
-    :fullscreen="fullscreen"
+    :fullscreen="expandable && fullscreen"
     :transition="false"
     :content-class="'item-dialog item-dialog--' + position"
   >
@@ -21,7 +21,7 @@ Can use used in tandem with ItemFormBase.js. See KeyForm.vue for example.
 
         <v-spacer></v-spacer>
 
-        <v-btn icon @click="toggleFullscreen()" class="mr-3">
+        <v-btn icon @click="toggleFullscreen()" class="mr-3" v-if="expandable">
           <v-icon>mdi-arrow-{{ fullscreen ? 'collapse' : 'expand' }}</v-icon>
         </v-btn>
 
@@ -89,6 +89,10 @@ export default {
     cancelButtonText: String,
     saveButtonText: String,
     expandable: Boolean,
+    name: {
+      type: String,
+      default: 'Unnamed',
+    },
   },
 
   data() {

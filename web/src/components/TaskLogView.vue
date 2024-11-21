@@ -7,7 +7,7 @@
     >{{ item.message }}
     </v-alert>
 
-    <v-container class="pa-0 mb-2 overflow-auto">
+    <v-container fluid class="pa-0 mb-2 overflow-auto">
       <v-row no-gutters class="flex-nowrap">
         <v-col>
           <v-list two-line subheader class="pa-0">
