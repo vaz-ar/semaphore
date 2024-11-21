@@ -890,10 +890,6 @@ definitions:
     properties:
       id:
         type: integer
-      template_id:
-        type: integer
-      project_id:
-        type: integer
       name:
         type: string
         example: default
@@ -909,6 +905,7 @@ definitions:
         type:
           - string
           - 'null'
+        example: path/to/script-client.py
 
   ScheduleRequest:
     type: object

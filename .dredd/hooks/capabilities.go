@@ -234,6 +234,7 @@ func alterRequestBody(t *trans.Transaction) {
 	bodyFieldProcessor("inventory_id", inventoryID, &request)
 	bodyFieldProcessor("repository_id", repoID, &request)
 	bodyFieldProcessor("template_id", templateID, &request)
+	bodyFieldProcessor("build_template_id", nil, &request)
 	if task != nil {
 		bodyFieldProcessor("task_id", task.ID, &request)
 	}
