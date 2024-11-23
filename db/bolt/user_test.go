@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/semaphoreui/semaphore/db"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBoltDb_UpdateProjectUser(t *testing.T) {
@@ -18,36 +19,24 @@ func TestBoltDb_UpdateProjectUser(t *testing.T) {
 			Username: "fiftin",
 		},
 	})
-
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	proj1, err := store.CreateProject(db.Project{
 		Created: time.Now(),
 		Name:    "Test1",
 	})
-
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	projUser, err := store.CreateProjectUser(db.ProjectUser{
 		ProjectID: proj1.ID,
 		UserID:    usr.ID,
 		Role:      db.ProjectOwner,
 	})
-
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	projUser.Role = db.ProjectOwner
 	err = store.UpdateProjectUser(projUser)
-
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 }
 
 func TestGetUsers(t *testing.T) {
@@ -61,21 +50,12 @@ func TestGetUsers(t *testing.T) {
 			Username: "fiftin",
 		},
 	})
-
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	found, err := store.GetUsers(db.RetrieveQueryParams{})
+	require.NoError(t, err)
 
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
-	if len(found) != 1 {
-		t.Fatal(err.Error())
-	}
-
+	require.Equal(t, 1, len(found))
 }
 
 func TestGetUser(t *testing.T) {
@@ -89,27 +69,17 @@ func TestGetUser(t *testing.T) {
 			Username: "fiftin",
 		},
 	})
-
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	found, err := store.GetUser(usr.ID)
+	require.NoError(t, err)
 
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
-	if found.Username != "fiftin" {
-		t.Fatal(err.Error())
-	}
+	require.Equal(t, "fiftin", found.Username)
 
 	err = store.DeleteUser(usr.ID)
-
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 }
+
 func TestGetUserCount(t *testing.T) {
 	store := CreateTestStore()
 
@@ -122,9 +92,7 @@ func TestGetUserCount(t *testing.T) {
 			Username: "userone",
 		},
 	})
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	// Create second user
 	_, err = store.CreateUser(db.UserWithPwd{
@@ -135,21 +103,16 @@ func TestGetUserCount(t *testing.T) {
 			Username: "usertwo",
 		},
 	})
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	// Get user count
 	count, err := store.GetUserCount()
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	// Verify the count
-	if count != 2 {
-		t.Fatalf("expected 2 users, got %d", count)
-	}
+	require.Equal(t, 2, count)
 }
+
 func TestBoltDb_DeleteUser(t *testing.T) {
 	store := CreateTestStore()
 
@@ -162,18 +125,14 @@ func TestBoltDb_DeleteUser(t *testing.T) {
 			Username: "deleteuser",
 		},
 	})
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	// Create a project
 	proj, err := store.CreateProject(db.Project{
 		Created: time.Now(),
 		Name:    "DeleteUserProject",
 	})
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	// Associate the user with the project
 	_, err = store.CreateProjectUser(db.ProjectUser{
@@ -181,25 +140,17 @@ func TestBoltDb_DeleteUser(t *testing.T) {
 		UserID:    usr.ID,
 		Role:      db.ProjectOwner,
 	})
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	// Delete the user
 	err = store.DeleteUser(usr.ID)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	require.NoError(t, err)
 
 	// Verify the user is deleted
 	_, err = store.GetUser(usr.ID)
-	if err == nil {
-		t.Fatal("expected error, got nil")
-	}
+	require.Error(t, err)
 
 	// Verify the project-user association is deleted
 	_, err = store.GetProjectUser(proj.ID, usr.ID)
-	if err == nil {
-		t.Fatal("expected error, got nil")
-	}
+	require.Error(t, err)
 }
