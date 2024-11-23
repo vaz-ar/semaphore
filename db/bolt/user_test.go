@@ -1,9 +1,10 @@
 package bolt
 
 import (
-	"github.com/semaphoreui/semaphore/db"
 	"testing"
 	"time"
+
+	"github.com/semaphoreui/semaphore/db"
 )
 
 func TestBoltDb_UpdateProjectUser(t *testing.T) {
@@ -107,5 +108,98 @@ func TestGetUser(t *testing.T) {
 
 	if err != nil {
 		t.Fatal(err.Error())
+	}
+}
+func TestGetUserCount(t *testing.T) {
+	store := CreateTestStore()
+
+	// Create first user
+	_, err := store.CreateUser(db.UserWithPwd{
+		Pwd: "123456",
+		User: db.User{
+			Email:    "user1@example.com",
+			Name:     "User One",
+			Username: "userone",
+		},
+	})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// Create second user
+	_, err = store.CreateUser(db.UserWithPwd{
+		Pwd: "123456",
+		User: db.User{
+			Email:    "user2@example.com",
+			Name:     "User Two",
+			Username: "usertwo",
+		},
+	})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// Get user count
+	count, err := store.GetUserCount()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// Verify the count
+	if count != 2 {
+		t.Fatalf("expected 2 users, got %d", count)
+	}
+}
+func TestBoltDb_DeleteUser(t *testing.T) {
+	store := CreateTestStore()
+
+	// Create a user
+	usr, err := store.CreateUser(db.UserWithPwd{
+		Pwd: "123456",
+		User: db.User{
+			Email:    "deleteuser@example.com",
+			Name:     "Delete User",
+			Username: "deleteuser",
+		},
+	})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// Create a project
+	proj, err := store.CreateProject(db.Project{
+		Created: time.Now(),
+		Name:    "DeleteUserProject",
+	})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// Associate the user with the project
+	_, err = store.CreateProjectUser(db.ProjectUser{
+		ProjectID: proj.ID,
+		UserID:    usr.ID,
+		Role:      db.ProjectOwner,
+	})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// Delete the user
+	err = store.DeleteUser(usr.ID)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// Verify the user is deleted
+	_, err = store.GetUser(usr.ID)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+
+	// Verify the project-user association is deleted
+	_, err = store.GetProjectUser(proj.ID, usr.ID)
+	if err == nil {
+		t.Fatal("expected error, got nil")
 	}
 }
