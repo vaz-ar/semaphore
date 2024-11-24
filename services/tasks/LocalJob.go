@@ -323,15 +323,22 @@ func (t *LocalJob) getPlaybookArgs(username string, incomingVersion *string) (ar
 		}
 	}
 
-	if t.Task.Debug {
+	var params db.AnsibleTaskParams
+
+	err = t.Task.GetParams(&params)
+	if err != nil {
+		return
+	}
+
+	if params.Debug {
 		args = append(args, "-vvvv")
 	}
 
-	if t.Task.Diff {
+	if params.Diff {
 		args = append(args, "--diff")
 	}
 
-	if t.Task.DryRun {
+	if params.DryRun {
 		args = append(args, "--check")
 	}
 
@@ -419,15 +426,25 @@ func (t *LocalJob) Run(username string, incomingVersion *string) (err error) {
 
 	var args []string
 	var inputs map[string]string
+	var params interface{}
 
 	switch t.Template.App {
 	case db.AppAnsible:
 		args, inputs, err = t.getPlaybookArgs(username, incomingVersion)
+		params = db.AnsibleTaskParams{}
 	case db.AppTerraform, db.AppTofu:
 		args, err = t.getTerraformArgs(username, incomingVersion)
+		params = db.TerraformTaskParams{}
 	default:
 		args, err = t.getShellArgs(username, incomingVersion)
+		params = db.ShellTaskParams{}
 	}
+
+	if err != nil {
+		return
+	}
+
+	err = t.Task.GetParams(params)
 
 	if err != nil {
 		return
@@ -454,8 +471,14 @@ func (t *LocalJob) Run(username string, incomingVersion *string) (err error) {
 		}
 	}
 
-	return t.App.Run(args, &environmentVariables, inputs, func(p *os.Process) {
-		t.Process = p
+	return t.App.Run(db_lib.LocalAppRunningArgs{
+		CliArgs:         args,
+		EnvironmentVars: &environmentVariables,
+		Inputs:          inputs,
+		TaskParams:      params,
+		Callback: func(p *os.Process) {
+			t.Process = p
+		},
 	})
 
 }

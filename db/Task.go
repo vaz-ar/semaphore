@@ -9,6 +9,9 @@ import (
 	"github.com/semaphoreui/semaphore/util"
 )
 
+type ShellTaskParams struct {
+}
+
 type TerraformTaskParams struct {
 	Plan        bool `json:"plan"`
 	AutoApprove bool `json:"auto_approve"`

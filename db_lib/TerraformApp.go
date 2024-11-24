@@ -148,8 +148,8 @@ func (t *TerraformApp) Apply(args []string, environmentVars *[]string, inputs ma
 	return cmd.Wait()
 }
 
-func (t *TerraformApp) Run(args []string, environmentVars *[]string, inputs map[string]string, cb func(*os.Process)) error {
-	err := t.Plan(args, environmentVars, inputs, cb)
+func (t *TerraformApp) Run(args LocalAppRunningArgs) error {
+	err := t.Plan(args.CliArgs, args.EnvironmentVars, args.Inputs, args.Callback)
 	if err != nil {
 		return err
 	}
@@ -173,7 +173,7 @@ func (t *TerraformApp) Run(args []string, environmentVars *[]string, inputs map[
 		return nil
 	case terraformReaderConfirmed:
 		t.Logger.SetStatus(task_logger.TaskRunningStatus)
-		return t.Apply(args, environmentVars, inputs, cb)
+		return t.Apply(args.CliArgs, args.EnvironmentVars, args.Inputs, args.Callback)
 	default:
 		return fmt.Errorf("unknown plan result")
 	}
