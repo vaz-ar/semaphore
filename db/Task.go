@@ -1,6 +1,7 @@
 package db
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/go-gorp/gorp/v3"
 	"time"
@@ -9,7 +10,7 @@ import (
 	"github.com/semaphoreui/semaphore/util"
 )
 
-type ShellTaskParams struct {
+type DefaultTaskParams struct {
 }
 
 type TerraformTaskParams struct {
@@ -70,7 +71,11 @@ type Task struct {
 }
 
 func (task *Task) GetParams(target interface{}) error {
-	return nil
+	content, err := json.Marshal(task.TaskParams)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(content, target)
 }
 
 func (task *Task) PreInsert(gorp.SqlExecutor) error {
@@ -124,7 +129,18 @@ func (task *Task) GetUrl() *string {
 }
 
 func (task *Task) ValidateNewTask(template Template) error {
-	return nil
+
+	var params interface{}
+	switch template.App {
+	case AppAnsible:
+		params = &AnsibleTaskParams{}
+	case AppTerraform, AppTofu:
+		params = &TerraformTaskParams{}
+	default:
+		params = &DefaultTaskParams{}
+	}
+
+	return task.GetParams(params)
 }
 
 func (task *TaskWithTpl) Fill(d Store) error {

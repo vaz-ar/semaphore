@@ -437,7 +437,7 @@ func (t *LocalJob) Run(username string, incomingVersion *string) (err error) {
 		params = db.TerraformTaskParams{}
 	default:
 		args, err = t.getShellArgs(username, incomingVersion)
-		params = db.ShellTaskParams{}
+		params = db.DefaultTaskParams{}
 	}
 
 	if err != nil {
