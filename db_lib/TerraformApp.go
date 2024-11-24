@@ -154,12 +154,19 @@ func (t *TerraformApp) Run(args LocalAppRunningArgs) error {
 		return err
 	}
 
-	if t.noChanges {
+	params := args.TaskParams.(db.TerraformTaskParams)
+
+	if t.noChanges || params.Plan {
 		t.Logger.SetStatus(task_logger.TaskSuccessStatus)
 		return nil
 	}
 
 	t.Logger.SetStatus(task_logger.TaskWaitingConfirmation)
+
+	if params.AutoApprove {
+		t.Logger.SetStatus(task_logger.TaskRunningStatus)
+		return t.Apply(args.CliArgs, args.EnvironmentVars, args.Inputs, args.Callback)
+	}
 
 	for {
 		time.Sleep(time.Second * 3)
