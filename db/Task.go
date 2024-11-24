@@ -9,6 +9,17 @@ import (
 	"github.com/semaphoreui/semaphore/util"
 )
 
+type TerraformTaskParams struct {
+	Plan        bool `json:"plan"`
+	AutoApprove bool `json:"auto_approve"`
+}
+
+type AnsibleTaskParams struct {
+	Debug  bool `json:"debug"`
+	DryRun bool `json:"dry_run"`
+	Diff   bool `json:"diff"`
+}
+
 // Task is a model of a task which will be executed by the runner
 type Task struct {
 	ID         int `db:"id" json:"id"`
@@ -51,6 +62,12 @@ type Task struct {
 	Version *string `db:"version" json:"version"`
 
 	InventoryID *int `db:"inventory_id" json:"inventory_id"`
+
+	TaskParams MapStringAnyField `db:"params" json:"params"`
+}
+
+func (task *Task) GetParams(target interface{}) error {
+	return nil
 }
 
 func (task *Task) PreInsert(gorp.SqlExecutor) error {
