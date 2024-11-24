@@ -67,19 +67,35 @@ type Task struct {
 
 	InventoryID *int `db:"inventory_id" json:"inventory_id"`
 
-	TaskParams MapStringAnyField `db:"params" json:"params"`
+	Params MapStringAnyField `db:"params" json:"params"`
 }
 
-func (task *Task) GetParams(target interface{}) error {
-	content, err := json.Marshal(task.TaskParams)
+func (task *Task) GetParams(target interface{}) (err error) {
+	content, err := json.Marshal(task.Params)
 	if err != nil {
-		return err
+		return
 	}
-	return json.Unmarshal(content, target)
+	err = json.Unmarshal(content, target)
+	return
 }
 
 func (task *Task) PreInsert(gorp.SqlExecutor) error {
 	task.Created = task.Created.UTC()
+
+	// Init params from old fields for backward compatibility
+
+	if task.Debug {
+		task.Params["debug"] = true
+	}
+
+	if task.DryRun {
+		task.Params["dry_run"] = true
+	}
+
+	if task.Diff {
+		task.Params["diff"] = true
+	}
+
 	return nil
 }
 

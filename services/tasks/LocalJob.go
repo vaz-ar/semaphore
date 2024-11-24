@@ -431,13 +431,13 @@ func (t *LocalJob) Run(username string, incomingVersion *string) (err error) {
 	switch t.Template.App {
 	case db.AppAnsible:
 		args, inputs, err = t.getPlaybookArgs(username, incomingVersion)
-		params = db.AnsibleTaskParams{}
+		params = &db.AnsibleTaskParams{}
 	case db.AppTerraform, db.AppTofu:
 		args, err = t.getTerraformArgs(username, incomingVersion)
-		params = db.TerraformTaskParams{}
+		params = &db.TerraformTaskParams{}
 	default:
 		args, err = t.getShellArgs(username, incomingVersion)
-		params = db.DefaultTaskParams{}
+		params = &db.DefaultTaskParams{}
 	}
 
 	if err != nil {
