@@ -262,11 +262,11 @@ export default {
         responseType: 'json',
       })).data;
 
-      this.user = (await axios({
+      this.user = this.item.user_id ? (await axios({
         method: 'get',
         url: `/api/users/${this.item.user_id}`,
         responseType: 'json',
-      })).data;
+      })).data : null;
     },
   },
 };
