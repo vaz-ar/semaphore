@@ -161,12 +161,12 @@ func (t *TerraformApp) Run(args LocalAppRunningArgs) error {
 		return nil
 	}
 
-	t.Logger.SetStatus(task_logger.TaskWaitingConfirmation)
-
 	if params.AutoApprove {
 		t.Logger.SetStatus(task_logger.TaskRunningStatus)
 		return t.Apply(args.CliArgs, args.EnvironmentVars, args.Inputs, args.Callback)
 	}
+
+	t.Logger.SetStatus(task_logger.TaskWaitingConfirmation)
 
 	for {
 		time.Sleep(time.Second * 3)
