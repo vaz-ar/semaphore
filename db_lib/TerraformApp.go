@@ -154,7 +154,7 @@ func (t *TerraformApp) Run(args LocalAppRunningArgs) error {
 		return err
 	}
 
-	params := args.TaskParams.(db.TerraformTaskParams)
+	params := args.TaskParams.(*db.TerraformTaskParams)
 
 	if t.noChanges || params.Plan {
 		t.Logger.SetStatus(task_logger.TaskSuccessStatus)
