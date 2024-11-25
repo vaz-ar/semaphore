@@ -69,6 +69,7 @@
         class="elevation-1"
         hide-default-footer
         :no-data-text="$t('noValues')"
+        style="background: #8585850f"
       >
         <template v-slot:item="props">
           <tr>
@@ -124,6 +125,7 @@
         class="elevation-1"
         hide-default-footer
         :no-data-text="$t('noValues')"
+        style="background: #8585850f"
       >
         <template v-slot:item="props">
           <tr>
@@ -178,6 +180,7 @@
         class="elevation-1"
         hide-default-footer
         :no-data-text="$t('noValues')"
+        style="background: #8585850f"
       >
         <template v-slot:item="props">
           <tr>
