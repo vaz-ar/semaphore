@@ -77,7 +77,7 @@
       <template v-slot:item.template_id="{ item }">
         <router-link
           :to="`/project/${projectId}/templates/${item.template_id}`">
-          <code>{{ templates.find((t) => t.id === item.template_id).name }}</code>
+          <code>{{ (templates.find((t) => t.id === item.template_id) || {name: '—'}).name }}</code>
         </router-link>
       </template>
       <template v-slot:item.actions="{ item }">
