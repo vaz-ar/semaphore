@@ -297,7 +297,7 @@ export default {
         responseType: 'json',
       })).data;
 
-      if (this.itemRefs.templates.length > 0) {
+      if (this.itemRefs.integrations.length > 0) {
         this.itemRefsDialog = true;
         return;
       }

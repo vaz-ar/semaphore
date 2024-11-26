@@ -89,7 +89,7 @@ const routes = [
     component: Integrations,
   },
   {
-    path: '/project/:projectId/integration/:integrationId',
+    path: '/project/:projectId/integrations/:integrationId',
     component: IntegrationExtractor,
   },
   {

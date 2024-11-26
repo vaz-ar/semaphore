@@ -70,7 +70,7 @@
     >
       <template v-slot:item.name="{ item }">
         <router-link
-          :to="`/project/${projectId}/integration/${item.id}`"
+          :to="`/project/${projectId}/integrations/${item.id}`"
         >{{ item.name }}
         </router-link>
       </template>
