@@ -172,6 +172,30 @@ func (d *BoltDb) deleteTemplate(projectID int, templateID int, tx *bbolt.Tx) (er
 		}
 	}
 
+	// Delete template vaults
+	vaults, err := d.GetTemplateVaults(projectID, templateID)
+	if err != nil {
+		return
+	}
+	for _, sch := range vaults {
+		err = d.deleteTemplateVault(projectID, sch.ID, tx)
+		if err != nil {
+			return
+		}
+	}
+
+	integrations, err := d.GetIntegrations(projectID, db.RetrieveQueryParams{})
+	if err != nil {
+		return
+	}
+
+	for _, integration := range integrations {
+		if integration.TemplateID != templateID {
+			continue
+		}
+		d.deleteIntegration(projectID, integration.ID, tx)
+	}
+
 	return d.deleteObject(projectID, db.TemplateProps, intObjectID(templateID), tx)
 }
 

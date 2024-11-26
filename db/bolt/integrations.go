@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/semaphoreui/semaphore/db"
+	"go.etcd.io/bbolt"
 )
 
 /*
@@ -145,10 +146,19 @@ func (d *BoltDb) UpdateIntegrationMatcher(projectID int, integrationMatcher db.I
 	return d.updateObject(projectID, db.IntegrationMatcherProps, integrationMatcher)
 }
 
-func (d *BoltDb) DeleteIntegrationMatcher(projectID int, matcherID int, integrationID int) error {
-	return d.deleteObject(projectID, db.IntegrationMatcherProps, intObjectID(matcherID), nil)
+func (d *BoltDb) deleteIntegrationMatcher(projectID int, matcherID int, integrationID int, tx *bbolt.Tx) error {
+	return d.deleteObject(projectID, db.IntegrationMatcherProps, intObjectID(matcherID), tx)
 }
+
+func (d *BoltDb) DeleteIntegrationMatcher(projectID int, matcherID int, integrationID int) error {
+	return d.deleteIntegrationMatcher(projectID, matcherID, integrationID, nil)
+}
+
 func (d *BoltDb) DeleteIntegration(projectID int, integrationID int) error {
+	return d.deleteIntegration(projectID, integrationID, nil)
+}
+
+func (d *BoltDb) deleteIntegration(projectID int, integrationID int, tx *bbolt.Tx) error {
 	matchers, err := d.GetIntegrationMatchers(projectID, db.RetrieveQueryParams{}, integrationID)
 
 	if err != nil {
@@ -156,10 +166,10 @@ func (d *BoltDb) DeleteIntegration(projectID int, integrationID int) error {
 	}
 
 	for m := range matchers {
-		d.DeleteIntegrationMatcher(projectID, matchers[m].ID, integrationID)
+		d.deleteIntegrationMatcher(projectID, matchers[m].ID, integrationID, tx)
 	}
 
-	return d.deleteObject(projectID, db.IntegrationProps, intObjectID(integrationID), nil)
+	return d.deleteObject(projectID, db.IntegrationProps, intObjectID(integrationID), tx)
 }
 
 func (d *BoltDb) GetIntegrationMatcherRefs(projectID int, matcherID int, integrationID int) (db.IntegrationExtractorChildReferrers, error) {
