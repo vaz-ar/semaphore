@@ -54,6 +54,8 @@ type ObjectReferrers struct {
 	Templates    []ObjectReferrer `json:"templates"`
 	Inventories  []ObjectReferrer `json:"inventories"`
 	Repositories []ObjectReferrer `json:"repositories"`
+	Integrations []ObjectReferrer `json:"integrations"`
+	Schedules    []ObjectReferrer `json:"schedules"`
 }
 
 type IntegrationReferrers struct {
