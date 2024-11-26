@@ -10,11 +10,11 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/semaphoreui/semaphore/db"
-	"github.com/semaphoreui/semaphore/util"
 	"github.com/go-gorp/gorp/v3"
 	_ "github.com/go-sql-driver/mysql" // imports mysql driver
 	_ "github.com/lib/pq"
+	"github.com/semaphoreui/semaphore/db"
+	"github.com/semaphoreui/semaphore/util"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -369,6 +369,16 @@ func (d *SqlDb) getObjectRefs(projectID int, objectProps db.ObjectProps, objectI
 	}
 
 	refs.Inventories, err = d.getObjectRefsFrom(projectID, objectProps, objectID, db.InventoryProps)
+	if err != nil {
+		return
+	}
+
+	refs.Schedules, err = d.getObjectRefsFrom(projectID, objectProps, objectID, db.ScheduleProps)
+	if err != nil {
+		return
+	}
+
+	refs.Integrations, err = d.getObjectRefsFrom(projectID, objectProps, objectID, db.IntegrationAliasProps)
 	if err != nil {
 		return
 	}

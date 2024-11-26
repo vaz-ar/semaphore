@@ -690,21 +690,10 @@ func (d *BoltDb) getObjectRefs(projectID int, objectProps db.ObjectProps, object
 		return
 	}
 
-	// templates, err := d.getObjectRefsFrom(projectID, objectProps, intObjectID(objectID), db.ScheduleProps)
-
-	// for _, st := range templates {
-	// 	exists := false
-	// 	for _, tpl := range refs.Templates {
-	// 		if tpl.ID == st.ID {
-	// 			exists = true
-	// 			break
-	// 		}
-	// 	}
-	// 	if exists {
-	// 		continue
-	// 	}
-	// 	refs.Templates = append(refs.Templates, st)
-	// }
+	refs.Schedules, err = d.getObjectRefsFrom(projectID, objectProps, intObjectID(objectID), db.ScheduleProps)
+	if err != nil {
+		return
+	}
 
 	refs.Integrations, err = d.getObjectRefsFrom(projectID, objectProps, intObjectID(objectID), db.IntegrationProps)
 	if err != nil {
