@@ -74,7 +74,11 @@
 
     <v-row>
       <v-col cols="12" md="6" class="pb-0">
-        <v-card class="mb-6" :color="$vuetify.theme.dark ? '#212121' : 'white'">
+        <v-card
+          class="mb-6"
+          :color="$vuetify.theme.dark ? '#212121' : 'white'"
+          style="background: #8585850f"
+        >
           <v-tabs
             fixed-tabs
             v-model="itemTypeIndex"

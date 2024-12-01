@@ -238,11 +238,25 @@ func (t *LocalJob) getTerraformArgs(username string, incomingVersion *string) (a
 		return
 	}
 
+	var params db.TerraformTaskParams
+	err = t.Task.GetParams(&params)
+	if err != nil {
+		return
+	}
+
+	if params.Destroy {
+		args = append(args, "-destroy")
+	}
+
 	for name, value := range extraVars {
-		if name == "semaphore_vars" {
-			continue
+
+		var v []byte
+		v, err = json.Marshal(value)
+		if err != nil {
+			return
 		}
-		args = append(args, "-var", fmt.Sprintf("%s=%s", name, value))
+
+		args = append(args, "-var", fmt.Sprintf("%s=%s", name, v))
 	}
 
 	for _, secret := range t.Environment.Secrets {
