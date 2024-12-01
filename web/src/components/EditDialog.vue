@@ -26,6 +26,7 @@ Can use used in tandem with ItemFormBase.js. See KeyForm.vue for example.
           @click="toggleHelp()"
           class="mr-3"
           :style="{opacity: needHelp ? 1 : 0.3}"
+          v-if="helpButton"
         >
           <v-icon>mdi-help-box</v-icon>
         </v-btn>

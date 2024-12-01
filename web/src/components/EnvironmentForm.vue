@@ -187,6 +187,21 @@
         <div>
           <v-subheader class="px-0">
             {{ $t('extraVariables') }}
+
+            <v-tooltip v-if="needHelp" bottom color="black" open-delay="300" max-width="400">
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon
+                  class="ml-1"
+                  v-bind="attrs"
+                  v-on="on"
+                >mdi-help-box</v-icon>
+              </template>
+              <div>
+                <div><code>--extra-vars</code> for Ansible</div>
+                <div><code>-var</code> for Terraform/OpenTofu</div>
+              </div>
+            </v-tooltip>
+
             <v-spacer />
             <v-btn icon @click="addSecret('var')">
               <v-icon>
@@ -466,11 +481,6 @@ export default {
         ...prev,
         [curr.name]: curr.value,
       }), {});
-
-      // this.predefinedEnvVars.forEach((index) => {
-      //   const predefinedVar = PREDEFINED_ENV_VARS[index];
-      //   env[predefinedVar.name] = predefinedVar.value;
-      // });
 
       const secrets = (this.secrets || []).map((s) => {
         let operation;
