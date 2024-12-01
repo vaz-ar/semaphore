@@ -249,14 +249,10 @@ func (t *LocalJob) getTerraformArgs(username string, incomingVersion *string) (a
 	}
 
 	for name, value := range extraVars {
-
-		var v []byte
-		v, err = json.Marshal(value)
-		if err != nil {
-			return
+		if name == "semaphore_vars" {
+			continue
 		}
-
-		args = append(args, "-var", fmt.Sprintf("%s=%s", name, v))
+		args = append(args, "-var", fmt.Sprintf("%s=%s", name, value))
 	}
 
 	for _, secret := range t.Environment.Secrets {
