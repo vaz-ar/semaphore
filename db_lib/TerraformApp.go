@@ -95,6 +95,16 @@ func (t *TerraformApp) init(environmentVars *[]string) error {
 	return cmd.Wait()
 }
 
+func (t *TerraformApp) isWorkspacesSupported(environmentVars *[]string) bool {
+	cmd := t.makeCmd(string(t.Name), []string{"workspace", "list"}, environmentVars)
+	err := cmd.Run()
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 func (t *TerraformApp) selectWorkspace(workspace string, environmentVars *[]string) error {
 	cmd := t.makeCmd(string(t.Name), []string{"workspace", "select", "-or-create=true", workspace}, environmentVars)
 	t.Logger.LogCmd(cmd)
@@ -109,6 +119,10 @@ func (t *TerraformApp) selectWorkspace(workspace string, environmentVars *[]stri
 func (t *TerraformApp) InstallRequirements(environmentVars *[]string) (err error) {
 	err = t.init(environmentVars)
 	if err != nil {
+		return
+	}
+
+	if !t.isWorkspacesSupported(environmentVars) {
 		return
 	}
 
