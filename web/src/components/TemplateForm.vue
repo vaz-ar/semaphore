@@ -165,7 +165,7 @@
         <v-select
           v-model="item.inventory_id"
           :label="fieldLabel('inventory')"
-          :items="inventory"
+          :items="appInventory"
           item-value="id"
           item-text="name"
           outlined
@@ -308,7 +308,11 @@ import 'codemirror/addon/lint/json-lint.js';
 import 'codemirror/addon/display/placeholder.js';
 import ArgsPicker from '@/components/ArgsPicker.vue';
 import TemplateVaults from '@/components/TemplateVaults.vue';
-import { TEMPLATE_TYPE_ICONS, TEMPLATE_TYPE_TITLES } from '../lib/constants';
+import {
+  TEMPLATE_TYPE_ICONS,
+  TEMPLATE_TYPE_TITLES,
+  APP_INVENTORY_TYPES,
+} from '../lib/constants';
 import SurveyVars from './SurveyVars';
 
 export default {
@@ -404,6 +408,10 @@ export default {
         && this.item != null
         && this.schedules != null
         && this.views != null;
+    },
+
+    appInventory() {
+      return this.inventory.filter((i) => (APP_INVENTORY_TYPES[this.app] || []).includes(i.type));
     },
   },
 
