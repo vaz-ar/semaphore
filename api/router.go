@@ -283,6 +283,17 @@ func Route() *mux.Router {
 	projectInventoryManagement.HandleFunc("/{inventory_id}", projects.UpdateInventory).Methods("PUT")
 	projectInventoryManagement.HandleFunc("/{inventory_id}", projects.RemoveInventory).Methods("DELETE")
 
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/aliases", projects.GetTerraformInventoryAliases).Methods("GET", "HEAD")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/aliases", projects.AddTerraformInventoryAlias).Methods("POST")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/aliases/{alias_id}", projects.GetTerraformInventoryAlias).Methods("GET")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/aliases/{alias_id}", projects.DeleteTerraformInventoryAlias).Methods("DELETE")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/aliases/{alias_id}", projects.SetTerraformInventoryAliasAccessKey).Methods("PUT")
+
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states", projects.GetTerraformInventoryStates).Methods("GET", "HEAD")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states", projects.AddTerraformInventoryState).Methods("POST")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states/{state_id}", projects.GetTerraformInventoryState).Methods("GET")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states/{state_id}", projects.DeleteTerraformInventoryState).Methods("DELETE")
+
 	projectEnvManagement := projectUserAPI.PathPrefix("/environment").Subrouter()
 	projectEnvManagement.Use(projects.EnvironmentMiddleware)
 
