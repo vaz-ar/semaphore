@@ -49,7 +49,7 @@ FROM alpine:3.19
 
 ARG TARGETARCH="amd64"
 # renovate: datasource=pypi depName=ansible
-ENV ANSIBLE_VERSION 11.0.0
+ENV ANSIBLE_VERSION 11.1.0
 ARG ANSIBLE_VENV_PATH=/opt/semaphore/apps/ansible/${ANSIBLE_VERSION}/venv
 
 RUN apk add --no-cache -U \
