@@ -38,16 +38,16 @@ module.exports = {
   ],
 
   settings: {
-    'import/extensions': ['.js', '.vue'],
     'import/resolver': {
       node: {
-        extensions: ['.js', '.vue', '.ts'],
-      },
-      alias: {
         extensions: ['.js', '.vue'],
-        map: [
-          ['@', './src'],
-        ],
+      },
+      'import/internal-regex': '^@',
+      'import/resolver': {
+        alias: {
+          map: ['@', './src'],
+          extensions: ['.vue', '.js'],
+        },
       },
     },
   },

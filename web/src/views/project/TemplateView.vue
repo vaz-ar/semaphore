@@ -1,9 +1,6 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div v-if="!isLoaded">
-    <v-progress-linear
-      indeterminate
-      color="primary darken-2"
-    ></v-progress-linear>
+    <v-progress-linear indeterminate color="primary darken-2"></v-progress-linear>
   </div>
   <div v-else>
     <NewTaskDialog
@@ -57,7 +54,7 @@
               : `/project/${projectId}/templates/`
           "
         >
-          {{ $t("taskTemplates2") }}
+          {{ $t('taskTemplates2') }}
         </router-link>
         <v-icon>mdi-chevron-right</v-icon>
         <span class="breadcrumbs__item">{{ item.name }}</span>
@@ -65,12 +62,7 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn
-        color="primary"
-        depressed
-        class="mr-3"
-        @click="newTaskDialog = true"
-      >
+      <v-btn color="primary" depressed class="mr-3" @click="newTaskDialog = true">
         {{ $t(TEMPLATE_TYPE_ACTION_TITLES[item.type]) }}
       </v-btn>
 
@@ -88,12 +80,7 @@
     </v-toolbar>
 
     <v-container fluid>
-      <v-alert
-        text
-        type="info"
-        class="mb-0 ml-4 mr-4 mb-2"
-        v-if="item.description"
-      >
+      <v-alert text type="info" class="mb-0 ml-4 mr-4 mb-2" v-if="item.description">
         {{ item.description }}
       </v-alert>
 
@@ -106,7 +93,7 @@
               </v-list-item-icon>
 
               <v-list-item-content>
-                <v-list-item-title>{{ $t("playbook") }}</v-list-item-title>
+                <v-list-item-title>{{ $t('playbook') }}</v-list-item-title>
                 <v-list-item-subtitle>{{ item.playbook }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -120,7 +107,7 @@
               </v-list-item-icon>
 
               <v-list-item-content>
-                <v-list-item-title>{{ $t("type") }}</v-list-item-title>
+                <v-list-item-title>{{ $t('type') }}</v-list-item-title>
                 <v-list-item-subtitle
                   >{{ $t(TEMPLATE_TYPE_TITLES[item.type]) }}
                 </v-list-item-subtitle>
@@ -136,12 +123,12 @@
               </v-list-item-icon>
 
               <v-list-item-content>
-                <v-list-item-title>{{ $t("inventory") }}</v-list-item-title>
+                <v-list-item-title>{{ $t('inventory') }}</v-list-item-title>
                 <v-list-item-subtitle>
                   {{
                     (
                       inventory.find((x) => x.id === item.inventory_id) || {
-                        name: "—",
+                        name: '—',
                       }
                     ).name
                   }}
@@ -157,11 +144,9 @@
                 <v-icon>mdi-code-braces</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t("environment") }}</v-list-item-title>
+                <v-list-item-title>{{ $t('environment') }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  {{
-                    environment.find((x) => x.id === item.environment_id).name
-                  }}
+                  {{ environment.find((x) => x.id === item.environment_id).name }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -174,11 +159,9 @@
                 <v-icon>mdi-git</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t("repository2") }}</v-list-item-title>
+                <v-list-item-title>{{ $t('repository2') }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  {{
-                    repositories.find((x) => x.id === item.repository_id).name
-                  }}
+                  {{ repositories.find((x) => x.id === item.repository_id).name }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -188,11 +171,9 @@
     </v-container>
 
     <v-tabs show-arrows class="pl-4">
-      <v-tab key="tasks">{{ $t("tasks") }} </v-tab>
+      <v-tab key="tasks">{{ $t('tasks') }} </v-tab>
 
-      <v-tab v-if="app === 'terraform' || app === 'tofu'" key="state">{{
-        $t("state")
-      }}</v-tab>
+      <v-tab v-if="app === 'terraform' || app === 'tofu'" key="state">{{ $t('state') }}</v-tab>
     </v-tabs>
 
     <TaskList :template="item" />
@@ -272,9 +253,7 @@ export default {
       return this.itemId === 'new';
     },
     isLoaded() {
-      return (
-        this.item && this.inventory && this.environment && this.repositories
-      );
+      return this.item && this.inventory && this.environment && this.repositories;
     },
   },
 
