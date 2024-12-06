@@ -6,7 +6,6 @@
     ></v-progress-linear>
   </div>
   <div v-else>
-
     <NewTaskDialog
       v-model="newTaskDialog"
       :project-id="projectId"
@@ -17,20 +16,20 @@
     />
 
     <EditTemplateDialogue
-        v-model="editDialog"
-        :project-id="projectId"
-        :item-app="item.app"
-        :item-id="itemId"
-        @save="loadData()"
+      v-model="editDialog"
+      :project-id="projectId"
+      :item-app="item.app"
+      :item-id="itemId"
+      @save="loadData()"
     ></EditTemplateDialogue>
 
     <EditTemplateDialogue
-        v-model="copyDialog"
-        :project-id="projectId"
-        :item-app="item.app"
-        item-id="new"
-        :source-item-id="itemId"
-        @save="onTemplateCopied"
+      v-model="copyDialog"
+      :project-id="projectId"
+      :item-app="item.app"
+      item-id="new"
+      :source-item-id="itemId"
+      @save="onTemplateCopied"
     ></EditTemplateDialogue>
 
     <ObjectRefsDialog
@@ -52,11 +51,13 @@
       <v-toolbar-title class="breadcrumbs">
         <router-link
           class="breadcrumbs__item breadcrumbs__item--link"
-          :to="viewId
+          :to="
+            viewId
               ? `/project/${projectId}/views/${viewId}/templates/`
-              : `/project/${projectId}/templates/`"
+              : `/project/${projectId}/templates/`
+          "
         >
-          {{ $t('taskTemplates2') }}
+          {{ $t("taskTemplates2") }}
         </router-link>
         <v-icon>mdi-chevron-right</v-icon>
         <span class="breadcrumbs__item">{{ item.name }}</span>
@@ -64,32 +65,24 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn color="primary" depressed class="mr-3" @click="newTaskDialog = true">
+      <v-btn
+        color="primary"
+        depressed
+        class="mr-3"
+        @click="newTaskDialog = true"
+      >
         {{ $t(TEMPLATE_TYPE_ACTION_TITLES[item.type]) }}
       </v-btn>
 
-      <v-btn
-        icon
-        color="error"
-        @click="askDelete()"
-        v-if="canUpdate"
-      >
+      <v-btn icon color="error" @click="askDelete()" v-if="canUpdate">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
 
-      <v-btn
-        icon
-        @click="copyDialog = true"
-        v-if="canUpdate"
-      >
+      <v-btn icon @click="copyDialog = true" v-if="canUpdate">
         <v-icon>mdi-content-copy</v-icon>
       </v-btn>
 
-      <v-btn
-        icon
-        @click="editDialog = true"
-        v-if="canUpdate"
-      >
+      <v-btn icon @click="editDialog = true" v-if="canUpdate">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
     </v-toolbar>
@@ -100,7 +93,8 @@
         type="info"
         class="mb-0 ml-4 mr-4 mb-2"
         v-if="item.description"
-      >{{ item.description }}
+      >
+        {{ item.description }}
       </v-alert>
 
       <v-row>
@@ -112,7 +106,7 @@
               </v-list-item-icon>
 
               <v-list-item-content>
-                <v-list-item-title>{{ $t('playbook') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("playbook") }}</v-list-item-title>
                 <v-list-item-subtitle>{{ item.playbook }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -126,8 +120,9 @@
               </v-list-item-icon>
 
               <v-list-item-content>
-                <v-list-item-title>{{ $t('type') }}</v-list-item-title>
-                <v-list-item-subtitle>{{ $t(TEMPLATE_TYPE_TITLES[item.type]) }}
+                <v-list-item-title>{{ $t("type") }}</v-list-item-title>
+                <v-list-item-subtitle
+                  >{{ $t(TEMPLATE_TYPE_TITLES[item.type]) }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -141,9 +136,15 @@
               </v-list-item-icon>
 
               <v-list-item-content>
-                <v-list-item-title>{{ $t('inventory') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("inventory") }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  {{ (inventory.find((x) => x.id === item.inventory_id) || {name: '—'}).name }}
+                  {{
+                    (
+                      inventory.find((x) => x.id === item.inventory_id) || {
+                        name: "—",
+                      }
+                    ).name
+                  }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -156,9 +157,11 @@
                 <v-icon>mdi-code-braces</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('environment') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("environment") }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  {{ environment.find((x) => x.id === item.environment_id).name }}
+                  {{
+                    environment.find((x) => x.id === item.environment_id).name
+                  }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -171,9 +174,11 @@
                 <v-icon>mdi-git</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title>{{ $t('repository2') }}</v-list-item-title>
+                <v-list-item-title>{{ $t("repository2") }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  {{ repositories.find((x) => x.id === item.repository_id).name }}
+                  {{
+                    repositories.find((x) => x.id === item.repository_id).name
+                  }}
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -182,12 +187,17 @@
       </v-row>
     </v-container>
 
-    <TaskList :template="item"/>
+    <v-tabs show-arrows class="pl-4">
+      <v-tab key="tasks">{{ $t("tasks") }} </v-tab>
+
+      <v-tab v-if="app === 'terraform' || app === 'tofu'" key="state">{{
+        $t("state")
+      }}</v-tab>
+    </v-tabs>
+
+    <TaskList :template="item" />
   </div>
 </template>
-<style lang="scss">
-
-</style>
 <script>
 import axios from 'axios';
 import EventBus from '@/event-bus';
@@ -262,10 +272,9 @@ export default {
       return this.itemId === 'new';
     },
     isLoaded() {
-      return this.item
-        && this.inventory
-        && this.environment
-        && this.repositories;
+      return (
+        this.item && this.inventory && this.environment && this.repositories
+      );
     },
   },
 
@@ -291,11 +300,13 @@ export default {
     },
 
     async askDelete() {
-      this.itemRefs = (await axios({
-        method: 'get',
-        url: `/api/project/${this.projectId}/templates/${this.itemId}/refs`,
-        responseType: 'json',
-      })).data;
+      this.itemRefs = (
+        await axios({
+          method: 'get',
+          url: `/api/project/${this.projectId}/templates/${this.itemId}/refs`,
+          responseType: 'json',
+        })
+      ).data;
 
       if (this.itemRefs.integrations.length > 0) {
         this.itemRefsDialog = true;
@@ -338,29 +349,37 @@ export default {
     },
 
     async loadData() {
-      this.item = (await axios({
-        method: 'get',
-        url: `/api/project/${this.projectId}/templates/${this.itemId}`,
-        responseType: 'json',
-      })).data;
+      this.item = (
+        await axios({
+          method: 'get',
+          url: `/api/project/${this.projectId}/templates/${this.itemId}`,
+          responseType: 'json',
+        })
+      ).data;
 
-      this.inventory = (await axios({
-        method: 'get',
-        url: `/api/project/${this.projectId}/inventory`,
-        responseType: 'json',
-      })).data;
+      this.inventory = (
+        await axios({
+          method: 'get',
+          url: `/api/project/${this.projectId}/inventory`,
+          responseType: 'json',
+        })
+      ).data;
 
-      this.environment = (await axios({
-        method: 'get',
-        url: `/api/project/${this.projectId}/environment`,
-        responseType: 'json',
-      })).data;
+      this.environment = (
+        await axios({
+          method: 'get',
+          url: `/api/project/${this.projectId}/environment`,
+          responseType: 'json',
+        })
+      ).data;
 
-      this.repositories = (await axios({
-        method: 'get',
-        url: `/api/project/${this.projectId}/repositories`,
-        responseType: 'json',
-      })).data;
+      this.repositories = (
+        await axios({
+          method: 'get',
+          url: `/api/project/${this.projectId}/repositories`,
+          responseType: 'json',
+        })
+      ).data;
     },
   },
 };
