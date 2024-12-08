@@ -99,8 +99,8 @@ const TaskStatUnitWeek TaskStatUnit = "week"
 const TaskStatUnitMonth TaskStatUnit = "month"
 
 type TaskFilter struct {
-	From   *time.Time `json:"from"`
-	To     *time.Time `json:"to"`
+	Start  *time.Time `json:"start"`
+	End    *time.Time `json:"end"`
 	UserID *int       `json:"user_id"`
 }
 

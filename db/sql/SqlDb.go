@@ -763,6 +763,8 @@ func (d *SqlDb) GetObjectReferences(objectProps db.ObjectProps, referringObjectP
 
 func (d *SqlDb) GetTaskStats(projectID int, templateID *int, unit db.TaskStatUnit, filter db.TaskFilter) (stats []db.TaskStat, err error) {
 
+	stats = make([]db.TaskStat, 0)
+
 	if unit != db.TaskStatUnitDay {
 		err = fmt.Errorf("only day unit is supported")
 		return
@@ -784,8 +786,12 @@ func (d *SqlDb) GetTaskStats(projectID int, templateID *int, unit db.TaskStatUni
 		q = q.Where("template_id=?", *templateID)
 	}
 
-	if filter.UserID != nil {
-		q = q.Where("user_id=?", *filter.UserID)
+	if filter.Start != nil {
+		q = q.Where("start>=?", *filter.Start)
+	}
+
+	if filter.End != nil {
+		q = q.Where("end<?", *filter.End)
 	}
 
 	query, args, err := q.ToSql()

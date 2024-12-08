@@ -117,9 +117,16 @@ export default {
     };
   },
   async created() {
+    const date = new Date((new Date()).getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    const start = `${year}-${month}-${day}`;
+
     this.stats = (await axios({
       method: 'get',
-      url: `/api/project/${this.template.project_id}/templates/${this.template.id}/stats`,
+      url: `/api/project/${this.template.project_id}/templates/${this.template.id}/stats?start=${start}`,
       responseType: 'json',
     })).data;
   },
