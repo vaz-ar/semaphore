@@ -165,7 +165,7 @@ export default {
 
       switch (this.dateRange) {
         case 'last_year':
-          date.setDate(date.getFullYear() - 1);
+          date.setFullYear(date.getFullYear() - 1);
           break;
         case 'last_month':
           date.setDate(date.getDate() - 30);
