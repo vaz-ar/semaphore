@@ -4,11 +4,6 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
-	"reflect"
-	"regexp"
-	"strconv"
-	"strings"
-
 	"github.com/Masterminds/squirrel"
 	"github.com/go-gorp/gorp/v3"
 	_ "github.com/go-sql-driver/mysql" // imports mysql driver
@@ -16,6 +11,10 @@ import (
 	"github.com/semaphoreui/semaphore/db"
 	"github.com/semaphoreui/semaphore/util"
 	log "github.com/sirupsen/logrus"
+	"reflect"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 type SqlDb struct {
@@ -757,6 +756,61 @@ func (d *SqlDb) GetObjectReferences(objectProps db.ObjectProps, referringObjectP
 		id := int(referringObjects.Elem().Index(i).FieldByName("ID").Int())
 		name := referringObjects.Elem().Index(i).FieldByName("Name").String()
 		referringObjs = append(referringObjs, db.ObjectReferrer{ID: id, Name: name})
+	}
+
+	return
+}
+
+func (d *SqlDb) GetTaskStats(projectID int, templateID *int, unit db.TaskStatUnit, filter db.TaskFilter) (stats []db.TaskStat, err error) {
+
+	if unit != db.TaskStatUnitDay {
+		err = fmt.Errorf("only day unit is supported")
+		return
+	}
+
+	var res []struct {
+		Date   string `db:"date"`
+		Status string `db:"status"`
+		Count  int    `db:"count"`
+	}
+
+	q := squirrel.Select("DATE(created) AS date, status, COUNT(*) AS count").
+		From("task").
+		Where("project_id=?", projectID).
+		GroupBy("DATE(created), status").
+		OrderBy("DATE(created) DESC")
+
+	if templateID != nil {
+		q = q.Where("template_id=?", *templateID)
+	}
+
+	if filter.UserID != nil {
+		q = q.Where("user_id=?", *filter.UserID)
+	}
+
+	query, args, err := q.ToSql()
+
+	if err != nil {
+		return
+	}
+
+	_, err = d.selectAll(&res, query, args...)
+
+	var date string
+	var stat *db.TaskStat
+
+	for _, r := range res {
+
+		if date != r.Date {
+			date = r.Date
+			stat = &db.TaskStat{
+				Date:          date,
+				CountByStatus: make(map[string]int),
+			}
+			stats = append(stats, *stat)
+		}
+
+		stat.CountByStatus[r.Status] = r.Count
 	}
 
 	return

@@ -92,6 +92,24 @@ func (e *ValidationError) Error() string {
 	return e.Message
 }
 
+type TaskStatUnit string
+
+const TaskStatUnitDay TaskStatUnit = "day"
+const TaskStatUnitWeek TaskStatUnit = "week"
+const TaskStatUnitMonth TaskStatUnit = "month"
+
+type TaskFilter struct {
+	From   *time.Time `json:"from"`
+	To     *time.Time `json:"to"`
+	UserID *int       `json:"user_id"`
+}
+
+type TaskStat struct {
+	Date          string         `json:"date"`
+	CountByStatus map[string]int `json:"count_by_status"`
+	AvgDuration   int            `json:"avg_duration"`
+}
+
 type Store interface {
 	// Connect connects to the database.
 	// Token parameter used if PermanentConnection returns false.
@@ -271,6 +289,8 @@ type Store interface {
 	GetTemplateVaults(projectID int, templateID int) ([]TemplateVault, error)
 	CreateTemplateVault(vault TemplateVault) (TemplateVault, error)
 	UpdateTemplateVaults(projectID int, templateID int, vaults []TemplateVault) error
+
+	GetTaskStats(projectID int, templateID *int, unit TaskStatUnit, filter TaskFilter) ([]TaskStat, error)
 }
 
 var AccessKeyProps = ObjectProps{

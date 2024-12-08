@@ -85,6 +85,9 @@
         </v-list>
       </v-col>
     </v-row>
+
+    <LineChart :source-data="stats"/>
+
   </v-container>
 
 </template>
@@ -94,8 +97,11 @@ import {
   TEMPLATE_TYPE_ICONS,
   TEMPLATE_TYPE_TITLES,
 } from '@/lib/constants';
+import axios from 'axios';
+import LineChart from '@/components/LineChart.vue';
 
 export default {
+  components: { LineChart },
   props: {
     template: Object,
     repositories: Array,
@@ -107,7 +113,15 @@ export default {
       TEMPLATE_TYPE_ICONS,
       TEMPLATE_TYPE_TITLES,
       TEMPLATE_TYPE_ACTION_TITLES,
+      stats: null,
     };
+  },
+  async created() {
+    this.stats = (await axios({
+      method: 'get',
+      url: `/api/project/${this.template.project_id}/templates/${this.template.id}/stats`,
+      responseType: 'json',
+    })).data;
   },
 };
 </script>
