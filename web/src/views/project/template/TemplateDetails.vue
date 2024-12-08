@@ -3,12 +3,12 @@
     <v-alert
       text
       type="info"
-      class="mb-0 ml-4 mr-4 mb-2"
+      class="mb-0 ml-4 mr-4 mb-6"
       v-if="template.description"
     >{{ template.description }}
     </v-alert>
 
-    <v-row>
+    <v-row class="mb-2">
       <v-col>
         <v-list subheader>
           <v-list-item>
@@ -85,6 +85,33 @@
         </v-list>
       </v-col>
     </v-row>
+
+    <v-card style="background: rgba(133, 133, 133, 0.06)" class="mx-4">
+      <v-card-title>
+        Task Status
+        <v-spacer />
+        <v-select
+          hide-details
+          dense
+          :items="dateRanges"
+          class="mr-6"
+          style="max-width: 200px"
+          v-model="dateRange"
+        />
+
+        <v-select
+          hide-details
+          dense
+          :items="users"
+          style="max-width: 200px"
+          v-model="user"
+        />
+      </v-card-title>
+      <v-card-text>
+        <LineChart :source-data="stats"/>
+      </v-card-text>
+    </v-card>
+
   </v-container>
 
 </template>
@@ -94,20 +121,98 @@ import {
   TEMPLATE_TYPE_ICONS,
   TEMPLATE_TYPE_TITLES,
 } from '@/lib/constants';
+import axios from 'axios';
+import LineChart from '@/components/LineChart.vue';
 
 export default {
+  components: { LineChart },
+
   props: {
     template: Object,
     repositories: Array,
     inventory: Array,
     environment: Array,
   },
+
   data() {
     return {
+      dateRanges: [{
+        text: 'Last Week',
+        value: 'last_week',
+      }, {
+        text: 'Last Month',
+        value: 'last_month',
+      }],
+      users: [{
+        text: 'All users',
+        value: null,
+      }],
+      user: null,
       TEMPLATE_TYPE_ICONS,
       TEMPLATE_TYPE_TITLES,
       TEMPLATE_TYPE_ACTION_TITLES,
+      stats: null,
+      dateRange: 'last_week',
     };
+  },
+
+  computed: {
+    startDate() {
+      const date = new Date();
+
+      switch (this.dateRange) {
+        case 'last_month':
+          date.setDate(date.getDate() - 7);
+          break;
+        case 'last_week':
+        default:
+          date.setDate(date.getDate() - 30);
+          break;
+      }
+
+      return date.toISOString().split('T')[0];
+    },
+  },
+
+  watch: {
+    async startDate() {
+      await this.refreshData();
+    },
+    async user() {
+      await this.refreshData();
+    },
+  },
+
+  async created() {
+    await this.refreshData();
+
+    this.users = [{
+      text: 'All users',
+      value: null,
+    }, ...(await axios({
+      method: 'get',
+      url: `/api/project/${this.template.project_id}/users`,
+      responseType: 'json',
+    })).data.map((x) => ({
+      value: x.id,
+      text: x.name,
+    }))];
+  },
+
+  methods: {
+    async refreshData() {
+      let url = `/api/project/${this.template.project_id}/templates/${this.template.id}/stats?start=${this.startDate}`;
+
+      if (this.user) {
+        url += `&user_id=${this.user}`;
+      }
+
+      this.stats = (await axios({
+        method: 'get',
+        url,
+        responseType: 'json',
+      })).data;
+    },
   },
 };
 </script>

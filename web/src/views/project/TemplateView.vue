@@ -79,12 +79,6 @@
       </v-btn>
     </v-toolbar>
 
-    <v-container fluid>
-      <v-alert text type="info" class="mb-0 ml-4 mr-4 mb-2" v-if="item.description">
-        {{ item.description }}
-      </v-alert>
-    </v-container>
-
     <v-tabs class="mb-4 ml-4">
       <v-tab :to="`/project/${item.project_id}/templates/${item.id}/tasks`">Tasks</v-tab>
       <v-tab :to="`/project/${item.project_id}/templates/${item.id}/details`">Details</v-tab>
