@@ -3,12 +3,12 @@
     <v-alert
       text
       type="info"
-      class="mb-0 ml-4 mr-4 mb-2"
+      class="mb-0 ml-4 mr-4 mb-6"
       v-if="template.description"
     >{{ template.description }}
     </v-alert>
 
-    <v-row>
+    <v-row class="mb-2">
       <v-col>
         <v-list subheader>
           <v-list-item>
@@ -86,7 +86,14 @@
       </v-col>
     </v-row>
 
-    <LineChart :source-data="stats"/>
+    <v-card style="background: rgba(133, 133, 133, 0.06)" class="mx-4">
+      <v-card-title>
+        Task Status
+      </v-card-title>
+      <v-card-text>
+        <LineChart :source-data="stats"/>
+      </v-card-text>
+    </v-card>
 
   </v-container>
 
