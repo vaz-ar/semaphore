@@ -861,6 +861,10 @@ func (d *BoltDb) GetTaskStats(projectID int, templateID *int, unit db.TaskStatUn
 				return false
 			}
 
+			if filter.UserID != nil && (task.UserID == nil || *task.UserID != *filter.UserID) {
+				return false
+			}
+
 			return true
 		}, func(i interface{}) error {
 
