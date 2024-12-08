@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"github.com/semaphoreui/semaphore/pkg/task_logger"
 	"reflect"
 	"strings"
 	"time"
@@ -105,9 +106,9 @@ type TaskFilter struct {
 }
 
 type TaskStat struct {
-	Date          string         `json:"date"`
-	CountByStatus map[string]int `json:"count_by_status"`
-	AvgDuration   int            `json:"avg_duration"`
+	Date          string                         `json:"date"`
+	CountByStatus map[task_logger.TaskStatus]int `json:"count_by_status"`
+	AvgDuration   int                            `json:"avg_duration"`
 }
 
 type Store interface {

@@ -9,6 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql" // imports mysql driver
 	_ "github.com/lib/pq"
 	"github.com/semaphoreui/semaphore/db"
+	"github.com/semaphoreui/semaphore/pkg/task_logger"
 	"github.com/semaphoreui/semaphore/util"
 	log "github.com/sirupsen/logrus"
 	"reflect"
@@ -771,9 +772,9 @@ func (d *SqlDb) GetTaskStats(projectID int, templateID *int, unit db.TaskStatUni
 	}
 
 	var res []struct {
-		Date   string `db:"date"`
-		Status string `db:"status"`
-		Count  int    `db:"count"`
+		Date   string                 `db:"date"`
+		Status task_logger.TaskStatus `db:"status"`
+		Count  int                    `db:"count"`
 	}
 
 	q := squirrel.Select("DATE(created) AS date, status, COUNT(*) AS count").
@@ -811,7 +812,7 @@ func (d *SqlDb) GetTaskStats(projectID int, templateID *int, unit db.TaskStatUni
 			date = r.Date
 			stat = &db.TaskStat{
 				Date:          date,
-				CountByStatus: make(map[string]int),
+				CountByStatus: make(map[task_logger.TaskStatus]int),
 			}
 			stats = append(stats, *stat)
 		}
