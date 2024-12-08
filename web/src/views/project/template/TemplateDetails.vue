@@ -137,11 +137,14 @@ export default {
   data() {
     return {
       dateRanges: [{
-        text: 'Last Week',
+        text: 'Past week',
         value: 'last_week',
       }, {
-        text: 'Last Month',
+        text: 'Past month',
         value: 'last_month',
+      }, {
+        text: 'Past year',
+        value: 'last_year',
       }],
       users: [{
         text: 'All users',
@@ -161,12 +164,15 @@ export default {
       const date = new Date();
 
       switch (this.dateRange) {
+        case 'last_year':
+          date.setDate(date.getFullYear() - 1);
+          break;
         case 'last_month':
-          date.setDate(date.getDate() - 7);
+          date.setDate(date.getDate() - 30);
           break;
         case 'last_week':
         default:
-          date.setDate(date.getDate() - 30);
+          date.setDate(date.getDate() - 7);
           break;
       }
 
