@@ -80,11 +80,19 @@
     </v-toolbar>
 
     <v-tabs class="mb-4 ml-4">
-      <v-tab :to="`/project/${item.project_id}/templates/${item.id}/tasks`">Tasks</v-tab>
-      <v-tab :to="`/project/${item.project_id}/templates/${item.id}/details`">Details</v-tab>
+      <v-tab
+        :to="`/project/${item.project_id}${
+          $route.params.viewId ? `/views/${$route.params.viewId}` : ''
+        }/templates/${item.id}/tasks`">Tasks</v-tab>
+      <v-tab
+        :to="`/project/${item.project_id}${
+          $route.params.viewId ? `/views/${$route.params.viewId}` : ''
+        }/templates/${item.id}/details`">Details</v-tab>
       <v-tab
         v-if="['terraform', 'tofu'].includes(item.app)"
-        :to="`/project/${item.project_id}/templates/${item.id}/state`"
+        :to="`/project/${item.project_id}${
+          $route.params.viewId ? `/views/${$route.params.viewId}` : ''
+        }/templates/${item.id}/state`"
       >
         State
         <v-icon class="ml-1" large color="hsl(348deg, 86%, 61%)">mdi-professional-hexagon</v-icon>

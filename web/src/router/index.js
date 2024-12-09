@@ -83,6 +83,21 @@ const routes = [
     }],
   },
   {
+    path: '/project/:projectId/views/:viewId/templates/:templateId',
+    redirect: '/project/:projectId/views/:viewId/templates/:templateId/tasks',
+    component: TemplateView,
+    children: [{
+      path: 'tasks',
+      component: TaskList,
+    }, {
+      path: 'details',
+      component: TemplateDetails,
+    }, {
+      path: 'state',
+      component: TemplateTerraformState,
+    }],
+  },
+  {
     path: '/project/:projectId/environment',
     component: Environment,
   },
