@@ -94,6 +94,7 @@ export default {
           y: {
             stacked: true,
             ticks: {
+              maxTicksLimit: 20,
               stepSize: 1,
             },
           },
