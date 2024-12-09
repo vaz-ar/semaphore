@@ -226,7 +226,7 @@ export default {
           date: this.startDate,
           count_by_status: {
             success: 0,
-            failed: 1000,
+            failed: 0,
             stopped: 0,
           },
         });
@@ -238,7 +238,7 @@ export default {
         this.stats.push({
           date: new Date().toISOString().split('T')[0],
           count_by_status: {
-            success: 1000,
+            success: 0,
             failed: 0,
             stopped: 0,
           },
