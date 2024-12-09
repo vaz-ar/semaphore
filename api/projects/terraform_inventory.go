@@ -28,7 +28,7 @@ func SetTerraformInventoryAliasAccessKey(w http.ResponseWriter, r *http.Request)
 }
 
 func GetTerraformInventoryStates(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
+	helpers.WriteJSON(w, http.StatusOK, []string{})
 }
 
 func AddTerraformInventoryState(w http.ResponseWriter, r *http.Request) {

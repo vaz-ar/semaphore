@@ -12,17 +12,23 @@
         class="ml-2"
         color="hsl(348deg, 86%, 61%)"
         href="https://semaphoreui.com/pro"
-      >Upgrade</v-btn>
+      >Upgrade
+      </v-btn>
     </v-alert>
 
     <div class="px-4 py-3">
       <div v-for="alias of (aliases || [])" :key="alias.id">
         <code class="mr-2">{{ alias.url }}</code>
-        <v-btn icon
-               @click="copyToClipboard(alias.url, $t('aliasUrlCopied'))">
+        <v-btn
+          icon
+          @click="copyToClipboard(alias.url, $t('aliasUrlCopied'))"
+        >
           <v-icon>mdi-content-copy</v-icon>
         </v-btn>
-        <v-btn icon @click="deleteAlias(alias.id)" :disabled="!premiumFeatures.terraform_backend">
+        <v-btn icon @click="editAlias(alias.id)">
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
+        <v-btn icon @click="deleteAlias(alias.id)">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </div>
@@ -32,6 +38,26 @@
       </v-btn>
     </div>
 
+    <v-data-table
+      :headers="headers"
+      :items="states"
+      :footer-props="{ itemsPerPageOptions: [20] }"
+      class="mt-0"
+    >
+      <template v-slot:item.id="{ item }">
+        <router-link
+          to="`/project/${item.project_id}/templates/${item.id}/terraform/state/${item.id}`"
+        >
+          {{ item.id }}
+        </router-link>
+      </template>
+
+      <template v-slot:item.actions="{ item }">
+        <v-btn icon class="pl-1 pr-2" @click="deleteState(item)">
+          <v-icon class="pr-1">mdi-trash</v-icon>
+        </v-btn>
+      </template>
+    </v-data-table>
   </div>
 </template>
 <script>
@@ -46,11 +72,25 @@ export default {
     inventory: Array,
     environment: Array,
     premiumFeatures: Object,
+    states: Array,
   },
 
   data() {
     return {
-      aliases: null,
+      headers: [{
+        text: 'ID',
+        value: 'id',
+        sortable: false,
+      }, {
+        text: 'Task',
+        value: 'task_id',
+        sortable: false,
+      }, {
+        text: 'Actions',
+        value: '',
+        sortable: false,
+      }],
+      aliases: [],
     };
   },
 
@@ -59,12 +99,20 @@ export default {
   },
 
   methods: {
+    deleteState(id) {
+      console.log(id);
+    },
+
     async loadAliases() {
       this.aliases = (await axios({
         method: 'get',
         url: `/api/project/${this.template.project_id}/inventory/${this.template.id}/terraform/aliases`,
         responseType: 'json',
       })).data;
+    },
+
+    editAlias(alias) {
+      console.log(alias);
     },
 
     async deleteAlias(alias) {
