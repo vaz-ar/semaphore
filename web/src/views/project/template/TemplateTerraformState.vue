@@ -33,7 +33,11 @@
         </v-btn>
       </div>
 
-      <v-btn color="primary" @click="addAlias()" :disabled="(aliases || []).length === 0">
+      <v-btn
+        color="primary"
+        @click="addAlias()"
+        :disabled="!premiumFeatures.terraform_backend"
+      >
         {{ aliases == null ? $t('LoadAlias') : $t('AddAlias') }}
       </v-btn>
     </div>
@@ -67,6 +71,7 @@ export default {
   data() {
     return {
       aliases: [],
+      state: null,
     };
   },
 
