@@ -38,58 +38,31 @@
       </v-btn>
     </div>
 
-    <v-data-table
-      :headers="headers"
-      :items="states"
-      :footer-props="{ itemsPerPageOptions: [20] }"
-      class="mt-0"
-    >
-      <template v-slot:item.id="{ item }">
-        <router-link
-          to="`/project/${item.project_id}/templates/${item.id}/terraform/state/${item.id}`"
-        >
-          {{ item.id }}
-        </router-link>
-      </template>
+    <TerraformStateView v-if="false"></TerraformStateView>
+    <v-container v-else>
+      <div style="text-align: center; color: grey;">No state available.</div>
+    </v-container>
 
-      <template v-slot:item.actions="{ item }">
-        <v-btn icon class="pl-1 pr-2" @click="deleteState(item)">
-          <v-icon class="pr-1">mdi-trash</v-icon>
-        </v-btn>
-      </template>
-    </v-data-table>
   </div>
 </template>
 <script>
 
 import axios from 'axios';
 import EventBus from '@/event-bus';
+import TerraformStateView from '@/components/TerraformStateView.vue';
 
 export default {
+  components: { TerraformStateView },
   props: {
     template: Object,
     repositories: Array,
     inventory: Array,
     environment: Array,
     premiumFeatures: Object,
-    states: Array,
   },
 
   data() {
     return {
-      headers: [{
-        text: 'ID',
-        value: 'id',
-        sortable: false,
-      }, {
-        text: 'Task',
-        value: 'task_id',
-        sortable: false,
-      }, {
-        text: 'Actions',
-        value: '',
-        sortable: false,
-      }],
       aliases: [],
     };
   },
