@@ -79,7 +79,7 @@
       </v-btn>
     </v-toolbar>
 
-    <v-tabs class="mb-4 ml-4">
+    <v-tabs class="ml-4">
       <v-tab
         :to="`/project/${item.project_id}${
           $route.params.viewId ? `/views/${$route.params.viewId}` : ''
@@ -103,6 +103,7 @@
       :inventory="inventory"
       :environment="environment"
       :repositories="repositories"
+      :premium-features="premiumFeatures"
     ></router-view>
   </div>
 </template>
@@ -133,6 +134,7 @@ export default {
   props: {
     projectId: Number,
     userPermissions: Number,
+    premiumFeatures: Object,
   },
 
   mixins: [PermissionsCheck],

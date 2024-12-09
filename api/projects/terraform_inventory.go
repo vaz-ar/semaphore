@@ -2,10 +2,13 @@
 
 package projects
 
-import "net/http"
+import (
+	"github.com/semaphoreui/semaphore/api/helpers"
+	"net/http"
+)
 
 func GetTerraformInventoryAliases(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
+	helpers.WriteJSON(w, http.StatusOK, []string{})
 }
 
 func AddTerraformInventoryAlias(w http.ResponseWriter, r *http.Request) {

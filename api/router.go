@@ -504,7 +504,8 @@ func getSystemInfo(w http.ResponseWriter, r *http.Request) {
 		"use_remote_runner": util.Config.UseRemoteRunner,
 
 		"premium_features": map[string]bool{
-			"project_runners": false,
+			"project_runners":   false,
+			"terraform_backend": false,
 		},
 	}
 
