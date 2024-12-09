@@ -38,7 +38,10 @@
       </v-btn>
     </div>
 
-    <TerraformStateView v-if="false"></TerraformStateView>
+    <TerraformStateView
+      v-if="premiumFeatures.terraform_backend"
+    />
+
     <v-container v-else>
       <div style="text-align: center; color: grey;">No state available.</div>
     </v-container>
