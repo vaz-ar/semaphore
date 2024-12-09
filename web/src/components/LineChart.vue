@@ -93,6 +93,9 @@ export default {
           },
           y: {
             stacked: true,
+            ticks: {
+              stepSize: 1,
+            },
           },
         },
         responsive: true,
