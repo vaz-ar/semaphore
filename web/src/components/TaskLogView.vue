@@ -1,7 +1,8 @@
 <template>
   <div class="task-log-view" :class="{'task-log-view--with-message': item.message}">
     <v-alert
-      type="info"
+      dense
+      class="d-inline-block mb-2"
       text
       v-if="item.message"
     >{{ item.message }}
@@ -110,8 +111,8 @@
 
 @import '~vuetify/src/styles/settings/_variables';
 
-.task-log-view {
-}
+$task-log-header-height: 62px + 64px + 8px;
+$task-log-message-height: 38px + 8px;
 
 .task-log-records {
   background: black;
@@ -123,12 +124,19 @@
   padding: 5px 10px 50px;
 }
 
-.v-dialog--fullscreen .task-log-records {
-  height: calc(100vh - 136px);
+.task-log-view--with-message .task-log-records {
+  height: calc(100vh - #{280px + $task-log-message-height});
 }
 
-.task-log-view--with-message .task-log-records {
-  height: calc(100vh - 300px);
+.v-dialog--fullscreen {
+
+  .task-log-records {
+    height: calc(100vh - $task-log-header-height);
+  }
+
+  .task-log-view--with-message .task-log-records {
+    height: calc(100vh - #{$task-log-header-height + $task-log-message-height});
+  }
 }
 
 .task-log-records__record {

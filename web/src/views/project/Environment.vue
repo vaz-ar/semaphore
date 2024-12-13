@@ -56,8 +56,11 @@
         :items-per-page="Number.MAX_VALUE"
         style="max-width: 800px;"
       >
+        <template v-slot:item.name="{ item }">
+          <a @click="editItem(item.id)">{{ item.name }}</a>
+        </template>
         <template v-slot:item.actions="{ item }">
-          <v-btn-toggle dense class="mr-6" :value-comparator="() => false">
+          <v-btn-toggle dense :value-comparator="() => false">
             <v-btn @click="askDeleteItem(item.id)">
               <v-icon>mdi-delete</v-icon>
             </v-btn>
