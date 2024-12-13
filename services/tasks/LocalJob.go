@@ -603,18 +603,17 @@ func (t *LocalJob) checkoutRepository() error {
 
 	// store commit to TaskRunner table
 
-	//commitHash, err := repo.GetLastCommitHash()
-	//
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//commitMessage, _ := repo.GetLastCommitMessage()
-	//
-	//t.task.CommitHash = &commitHash
-	//t.task.CommitMessage = commitMessage
-	//
-	//return t.pool.store.UpdateTask(t.task)
+	commitHash, err := repo.GetLastCommitHash()
+
+	if err != nil {
+		return err
+	}
+
+	commitMessage, _ := repo.GetLastCommitMessage()
+
+	t.Log("Commit hash: " + commitHash)
+	t.Log("Commit message: " + commitMessage)
+
 	return nil
 }
 

@@ -17,7 +17,7 @@
       dark
       icon="mdi-source-fork"
       dismissible
-      v-model="commitAvailable"
+      v-model="hasCommit"
       prominent
     >
       <div
@@ -88,6 +88,19 @@
       />
     </div>
 
+<!--    <v-select-->
+<!--      v-model="item.inventory_id"-->
+<!--      :label="fieldLabel('inventory')"-->
+<!--      :items="appInventory"-->
+<!--      item-value="id"-->
+<!--      item-text="name"-->
+<!--      outlined-->
+<!--      dense-->
+<!--      required-->
+<!--      :disabled="formSaving"-->
+<!--      v-if="needField('inventory')"-->
+<!--    ></v-select>-->
+
     <TaskParamsForm v-if="template.app === 'ansible'" v-model="item.params" :app="template.app" />
     <TaskParamsForm v-else v-model="item.params" :app="template.app" />
 
@@ -105,13 +118,9 @@
 
 import ItemFormBase from '@/components/ItemFormBase';
 import axios from 'axios';
-// import { codemirror } from 'vue-codemirror';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/vue/vue.js';
-import 'codemirror/addon/lint/json-lint.js';
-import 'codemirror/addon/display/placeholder.js';
 import TaskParamsForm from '@/components/TaskParamsForm.vue';
 import ArgsPicker from '@/components/ArgsPicker.vue';
+import { APP_INVENTORY_TYPES } from '@/lib/constants';
 
 export default {
   mixins: [ItemFormBase],
@@ -122,13 +131,12 @@ export default {
   components: {
     ArgsPicker,
     TaskParamsForm,
-    // codemirror,
   },
   data() {
     return {
       template: null,
       buildTasks: null,
-      commitAvailable: null,
+      hasCommit: null,
       editedEnvironment: null,
       editedSecretEnvironment: null,
       cmOptions: {
@@ -139,12 +147,16 @@ export default {
         lint: true,
         indentWithTabs: false,
       },
-      // advancedOptions: false,
+      inventory: null,
     };
   },
   computed: {
     args() {
       return JSON.parse(this.item.arguments || '[]');
+    },
+
+    appInventory() {
+      return this.inventory.filter((i) => (APP_INVENTORY_TYPES[this.app] || []).includes(i.type));
     },
   },
 
@@ -163,7 +175,7 @@ export default {
       this.assignItem(val);
     },
 
-    commitAvailable(val) {
+    hasCommit(val) {
       if (val == null) {
         this.commit_hash = null;
       }
@@ -202,7 +214,7 @@ export default {
 
       this.editedEnvironment = JSON.parse(v.environment || '{}');
       this.editedSecretEnvironment = JSON.parse(v.secret || '{}');
-      this.commitAvailable = v.commit_hash != null;
+      this.hasCommit = v.commit_hash != null;
     },
 
     isLoaded() {
@@ -225,8 +237,6 @@ export default {
         this.item.params = {};
       }
 
-      // this.advancedOptions = this.item.arguments != null;
-
       this.template = (await axios({
         keys: 'get',
         url: `/api/project/${this.projectId}/templates/${this.templateId}`,
@@ -238,6 +248,12 @@ export default {
         url: `/api/project/${this.projectId}/templates/${this.template.build_template_id}/tasks?status=success`,
         responseType: 'json',
       })).data.filter((task) => task.status === 'success') : [];
+
+      this.inventory = (await axios({
+        keys: 'get',
+        url: `/api/project/${this.projectId}/inventory`,
+        responseType: 'json',
+      })).data;
 
       if (this.item.build_task_id == null
         && this.buildTasks.length > 0

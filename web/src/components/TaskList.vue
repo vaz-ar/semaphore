@@ -1,42 +1,15 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div v-if="tasks != null">
-    <EditDialog
-        v-model="newTaskDialog"
-        :save-button-text="$t('Re' + getActionButtonTitle())"
-        @save="onTaskCreated"
-    >
-      <template v-slot:title={}>
-        <v-icon class="mr-4">{{ TEMPLATE_TYPE_ICONS[template.type] }}</v-icon>
-        <span class="breadcrumbs__item">{{ template.name }}</span>
-        <v-icon>mdi-chevron-right</v-icon>
-        <span class="breadcrumbs__item">{{ $t('newTask') }}</span>
-      </template>
 
-      <template v-slot:form="{ onSave, onError, needSave, needReset }">
-        <TerraformTaskForm
-            v-if="['terraform', 'tofu'].includes(template.app)"
-            :project-id="template.project_id"
-            item-id="new"
-            :template-id="template.id"
-            @save="onSave"
-            @error="onError"
-            :need-save="needSave"
-            :need-reset="needReset"
-            :source-task="sourceTask"
-        />
-        <TaskForm
-          v-else
-          :project-id="template.project_id"
-          item-id="new"
-          :template-id="template.id"
-          @save="onSave"
-          @error="onError"
-          :need-save="needSave"
-          :need-reset="needReset"
-          :source-task="sourceTask"
-        />
-      </template>
-    </EditDialog>
+    <NewTaskDialog
+      v-model="newTaskDialog"
+      :project-id="template.project_id"
+      :template-id="template.id"
+      :template-alias="template.name"
+      :template-type="template.type"
+      :template-app="template.app"
+      :source-task="sourceTask"
+    />
 
     <v-data-table
         :headers="headers"
@@ -89,20 +62,15 @@
 </template>
 <script>
 import axios from 'axios';
-import EventBus from '@/event-bus';
-import TaskForm from '@/components/TaskForm.vue';
 import TaskStatus from '@/components/TaskStatus.vue';
 import TaskLink from '@/components/TaskLink.vue';
-import EditDialog from '@/components/EditDialog.vue';
 import { TEMPLATE_TYPE_ACTION_TITLES, TEMPLATE_TYPE_ICONS } from '@/lib/constants';
-import TerraformTaskForm from '@/components/TerraformTaskForm.vue';
+import NewTaskDialog from '@/components/NewTaskDialog.vue';
 
 export default {
   components: {
-    TerraformTaskForm,
-    EditDialog,
+    NewTaskDialog,
     TaskStatus,
-    TaskForm,
     TaskLink,
   },
   props: {
@@ -174,14 +142,9 @@ export default {
         responseType: 'json',
       })).data;
     },
+
     getActionButtonTitle() {
       return this.$i18n.t(`Re${TEMPLATE_TYPE_ACTION_TITLES[this.template.type]}`);
-    },
-
-    onTaskCreated(e) {
-      EventBus.$emit('i-show-task', {
-        taskId: e.item.id,
-      });
     },
 
     createTask(task) {

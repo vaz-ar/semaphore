@@ -312,7 +312,9 @@ import {
   TEMPLATE_TYPE_ICONS,
   TEMPLATE_TYPE_TITLES,
   APP_INVENTORY_TYPES,
-} from '../lib/constants';
+  APP_FIELDS,
+  UNKNOWN_APP_FIELDS,
+} from '@/lib/constants';
 import SurveyVars from './SurveyVars';
 
 export default {
@@ -326,7 +328,7 @@ export default {
 
   props: {
     sourceItemId: Number,
-    fields: Object,
+    // fields: Object,
     app: String,
   },
 
@@ -397,6 +399,10 @@ export default {
   },
 
   computed: {
+    fields() {
+      return APP_FIELDS[this.app] || UNKNOWN_APP_FIELDS;
+    },
+
     isLoaded() {
       if (this.isNew && this.sourceItemId == null) {
         return true;
