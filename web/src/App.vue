@@ -1060,10 +1060,6 @@ export default {
 
   methods: {
 
-    async isAuthenticated() {
-      return document.cookie.includes('semaphore=');
-    },
-
     async onSubscriptionKeyUpdates() {
       EventBus.$emit('i-snackbar', {
         color: 'success',
