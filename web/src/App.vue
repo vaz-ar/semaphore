@@ -894,10 +894,6 @@ export default {
       return this.projects.find((x) => x.id === this.projectId);
     },
 
-    isAuthenticated() {
-      return document.cookie.includes('semaphore=');
-    },
-
     templatesUrl() {
       let viewId = localStorage.getItem(`project${this.projectId}__lastVisitedViewId`);
       if (viewId) {
@@ -911,14 +907,6 @@ export default {
   },
 
   async created() {
-    if (!this.isAuthenticated) {
-      if (this.$route.path !== '/auth/login') {
-        await this.$router.push({ path: '/auth/login' });
-      }
-      this.state = 'success';
-      return;
-    }
-
     if (localStorage.getItem('darkMode') === '1') {
       this.darkMode = true;
     }
@@ -927,6 +915,14 @@ export default {
       await this.loadData();
       this.state = 'success';
     } catch (err) {
+      if (err.response && err.response.status === 401) {
+        if (this.$route.path !== '/auth/login') {
+          await this.$router.push({ path: '/auth/login' });
+        }
+        this.state = 'success';
+        return;
+      }
+
       EventBus.$emit('i-snackbar', {
         color: 'error',
         text: getErrorMessage(err),
@@ -1063,6 +1059,11 @@ export default {
   },
 
   methods: {
+
+    async isAuthenticated() {
+      return document.cookie.includes('semaphore=');
+    },
+
     async onSubscriptionKeyUpdates() {
       EventBus.$emit('i-snackbar', {
         color: 'success',
@@ -1158,10 +1159,6 @@ export default {
     },
 
     async loadUserInfo() {
-      if (!this.isAuthenticated) {
-        return;
-      }
-
       this.user = (await axios({
         method: 'get',
         url: '/api/user',
