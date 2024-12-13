@@ -88,18 +88,18 @@
       />
     </div>
 
-<!--    <v-select-->
-<!--      v-model="item.inventory_id"-->
-<!--      :label="fieldLabel('inventory')"-->
-<!--      :items="appInventory"-->
-<!--      item-value="id"-->
-<!--      item-text="name"-->
-<!--      outlined-->
-<!--      dense-->
-<!--      required-->
-<!--      :disabled="formSaving"-->
-<!--      v-if="needField('inventory')"-->
-<!--    ></v-select>-->
+    <v-select
+      v-model="inventory_id"
+      :label="fieldLabel('inventory')"
+      :items="inventory"
+      item-value="id"
+      item-text="name"
+      outlined
+      dense
+      required
+      :disabled="formSaving"
+      v-if="needField('inventory')"
+    ></v-select>
 
     <TaskParamsForm v-if="template.app === 'ansible'" v-model="item.params" :app="template.app" />
     <TaskParamsForm v-else v-model="item.params" :app="template.app" />
@@ -121,17 +121,21 @@ import axios from 'axios';
 import TaskParamsForm from '@/components/TaskParamsForm.vue';
 import ArgsPicker from '@/components/ArgsPicker.vue';
 import { APP_INVENTORY_TYPES } from '@/lib/constants';
+import AppFieldsMixin from '@/components/AppFieldsMixin';
 
 export default {
-  mixins: [ItemFormBase],
+  mixins: [ItemFormBase, AppFieldsMixin],
+
   props: {
     templateId: Number,
     sourceTask: Object,
   },
+
   components: {
     ArgsPicker,
     TaskParamsForm,
   },
+
   data() {
     return {
       template: null,
@@ -150,25 +154,41 @@ export default {
       inventory: null,
     };
   },
+
   computed: {
     args() {
       return JSON.parse(this.item.arguments || '[]');
     },
 
-    appInventory() {
-      return this.inventory.filter((i) => (APP_INVENTORY_TYPES[this.app] || []).includes(i.type));
+    app() {
+      return this.template.app;
+    },
+
+    inventory_id: {
+      get() {
+        return (this.item || {}).inventory_id || this.template.inventory_id;
+      },
+      set(newValue) {
+        this.item.inventory_id = newValue;
+      },
     },
   },
 
   watch: {
     needReset(val) {
       if (val) {
-        this.item.template_id = this.templateId;
+        if (this.item) {
+          this.item.template_id = this.templateId;
+        }
+        this.inventory = null;
+        this.template = null;
       }
     },
 
     templateId(val) {
-      this.item.template_id = val;
+      if (this.item) {
+        this.item.template_id = val;
+      }
     },
 
     sourceTask(val) {
@@ -220,7 +240,8 @@ export default {
     isLoaded() {
       return this.item != null
         && this.template != null
-        && this.buildTasks != null;
+        && this.buildTasks != null
+        && this.inventory != null;
     },
 
     beforeSave() {
@@ -253,7 +274,7 @@ export default {
         keys: 'get',
         url: `/api/project/${this.projectId}/inventory`,
         responseType: 'json',
-      })).data;
+      })).data.filter((i) => (APP_INVENTORY_TYPES[this.app] || []).includes(i.type));
 
       if (this.item.build_task_id == null
         && this.buildTasks.length > 0
