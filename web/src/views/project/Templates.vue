@@ -148,9 +148,9 @@
           {{ getAppIcon(item.app) }}
         </v-icon>
 
-        <v-icon class="mr-3" small>
-          {{ TEMPLATE_TYPE_ICONS[item.type] }}
-        </v-icon>
+<!--        <v-icon class="mr-3" small>-->
+<!--          {{ TEMPLATE_TYPE_ICONS[item.type] }}-->
+<!--        </v-icon>-->
 
         <router-link
           :to="viewId
@@ -214,10 +214,11 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-btn text class="pl-1 pr-2" @click="createTask(item.id)">
-          <v-icon class="pr-1">mdi-play</v-icon>
-          {{ $t(TEMPLATE_TYPE_ACTION_TITLES[item.type]) }}
-        </v-btn>
+        <v-btn-toggle dense :value-comparator="() => false">
+          <v-btn @click="createTask(item.id)">
+            <v-icon>mdi-play</v-icon>
+          </v-btn>
+        </v-btn-toggle>
       </template>
 
       <template v-slot:expanded-item="{ headers, item }">
@@ -441,6 +442,11 @@ export default {
           value: 'name',
         },
         {
+          value: 'actions',
+          sortable: false,
+          width: '0%',
+        },
+        {
           text: this.$i18n.t('version'),
           value: 'version',
           sortable: false,
@@ -474,12 +480,6 @@ export default {
           text: this.$i18n.t('repository2'),
           value: 'repository_id',
           sortable: false,
-        },
-        {
-          text: this.$i18n.t('actions'),
-          value: 'actions',
-          sortable: false,
-          width: '0%',
         },
       ];
     },

@@ -45,46 +45,40 @@
       >{{ $t('newKey') }}</v-btn>
     </v-toolbar>
 
-    <v-data-table
-      :headers="headers"
-      :items="items"
-      hide-default-footer
-      class="mt-4"
-      :items-per-page="Number.MAX_VALUE"
-    >
-      <template v-slot:item.name="{ item }">
-        {{ item.name }}
-        <v-chip
-          color="error"
-          v-if="item.empty && item.type !== 'none'"
-          small
-          style="font-weight: bold;"
-          class="ml-2"
-        >{{ $t('empty') }}</v-chip>
-      </template>
-      <template v-slot:item.type="{ item }">
-        <code>{{ item.type }}</code>
-      </template>
-      <template v-slot:item.actions="{ item }">
-        <div style="white-space: nowrap">
-          <v-btn
-            icon
-            class="mr-1"
-            @click="askDeleteItem(item.id)"
-          >
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
+    <v-container fluid>
+      <v-data-table
+        :headers="headers"
+        :items="items"
+        hide-default-footer
+        class="mt-4"
+        :items-per-page="Number.MAX_VALUE"
+      >
+        <template v-slot:item.name="{ item }">
+          {{ item.name }}
+          <v-chip
+            color="error"
+            v-if="item.empty && item.type !== 'none'"
+            small
+            style="font-weight: bold;"
+            class="ml-2"
+          >{{ $t('empty') }}</v-chip>
+        </template>
+        <template v-slot:item.type="{ item }">
+          <code>{{ item.type }}</code>
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-btn-toggle dense :value-comparator="() => false">
+            <v-btn @click="askDeleteItem(item.id)">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+            <v-btn @click="editItem(item.id)">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+        </template>
+      </v-data-table>
+    </v-container>
 
-          <v-btn
-            icon
-            class="mr-1"
-            @click="editItem(item.id)"
-          >
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-        </div>
-      </template>
-    </v-data-table>
   </div>
 
 </template>
@@ -100,18 +94,19 @@ export default {
       return [{
         text: this.$i18n.t('name'),
         value: 'name',
-        width: '50%',
+        width: '20%',
       },
       {
         text: this.$i18n.t('type'),
         value: 'type',
-        width: '50%',
+        width: '10%',
       },
       {
-        text: this.$i18n.t('actions'),
         value: 'actions',
         sortable: false,
-      }];
+        width: '80%',
+      },
+      ];
     },
     getItemsUrl() {
       return `/api/project/${this.projectId}/keys`;
