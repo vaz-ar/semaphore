@@ -37,7 +37,7 @@
 
       <v-divider class="mb-8" />
 
-      <div class="project-backup project-settings-button">
+      <div class="project-backup project-settings-button" v-if="projectType === ''">
 
         <v-row align="center">
           <v-col class="shrink">
