@@ -44,12 +44,15 @@
       >{{ $t('newRepository') }}</v-btn>
     </v-toolbar>
 
+    <v-divider />
+
     <v-data-table
       :headers="headers"
       :items="items"
       hide-default-footer
       class="mt-4"
       :items-per-page="Number.MAX_VALUE"
+      style="max-width: calc(var(--breakpoint-xl) - var(--nav-drawer-width) - 100px); margin: auto;"
     >
       <template v-slot:item.git_url="{ item }">
         {{ item.git_url }}

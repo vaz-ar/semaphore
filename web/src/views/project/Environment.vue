@@ -47,30 +47,30 @@
       </v-btn>
     </v-toolbar>
 
-    <v-container class="pa-0">
-      <v-data-table
-        :headers="headers"
-        :items="items"
-        hide-default-footer
-        class="mt-4"
-        :items-per-page="Number.MAX_VALUE"
-        style="max-width: 800px;"
-      >
-        <template v-slot:item.name="{ item }">
-          <a @click="editItem(item.id)">{{ item.name }}</a>
-        </template>
-        <template v-slot:item.actions="{ item }">
-          <v-btn-toggle dense :value-comparator="() => false">
-            <v-btn @click="askDeleteItem(item.id)">
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-            <v-btn @click="editItem(item.id)">
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-          </v-btn-toggle>
-        </template>
-      </v-data-table>
-    </v-container>
+    <v-divider />
+
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      hide-default-footer
+      class="mt-4"
+      :items-per-page="Number.MAX_VALUE"
+      style="max-width: calc(var(--breakpoint-lg) - var(--nav-drawer-width) - 200px); margin: auto;"
+    >
+      <template v-slot:item.name="{ item }">
+        <a @click="editItem(item.id)">{{ item.name }}</a>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-btn-toggle dense :value-comparator="() => false">
+          <v-btn @click="askDeleteItem(item.id)">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+          <v-btn @click="editItem(item.id)">
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+      </template>
+    </v-data-table>
   </div>
 
 </template>

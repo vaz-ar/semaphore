@@ -16,6 +16,7 @@
       :items="items"
       class="mt-4"
       :footer-props="{ itemsPerPageOptions: [20] }"
+      style="max-width: calc(var(--breakpoint-lg) - var(--nav-drawer-width)); margin: auto;"
     >
       <template v-slot:item.created="{ item }">
         {{ item.created | formatDate }}

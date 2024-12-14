@@ -585,10 +585,6 @@
 </template>
 <style lang="scss">
 
-.v-alert__wrapper {
-  //overflow: auto;
-}
-
 .v-dialog > .v-card > .v-card__title {
   flex-wrap: nowrap;
   overflow: hidden;
@@ -649,7 +645,22 @@
   height: 64px !important;
 }
 
-.v-data-table-header {
+.v-data-table .v-data-footer {
+  margin-left: 16px !important;
+  margin-right: 16px !important;
+}
+
+.v-data-table__wrapper {
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+.v-data-table td:first-child {
+  padding-left: 2px !important;
+}
+
+.v-data-table td:last-child {
+  padding-right: 2px !important;
 }
 
 .v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th {
@@ -657,8 +668,18 @@
   white-space: nowrap;
 }
 
+.v-data-table > .v-data-table__wrapper > table > thead > tr {
+  background: transparent;
+  &:hover {
+    background-color: rgba(143, 143, 143, 0.04);
+  }
+}
+
 .v-data-table > .v-data-table__wrapper > table > tbody > tr {
   background: transparent !important;
+  &:hover {
+    background-color: rgba(143, 143, 143, 0.04) !important;
+  }
 
   & > td {
     white-space: nowrap;

@@ -16,14 +16,14 @@
         :items="tasks"
         :hide-default-footer="hideFooter"
         :footer-props="{ itemsPerPageOptions: [20] }"
-        class="mt-0"
+        class="mt-0 TaskListTable"
     >
       <template v-slot:item.id="{ item }">
         <TaskLink
             :task-id="item.id"
             :label="'#' + item.id"
         />
-        <div style="font-size: 14px; line-height: 1;">
+        <div style="font-size: 14px;">
           <span v-if="item.message">
             <v-icon x-small>mdi-message-outline</v-icon> {{ item.message }}
           </span>
@@ -68,6 +68,11 @@
     </v-data-table>
   </div>
 </template>
+<style lang="scss">
+.TaskListTable td {
+  height: 60px !important;
+}
+</style>
 <script>
 import axios from 'axios';
 import TaskStatus from '@/components/TaskStatus.vue';

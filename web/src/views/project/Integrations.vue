@@ -45,7 +45,9 @@
       </v-btn>
     </v-toolbar>
 
-    <div class="px-4 py-3">
+    <div
+      class="px-4 py-3"
+    >
       <div class="mb-3 pl-1" v-if="(aliases || []).length === 0">There is no aliases.</div>
 
       <div v-else v-for="alias of (aliases || [])" :key="alias.id">
@@ -64,11 +66,14 @@
       </v-btn>
     </div>
 
+    <v-divider />
+
     <v-data-table
       :headers="headers"
       :items="items"
       class="mt-4"
       :items-per-page="Number.MAX_VALUE"
+      style="max-width: calc(var(--breakpoint-xl) - var(--nav-drawer-width) - 200px); margin: auto;"
     >
       <template v-slot:item.name="{ item }">
         <router-link
@@ -132,18 +137,19 @@ export default {
       return [{
         text: this.$i18n.t('name'),
         value: 'name',
-        width: '33.33%',
+        width: '40%',
         sortable: true,
       },
       {
         text: this.$i18n.t('template'),
         value: 'template_id',
-        width: '33.33%',
+        width: '60%',
         sortable: true,
       },
       {
         value: 'actions',
         sortable: false,
+        width: '0%',
       }];
     },
     getItemsUrl() {

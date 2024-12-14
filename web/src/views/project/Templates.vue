@@ -27,11 +27,11 @@
     </v-dialog>
 
     <EditTemplateDialog
-        v-model="editDialog"
-        :project-id="projectId"
-        :item-app="itemApp"
-        item-id="new"
-        @save="loadItems()"
+      v-model="editDialog"
+      :project-id="projectId"
+      :item-app="itemApp"
+      item-id="new"
+      @save="loadItems()"
     ></EditTemplateDialog>
 
     <NewTaskDialog
@@ -88,10 +88,10 @@
           <v-divider v-if="isAdmin && appsMixin.activeAppIds.length > 0"/>
 
           <v-list-item
-              v-if="isAdmin"
-              key="other"
-              link
-              href="/apps"
+            v-if="isAdmin"
+            key="other"
+            link
+            href="/apps"
           >
             <v-list-item-icon>
               <v-icon>mdi-cogs</v-icon>
@@ -127,6 +127,8 @@
       </v-btn>
     </v-tabs>
 
+    <v-divider style="margin-top: -1px;"/>
+
     <v-data-table
       hide-default-footer
       class="mt-4 templates-table"
@@ -148,9 +150,9 @@
           {{ getAppIcon(item.app) }}
         </v-icon>
 
-<!--        <v-icon class="mr-3" small>-->
-<!--          {{ TEMPLATE_TYPE_ICONS[item.type] }}-->
-<!--        </v-icon>-->
+        <!--        <v-icon class="mr-3" small>-->
+        <!--          {{ TEMPLATE_TYPE_ICONS[item.type] }}-->
+        <!--        </v-icon>-->
 
         <router-link
           :to="viewId
@@ -196,7 +198,7 @@
             :tooltip="item.last_task.message"
           />
           <div style="color: gray; font-size: 14px;">
-            {{ $t('by', {user_name: item.last_task.user_name }) }}
+            {{ $t('by', {user_name: item.last_task.user_name}) }}
           </div>
         </div>
       </template>
@@ -269,10 +271,7 @@ import TaskStatus from '@/components/TaskStatus.vue';
 import socket from '@/socket';
 import NewTaskDialog from '@/components/NewTaskDialog.vue';
 
-import {
-  TEMPLATE_TYPE_ACTION_TITLES,
-  TEMPLATE_TYPE_ICONS,
-} from '@/lib/constants';
+import { TEMPLATE_TYPE_ACTION_TITLES, TEMPLATE_TYPE_ICONS } from '@/lib/constants';
 import EditTemplateDialog from '@/components/EditTemplateDialog.vue';
 import AppsMixin from '@/components/AppsMixin';
 

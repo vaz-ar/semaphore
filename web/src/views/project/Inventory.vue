@@ -82,8 +82,9 @@
           </v-list-item>
         </v-list>
       </v-menu>
-
     </v-toolbar>
+
+    <v-divider class="hidden-lg-and-down"/>
 
     <v-data-table
       :headers="headers"
@@ -91,6 +92,7 @@
       hide-default-footer
       class="mt-4"
       :items-per-page="Number.MAX_VALUE"
+      style="max-width: calc(var(--breakpoint-xl) - var(--nav-drawer-width) - 200px); margin: auto;"
     >
       <template v-slot:item.name="{ item }">
         <v-icon class="mr-3" small>
@@ -162,7 +164,7 @@ export default {
       return [{
         text: this.$i18n.t('name'),
         value: 'name',
-        width: '20%',
+        width: '30%',
       },
       {
         text: this.$i18n.t('type'),
@@ -172,12 +174,12 @@ export default {
       {
         text: this.$i18n.t('path'),
         value: 'inventory',
-        width: '20%',
+        width: '50%',
       },
       {
         value: 'actions',
         sortable: false,
-        width: '80%',
+        width: '0%',
       },
       ];
     },

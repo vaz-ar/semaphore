@@ -33,7 +33,7 @@
       @yes="deleteItem(itemId)"
     />
 
-    <v-toolbar flat >
+    <v-toolbar flat>
       <v-app-bar-nav-icon @click="showDrawer()"></v-app-bar-nav-icon>
       <v-toolbar-title>{{ $t('schedule') }}</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -45,12 +45,18 @@
       </v-btn>
     </v-toolbar>
 
+    <v-divider />
+
     <v-data-table
       :headers="headers"
       :items="items"
       hide-default-footer
       class="mt-4"
       :items-per-page="Number.MAX_VALUE"
+      style="
+          max-width: calc(var(--breakpoint-xl) - var(--nav-drawer-width) - 200px);
+          margin: auto;
+        "
     >
       <template v-slot:item.active="{ item }">
         <v-switch
