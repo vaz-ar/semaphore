@@ -14,7 +14,7 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      class="mt-4"
+      class="mt-4 CenterToScreen"
       :footer-props="{ itemsPerPageOptions: [20] }"
       style="max-width: calc(var(--breakpoint-lg) - var(--nav-drawer-width)); margin: auto;"
     >

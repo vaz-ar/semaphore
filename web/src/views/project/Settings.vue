@@ -18,7 +18,10 @@
       :can-update-project="true"
     />
 
-    <div style="margin: auto; max-width: 600px; padding: 0 16px;">
+    <div
+      style="margin: auto; max-width: 600px; padding: 0 16px;"
+      class="CenterToScreen"
+    >
       <h2 class="mt-8 mb-1">General</h2>
 
       <v-divider class="mb-8" />

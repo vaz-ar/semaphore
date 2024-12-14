@@ -714,6 +714,12 @@
   }
 }
 
+@import '~vuetify/src/styles/styles.sass';
+@media #{map-get($display-breakpoints, 'xl-only')} {
+  .CenterToScreen {
+    transform: translateX(-130px);
+  }
+}
 </style>
 
 <script>

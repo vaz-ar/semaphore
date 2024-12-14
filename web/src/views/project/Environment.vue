@@ -53,7 +53,7 @@
       :headers="headers"
       :items="items"
       hide-default-footer
-      class="mt-4"
+      class="mt-4 CenterToScreen"
       :items-per-page="Number.MAX_VALUE"
       style="max-width: calc(var(--breakpoint-lg) - var(--nav-drawer-width) - 200px); margin: auto;"
     >
