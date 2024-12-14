@@ -65,13 +65,11 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-btn
-          icon
-          @click="askDeleteItem(item.id)"
-          v-if="can(USER_PERMISSIONS.manageProjectUsers)"
-        >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
+        <v-btn-toggle dense :value-comparator="() => false">
+          <v-btn @click="askDeleteItem(item.id)" v-if="can(USER_PERMISSIONS.manageProjectUsers)">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </v-btn-toggle>
       </template>
     </v-data-table>
   </div>
@@ -132,7 +130,6 @@ export default {
           value: 'role',
         },
         {
-          text: this.$i18n.t('actions'),
           value: 'actions',
           sortable: false,
         }];
