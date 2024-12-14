@@ -20,7 +20,7 @@
       class="mt-4"
     >
       <template v-slot:item.tpl_alias="{ item }">
-        <div class="d-flex">
+        <div class="d-flex align-center">
           <v-icon
               class="mr-3"
               small
@@ -28,9 +28,9 @@
             {{ getAppIcon(item.tpl_app) }}
           </v-icon>
 
-          <v-icon class="mr-3" small>
-            {{ TEMPLATE_TYPE_ICONS[item.tpl_type] }}
-          </v-icon>
+<!--          <v-icon class="mr-3" small>-->
+<!--            {{ TEMPLATE_TYPE_ICONS[item.tpl_type] }}-->
+<!--          </v-icon>-->
 
           <TaskLink
             :task-id="item.id"

@@ -89,6 +89,7 @@
     </div>
 
     <v-select
+      class="mt-3"
       v-model="inventory_id"
       :label="fieldLabel('inventory')"
       :items="inventory"
@@ -99,6 +100,7 @@
       required
       :disabled="formSaving"
       v-if="needField('inventory')"
+      hide-details
     ></v-select>
 
     <TaskParamsForm v-if="template.app === 'ansible'" v-model="item.params" :app="template.app" />

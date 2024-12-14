@@ -24,7 +24,9 @@
             v-on="on"
             @click="showTaskLog()"
             :class="{'task-link-with-tooltip': tooltip}"
-        >{{ label }}</a>
+        >
+          {{ label }}
+        </a>
       </template>
 
       <span>{{ tooltip }}</span>
