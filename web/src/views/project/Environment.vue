@@ -47,7 +47,7 @@
       </v-btn>
     </v-toolbar>
 
-    <v-container>
+    <v-container class="pa-0">
       <v-data-table
         :headers="headers"
         :items="items"

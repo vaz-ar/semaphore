@@ -61,23 +61,14 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <div style="white-space: nowrap">
-          <v-btn
-            icon
-            class="mr-1"
-            @click="askDeleteItem(item.id)"
-          >
+        <v-btn-toggle dense :value-comparator="() => false">
+          <v-btn @click="askDeleteItem(item.id)">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
-
-          <v-btn
-            icon
-            class="mr-1"
-            @click="editItem(item.id)"
-          >
+          <v-btn @click="editItem(item.id)">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
-        </div>
+        </v-btn-toggle>
       </template>
     </v-data-table>
   </div>

@@ -46,7 +46,7 @@
           </router-link>
         </div>
 
-        <div style="font-size: 14px; line-height: 1;" class="ml-14">
+        <div style="font-size: 14px; line-height: 1;" class="ml-7">
             <span v-if="item.message">
               <v-icon x-small>mdi-message-outline</v-icon> {{ item.message }}
             </span>

@@ -45,13 +45,15 @@
       >{{ $t('newKey') }}</v-btn>
     </v-toolbar>
 
-    <v-container fluid>
+    <v-container class="pa-0">
+
       <v-data-table
         :headers="headers"
         :items="items"
         hide-default-footer
         class="mt-4"
         :items-per-page="Number.MAX_VALUE"
+        style="max-width: 1000px;"
       >
         <template v-slot:item.name="{ item }">
           {{ item.name }}
@@ -94,17 +96,17 @@ export default {
       return [{
         text: this.$i18n.t('name'),
         value: 'name',
-        width: '20%',
+        width: '60%',
       },
       {
         text: this.$i18n.t('type'),
         value: 'type',
-        width: '10%',
+        width: '40%',
       },
       {
         value: 'actions',
         sortable: false,
-        width: '80%',
+        width: '0%',
       },
       ];
     },
