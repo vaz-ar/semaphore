@@ -20,7 +20,7 @@
       class="mt-4"
     >
       <template v-slot:item.tpl_alias="{ item }">
-        <div class="d-flex">
+        <div class="d-flex align-center">
           <v-icon
               class="mr-3"
               small
@@ -28,13 +28,12 @@
             {{ getAppIcon(item.tpl_app) }}
           </v-icon>
 
-          <v-icon class="mr-3" small>
-            {{ TEMPLATE_TYPE_ICONS[item.tpl_type] }}
-          </v-icon>
+<!--          <v-icon class="mr-3" small>-->
+<!--            {{ TEMPLATE_TYPE_ICONS[item.tpl_type] }}-->
+<!--          </v-icon>-->
 
           <TaskLink
             :task-id="item.id"
-            :tooltip="item.message"
             :label="'#' + item.id"
           />
 
@@ -45,6 +44,15 @@
             '/templates/' + item.template_id"
           >{{ item.tpl_alias }}
           </router-link>
+        </div>
+
+        <div style="font-size: 14px; line-height: 1;" class="ml-7">
+            <span v-if="item.message">
+              <v-icon x-small>mdi-message-outline</v-icon> {{ item.message }}
+            </span>
+          <span v-else-if="item.commit_hash">
+              <v-icon x-small>mdi-source-fork</v-icon> {{ item.commit_message }}
+            </span>
         </div>
       </template>
 

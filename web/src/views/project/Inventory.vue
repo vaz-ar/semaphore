@@ -107,23 +107,14 @@
         {{ ['file', 'terraform-workspace'].includes(item.type) ? item.inventory : '&mdash;' }}
       </template>
       <template v-slot:item.actions="{ item }">
-        <div style="white-space: nowrap">
-          <v-btn
-            icon
-            class="mr-1"
-            @click="askDeleteItem(item.id)"
-          >
+        <v-btn-toggle dense :value-comparator="() => false">
+          <v-btn @click="askDeleteItem(item.id)">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
-
-          <v-btn
-            icon
-            class="mr-1"
-            @click="itemApp = getAppByType(item.type); editItem(item.id)"
-          >
+          <v-btn @click="itemApp = getAppByType(item.type); editItem(item.id)">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
-        </div>
+        </v-btn-toggle>
       </template>
     </v-data-table>
   </div>
@@ -171,23 +162,24 @@ export default {
       return [{
         text: this.$i18n.t('name'),
         value: 'name',
-        width: '33.33%',
+        width: '20%',
       },
       {
         text: this.$i18n.t('type'),
         value: 'type',
-        width: '33.33%',
+        width: '20%',
       },
       {
         text: this.$i18n.t('path'),
         value: 'inventory',
-        width: '33.33%',
+        width: '20%',
       },
       {
-        text: this.$i18n.t('actions'),
         value: 'actions',
         sortable: false,
-      }];
+        width: '80%',
+      },
+      ];
     },
 
     getItemsUrl() {
