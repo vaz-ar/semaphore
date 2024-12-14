@@ -15,16 +15,20 @@
     <v-alert
       color="blue"
       dark
-      icon="mdi-source-fork"
       dismissible
+      dense
       v-model="hasCommit"
-      prominent
+      class="overflow-hidden mt-2"
     >
       <div
         style="font-weight: bold;"
-      >{{ (item.commit_hash || '').substr(0, 10) }}
+      >
+        <v-icon small>mdi-source-fork</v-icon>
+        {{ (item.commit_hash || '').substr(0, 10) }}
       </div>
-      <div v-if="sourceTask && sourceTask.commit_message">{{ sourceTask.commit_message }}</div>
+      <div v-if="sourceTask && sourceTask.commit_message">
+        {{ sourceTask.commit_message.substring(0, 50) }}
+      </div>
     </v-alert>
 
     <v-select

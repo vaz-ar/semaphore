@@ -586,7 +586,7 @@
 <style lang="scss">
 
 .v-alert__wrapper {
-  overflow: auto;
+  //overflow: auto;
 }
 
 .v-dialog > .v-card > .v-card__title {
