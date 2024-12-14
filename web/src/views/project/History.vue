@@ -34,7 +34,6 @@
 
           <TaskLink
             :task-id="item.id"
-            :tooltip="item.message"
             :label="'#' + item.id"
           />
 
@@ -45,6 +44,15 @@
             '/templates/' + item.template_id"
           >{{ item.tpl_alias }}
           </router-link>
+        </div>
+
+        <div style="font-size: 14px; line-height: 1;" class="ml-14">
+            <span v-if="item.message">
+              <v-icon x-small>mdi-message-outline</v-icon> {{ item.message }}
+            </span>
+          <span v-else-if="item.commit_hash">
+              <v-icon x-small>mdi-source-fork</v-icon> {{ item.commit_message }}
+            </span>
         </div>
       </template>
 
