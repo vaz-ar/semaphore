@@ -23,7 +23,14 @@
             :task-id="item.id"
             :label="'#' + item.id"
         />
-        <div style="font-size: 14px; line-height: 1;">{{ item.message }}</div>
+        <div style="font-size: 14px; line-height: 1;">
+          <span v-if="item.message">
+            <v-icon x-small>mdi-message-outline</v-icon> {{ item.message }}
+          </span>
+          <span v-else-if="item.commit_hash">
+            <v-icon x-small>mdi-source-fork</v-icon> {{ item.commit_message }}
+          </span>
+        </div>
       </template>
 
       <template v-slot:item.version="{ item }">
