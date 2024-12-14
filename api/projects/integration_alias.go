@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/context"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
 	"github.com/semaphoreui/semaphore/pkg/random"
 	"github.com/semaphoreui/semaphore/util"
-	"github.com/gorilla/context"
 )
 
 type publicAlias struct {
@@ -16,19 +16,23 @@ type publicAlias struct {
 	URL string `json:"url"`
 }
 
-func getPublicAlias(alias db.IntegrationAlias) publicAlias {
-
+func getPublicAliasURL(scope string, alias string) string {
 	aliasURL := util.Config.WebHost
 
 	if !strings.HasSuffix(aliasURL, "/") {
 		aliasURL += "/"
 	}
 
-	aliasURL += "api/integrations/" + alias.Alias
+	aliasURL += "api/" + scope + "/" + alias
+
+	return aliasURL
+}
+
+func getPublicAlias(alias db.IntegrationAlias) publicAlias {
 
 	return publicAlias{
 		ID:  alias.ID,
-		URL: aliasURL,
+		URL: getPublicAliasURL("integrations", alias.Alias),
 	}
 }
 
