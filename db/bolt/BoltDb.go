@@ -39,6 +39,8 @@ type BoltDb struct {
 	db          *bbolt.DB
 	connections map[string]bool
 	mu          sync.Mutex
+
+	integrationAlias publicAlias
 }
 
 type objectID interface {
