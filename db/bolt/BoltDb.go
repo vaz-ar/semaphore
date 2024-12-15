@@ -57,7 +57,7 @@ func CreateBoltDB() *BoltDb {
 		publicAliasProps: integrationAliasProps,
 		db:               &res,
 	}
-	res.integrationAlias = publicAlias{
+	res.terraformAlias = publicAlias{
 		aliasProps:       db.TerraformInventoryAliasProps,
 		publicAliasProps: terraformAliasProps,
 		db:               &res,
