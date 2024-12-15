@@ -39,6 +39,18 @@ type BoltDb struct {
 	db          *bbolt.DB
 	connections map[string]bool
 	mu          sync.Mutex
+
+	integrationAlias publicAlias
+}
+
+func CreateBoltDB() *BoltDb {
+	res := BoltDb{}
+	res.integrationAlias = publicAlias{
+		aliasProps:       db.IntegrationAliasProps,
+		publicAliasProps: integrationAliasProps,
+		db:               &res,
+	}
+	return &res
 }
 
 type objectID interface {
@@ -911,9 +923,9 @@ func CreateTestStore() *BoltDb {
 	}
 
 	fn := "/tmp/test_semaphore_db_" + util.RandString(5)
-	store := BoltDb{
-		Filename: fn,
-	}
+	store := CreateBoltDB()
+
+	store.Filename = fn
 	store.Connect("test")
-	return &store
+	return store
 }
