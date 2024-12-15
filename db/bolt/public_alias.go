@@ -20,6 +20,13 @@ func (d *publicAlias) getAliases(projectID int, filter func(i interface{}) bool,
 	return
 }
 
+func (d *publicAlias) getAlias(projectID int, aliasID int, res interface{}) (err error) {
+
+	err = d.db.getObject(projectID, d.aliasProps, intObjectID(aliasID), res)
+
+	return
+}
+
 func (d *publicAlias) getPublicAlias(alias string, aliasObj interface{}) (err error) {
 
 	err = d.db.getObject(-1, d.publicAliasProps, strObjectID(alias), aliasObj)
