@@ -41,6 +41,13 @@ type BoltDb struct {
 	mu          sync.Mutex
 
 	integrationAlias publicAlias
+	terraformAlias   publicAlias
+}
+
+var terraformAliasProps = db.ObjectProps{
+	TableName:         "terraform_alias",
+	Type:              reflect.TypeOf(db.TerraformInventoryAlias{}),
+	PrimaryColumnName: "alias",
 }
 
 func CreateBoltDB() *BoltDb {
@@ -48,6 +55,11 @@ func CreateBoltDB() *BoltDb {
 	res.integrationAlias = publicAlias{
 		aliasProps:       db.IntegrationAliasProps,
 		publicAliasProps: integrationAliasProps,
+		db:               &res,
+	}
+	res.integrationAlias = publicAlias{
+		aliasProps:       db.TerraformInventoryAliasProps,
+		publicAliasProps: terraformAliasProps,
 		db:               &res,
 	}
 	return &res
