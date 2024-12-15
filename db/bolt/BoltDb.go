@@ -923,9 +923,9 @@ func CreateTestStore() *BoltDb {
 	}
 
 	fn := "/tmp/test_semaphore_db_" + util.RandString(5)
-	store := BoltDb{
-		Filename: fn,
-	}
+	store := CreateBoltDB()
+
+	store.Filename = fn
 	store.Connect("test")
-	return &store
+	return store
 }
