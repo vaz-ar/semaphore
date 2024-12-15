@@ -15,3 +15,11 @@ var TerraformInventoryAliasProps = ObjectProps{
 	Type:              reflect.TypeOf(TerraformInventoryAlias{}),
 	PrimaryColumnName: "id",
 }
+
+func (alias TerraformInventoryAlias) ToAlias() Alias {
+	return Alias{
+		ID:        alias.ID,
+		Alias:     alias.Alias,
+		ProjectID: alias.ProjectID,
+	}
+}
