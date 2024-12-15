@@ -43,6 +43,16 @@ type BoltDb struct {
 	integrationAlias publicAlias
 }
 
+func CreateBoltDB() *BoltDb {
+	res := BoltDb{}
+	res.integrationAlias = publicAlias{
+		aliasProps:       db.IntegrationAliasProps,
+		publicAliasProps: integrationAliasProps,
+		db:               &res,
+	}
+	return &res
+}
+
 type objectID interface {
 	ToBytes() []byte
 }

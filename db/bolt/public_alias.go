@@ -47,7 +47,7 @@ func (d *publicAlias) createAlias(aliasObj interface{}) (newAlias interface{}, e
 		return
 	}
 
-	_, err = d.db.createObject(-1, d.aliasProps, aliasObj)
+	_, err = d.db.createObject(-1, d.publicAliasProps, aliasObj)
 
 	if err != nil {
 		_ = d.deleteIntegrationAlias(alias.ProjectID, alias.ID)
@@ -58,12 +58,12 @@ func (d *publicAlias) createAlias(aliasObj interface{}) (newAlias interface{}, e
 }
 
 func (d *publicAlias) deleteIntegrationAlias(projectID int, aliasID int) (err error) {
-
-	aliasObj := reflect.New(d.aliasProps.Type).Interface()
+	aliasPtr := reflect.New(d.aliasProps.Type)
+	aliasObj := aliasPtr.Elem().Interface()
 
 	alias := aliasObj.(db.Aliasable).ToAlias()
 
-	err = d.db.getObject(projectID, d.aliasProps, intObjectID(aliasID), &aliasObj)
+	err = d.db.getObject(projectID, d.aliasProps, intObjectID(aliasID), aliasPtr.Interface())
 	if err != nil {
 		return
 	}
