@@ -297,7 +297,7 @@ func Route() *mux.Router {
 	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/aliases/{alias_id}", projects.SetTerraformInventoryAliasAccessKey).Methods("PUT")
 
 	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states", projects.GetTerraformInventoryStates).Methods("GET", "HEAD")
-	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states", projects.AddTerraformInventoryState).Methods("POST")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states/latest", projects.GetTerraformInventoryLatestState).Methods("GET", "HEAD")
 	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states/{state_id}", projects.GetTerraformInventoryState).Methods("GET")
 	projectInventoryManagement.HandleFunc("/{inventory_id}/terraform/states/{state_id}", projects.DeleteTerraformInventoryState).Methods("DELETE")
 

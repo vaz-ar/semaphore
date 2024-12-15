@@ -31,8 +31,8 @@ func GetTerraformInventoryStates(w http.ResponseWriter, r *http.Request) {
 	helpers.WriteJSON(w, http.StatusOK, []string{})
 }
 
-func AddTerraformInventoryState(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
+func GetTerraformInventoryLatestState(w http.ResponseWriter, r *http.Request) {
+	helpers.WriteErrorStatus(w, "No state found", http.StatusNotFound)
 }
 
 func GetTerraformInventoryState(w http.ResponseWriter, r *http.Request) {
