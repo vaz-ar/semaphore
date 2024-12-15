@@ -100,10 +100,12 @@ func Route() *mux.Router {
 	publicWebHookRouter.Use(StoreMiddleware, JSONMiddleware)
 	publicWebHookRouter.Path("/integrations/{integration_alias}").HandlerFunc(ReceiveIntegration).Methods("POST", "GET", "OPTIONS")
 
-	publicWebHookRouter.Path("/terraform/{alias}").HandlerFunc(getTerraformState).Methods("GET")
-	publicWebHookRouter.Path("/terraform/{alias}").HandlerFunc(addTerraformState).Methods("POST")
-	publicWebHookRouter.Path("/terraform/{alias}").HandlerFunc(lockTerraformState).Methods("LOCK")
-	publicWebHookRouter.Path("/terraform/{alias}").HandlerFunc(unlockTerraformState).Methods("UNLOCK")
+	terraformWebhookRouter := publicWebHookRouter.PathPrefix("/terraform").Subrouter()
+	terraformWebhookRouter.Use(TerraformInventoryAliasMiddleware)
+	terraformWebhookRouter.Path("/{alias}").HandlerFunc(getTerraformState).Methods("GET")
+	terraformWebhookRouter.Path("/{alias}").HandlerFunc(addTerraformState).Methods("POST")
+	terraformWebhookRouter.Path("/{alias}").HandlerFunc(lockTerraformState).Methods("LOCK")
+	terraformWebhookRouter.Path("/{alias}").HandlerFunc(unlockTerraformState).Methods("UNLOCK")
 
 	authenticatedWS := r.PathPrefix(webPath + "api").Subrouter()
 	authenticatedWS.Use(JSONMiddleware, authenticationWithStore)
