@@ -24,6 +24,12 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tpl, err := helpers.Store(r).GetTemplate(project.ID, taskObj.TemplateID)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
 	newTask, err := helpers.TaskPool(r).AddTask(taskObj, &user.ID, project.ID)
 
 	if errors.Is(err, tasks.ErrInvalidSubscription) {
@@ -33,6 +39,10 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 		util.LogErrorWithFields(err, log.Fields{"error": "Cannot write new event to database"})
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	if tpl.App.NeedTaskAlias() {
+		_, err = helpers.TaskPool(r).CreateAliasForTask(newTask.ID)
 	}
 
 	helpers.WriteJSON(w, http.StatusCreated, newTask)
