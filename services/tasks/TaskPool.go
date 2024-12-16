@@ -94,25 +94,6 @@ func (p *TaskPool) GetTaskByAlias(alias string) (task *TaskRunner) {
 	return p.aliases[alias]
 }
 
-func (p *TaskPool) CreateAliasForTask(taskID int) (alias string, err error) {
-	task := p.GetTask(taskID)
-
-	if task == nil {
-		err = errors.New("task not found")
-		return
-	}
-
-	if task.Alias != "" {
-		err = errors.New("task already has an alias")
-		return
-	}
-
-	alias = random.String(32)
-	task.Alias = alias
-	p.aliases[alias] = task
-	return
-}
-
 // nolint: gocyclo
 func (p *TaskPool) Run() {
 	ticker := time.NewTicker(5 * time.Second)
@@ -348,7 +329,7 @@ func getNextBuildVersion(startVersion string, currentVersion string) string {
 	return prefix + strconv.Itoa(newVer) + suffix
 }
 
-func (p *TaskPool) AddTask(taskObj db.Task, userID *int, projectID int) (newTask db.Task, err error) {
+func (p *TaskPool) AddTask(taskObj db.Task, userID *int, projectID int, needAlias bool) (newTask db.Task, err error) {
 	taskObj.Created = time.Now()
 	taskObj.Status = task_logger.TaskWaitingStatus
 	taskObj.UserID = userID
@@ -388,6 +369,11 @@ func (p *TaskPool) AddTask(taskObj db.Task, userID *int, projectID int) (newTask
 	taskRunner := TaskRunner{
 		Task: newTask,
 		pool: p,
+	}
+
+	if needAlias {
+		taskRunner.Alias = random.String(32)
+		p.aliases[taskRunner.Alias] = &taskRunner
 	}
 
 	err = taskRunner.populateDetails()

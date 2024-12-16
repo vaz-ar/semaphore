@@ -30,7 +30,7 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newTask, err := helpers.TaskPool(r).AddTask(taskObj, &user.ID, project.ID)
+	newTask, err := helpers.TaskPool(r).AddTask(taskObj, &user.ID, project.ID, tpl.App.NeedTaskAlias())
 
 	if errors.Is(err, tasks.ErrInvalidSubscription) {
 		helpers.WriteErrorStatus(w, "No active subscription available.", http.StatusForbidden)
@@ -38,15 +38,6 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 	} else if err != nil {
 		util.LogErrorWithFields(err, log.Fields{"error": "Cannot write new event to database"})
 		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if tpl.App.NeedTaskAlias() {
-		_, err = helpers.TaskPool(r).CreateAliasForTask(newTask.ID)
-	}
-
-	if err != nil {
-		helpers.WriteError(w, err)
 		return
 	}
 
