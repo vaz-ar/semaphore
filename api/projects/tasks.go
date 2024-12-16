@@ -30,7 +30,6 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 		helpers.WriteErrorStatus(w, "No active subscription available.", http.StatusForbidden)
 		return
 	} else if err != nil {
-
 		util.LogErrorWithFields(err, log.Fields{"error": "Cannot write new event to database"})
 		w.WriteHeader(http.StatusInternalServerError)
 		return

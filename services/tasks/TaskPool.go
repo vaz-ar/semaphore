@@ -90,11 +90,11 @@ func (p *TaskPool) GetTask(id int) (task *TaskRunner) {
 	return
 }
 
-func (p *TaskPool) GetRunningTaskByAlias(alias string) (task *TaskRunner) {
+func (p *TaskPool) GetTaskByAlias(alias string) (task *TaskRunner) {
 	return p.aliases[alias]
 }
 
-func (p *TaskPool) CreateAliasForRunningTask(taskID int) (alias string, err error) {
+func (p *TaskPool) CreateAliasForTask(taskID int) (alias string, err error) {
 	var task *TaskRunner
 	for _, t := range p.RunningTasks {
 		if t.Task.ID == taskID {
