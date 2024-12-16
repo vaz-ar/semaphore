@@ -16,7 +16,7 @@ import (
 )
 
 type Job interface {
-	Run(username string, incomingVersion *string) error
+	Run(username string, incomingVersion *string, alias string) error
 	Kill()
 }
 
@@ -157,7 +157,7 @@ func (t *TaskRunner) run() {
 
 	}
 
-	err = t.job.Run(username, incomingVersion)
+	err = t.job.Run(username, incomingVersion, t.Alias)
 
 	if err != nil {
 		t.Log("Running app failed: " + err.Error())
