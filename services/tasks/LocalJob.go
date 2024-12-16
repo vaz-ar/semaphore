@@ -419,7 +419,7 @@ func (t *LocalJob) getPlaybookArgs(username string, incomingVersion *string) (ar
 	return
 }
 
-func (t *LocalJob) Run(username string, incomingVersion *string) (err error) {
+func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (err error) {
 
 	defer func() {
 		t.destroyKeys()
@@ -444,6 +444,9 @@ func (t *LocalJob) Run(username string, incomingVersion *string) (err error) {
 	case db.AppTerraform, db.AppTofu:
 		args, err = t.getTerraformArgs(username, incomingVersion)
 		params = &db.TerraformTaskParams{}
+		if alias != "" {
+			environmentVariables = append(environmentVariables, "TF_HTTP_ADDRESS="+util.GetPublicAliasURL("terraform", alias))
+		}
 	default:
 		args, err = t.getShellArgs(username, incomingVersion)
 		params = &db.DefaultTaskParams{}

@@ -1,14 +1,12 @@
 package projects
 
 import (
-	"net/http"
-	"strings"
-
 	"github.com/gorilla/context"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
 	"github.com/semaphoreui/semaphore/pkg/random"
 	"github.com/semaphoreui/semaphore/util"
+	"net/http"
 )
 
 type publicAlias struct {
@@ -16,23 +14,11 @@ type publicAlias struct {
 	URL string `json:"url"`
 }
 
-func getPublicAliasURL(scope string, alias string) string {
-	aliasURL := util.Config.WebHost
-
-	if !strings.HasSuffix(aliasURL, "/") {
-		aliasURL += "/"
-	}
-
-	aliasURL += "api/" + scope + "/" + alias
-
-	return aliasURL
-}
-
 func getPublicAlias(alias db.IntegrationAlias) publicAlias {
 
 	return publicAlias{
 		ID:  alias.ID,
-		URL: getPublicAliasURL("integrations", alias.Alias),
+		URL: util.GetPublicAliasURL("integrations", alias.Alias),
 	}
 }
 

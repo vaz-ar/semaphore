@@ -63,18 +63,12 @@ type jobLogRecord struct {
 	record LogRecord
 }
 
-type resourceLock struct {
-	lock   bool
-	holder *job
-}
-
 type job struct {
 	username        string
 	incomingVersion *string
+	alias           string
 
 	// job presents remote or local job information
-	job             *tasks.LocalJob
-	status          task_logger.TaskStatus
-	args            []string
-	environmentVars []string
+	job    *tasks.LocalJob
+	status task_logger.TaskStatus
 }

@@ -186,7 +186,7 @@ func (p *JobPool) Run() {
 			go func(runningJob *runningJob) {
 				runningJob.SetStatus(task_logger.TaskRunningStatus)
 
-				err := runningJob.job.Run(t.username, t.incomingVersion)
+				err := runningJob.job.Run(t.username, t.incomingVersion, t.alias)
 
 				if runningJob.status.IsFinished() {
 					return
@@ -466,6 +466,7 @@ func (p *JobPool) checkNewJobs() {
 		taskRunner := job{
 			username:        newJob.Username,
 			incomingVersion: newJob.IncomingVersion,
+			alias:           newJob.Alias,
 
 			job: &tasks.LocalJob{
 				Task:        newJob.Task,

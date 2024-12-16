@@ -874,3 +874,15 @@ func PrintDebug() {
 	b, _ := Config.ToJSON()
 	fmt.Println(string(b))
 }
+
+func GetPublicAliasURL(scope string, alias string) string {
+	aliasURL := Config.WebHost
+
+	if !strings.HasSuffix(aliasURL, "/") {
+		aliasURL += "/"
+	}
+
+	aliasURL += "api/" + scope + "/" + alias
+
+	return aliasURL
+}
