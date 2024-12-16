@@ -45,6 +45,11 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 		_, err = helpers.TaskPool(r).CreateAliasForTask(newTask.ID)
 	}
 
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
 	helpers.WriteJSON(w, http.StatusCreated, newTask)
 }
 

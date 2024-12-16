@@ -95,13 +95,7 @@ func (p *TaskPool) GetTaskByAlias(alias string) (task *TaskRunner) {
 }
 
 func (p *TaskPool) CreateAliasForTask(taskID int) (alias string, err error) {
-	var task *TaskRunner
-	for _, t := range p.RunningTasks {
-		if t.Task.ID == taskID {
-			task = t
-			break
-		}
-	}
+	task := p.GetTask(taskID)
 
 	if task == nil {
 		err = errors.New("task not found")
@@ -254,6 +248,7 @@ func CreateTaskPool(store db.Store) TaskPool {
 		logger:         make(chan logRecord, 10000), // store log records to database
 		store:          store,
 		resourceLocker: make(chan *resourceLock),
+		aliases:        make(map[string]*TaskRunner),
 	}
 }
 
