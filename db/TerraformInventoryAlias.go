@@ -8,6 +8,7 @@ type TerraformInventoryAlias struct {
 	InventoryID int    `db:"inventory_id" json:"inventory_id"`
 	AuthKeyID   int    `db:"auth_key_id" json:"auth_key_id"`
 	Alias       string `db:"alias" json:"alias"`
+	TaskID      *int   `db:"-" json:"-"`
 }
 
 var TerraformInventoryAliasProps = ObjectProps{
