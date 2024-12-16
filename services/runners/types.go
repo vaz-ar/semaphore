@@ -11,6 +11,7 @@ import (
 type JobData struct {
 	Username            string
 	IncomingVersion     *string
+	Alias               string
 	Task                db.Task        `json:"task" binding:"required"`
 	Template            db.Template    `json:"template" binding:"required"`
 	Inventory           db.Inventory   `json:"inventory" binding:"required"`

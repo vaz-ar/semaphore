@@ -65,6 +65,7 @@ func GetRunner(w http.ResponseWriter, r *http.Request) {
 			data.NewJobs = append(data.NewJobs, runners.JobData{
 				Username:            tsk.Username,
 				IncomingVersion:     tsk.IncomingVersion,
+				Alias:               tsk.Alias,
 				Task:                tsk.Task,
 				Template:            tsk.Template,
 				Inventory:           tsk.Inventory,
