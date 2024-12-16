@@ -877,6 +877,18 @@ func PrintDebug() {
 
 func GetPublicAliasURL(scope string, alias string) string {
 	aliasURL := Config.WebHost
+	port := Config.Port
+	if port == "" {
+		port = "3000"
+	}
+
+	if strings.HasPrefix(port, ":") {
+		port = port[1:]
+	}
+
+	if aliasURL == "" {
+		aliasURL = "http://localhost:" + port
+	}
 
 	if !strings.HasSuffix(aliasURL, "/") {
 		aliasURL += "/"
