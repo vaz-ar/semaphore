@@ -3,6 +3,7 @@ package tasks
 import (
 	"errors"
 	"fmt"
+	"github.com/semaphoreui/semaphore/pkg/random"
 	"regexp"
 	"strconv"
 	"strings"
@@ -46,6 +47,8 @@ type TaskPool struct {
 	store db.Store
 
 	resourceLocker chan *resourceLock
+
+	aliases map[string]*TaskRunner
 }
 
 var ErrInvalidSubscription = errors.New("has no active subscription")
@@ -87,6 +90,35 @@ func (p *TaskPool) GetTask(id int) (task *TaskRunner) {
 	return
 }
 
+func (p *TaskPool) GetRunningTaskByAlias(alias string) (task *TaskRunner) {
+	return p.aliases[alias]
+}
+
+func (p *TaskPool) CreateAliasForRunningTask(taskID int) (alias string, err error) {
+	var task *TaskRunner
+	for _, t := range p.RunningTasks {
+		if t.Task.ID == taskID {
+			task = t
+			break
+		}
+	}
+
+	if task == nil {
+		err = errors.New("task not found")
+		return
+	}
+
+	if task.Alias != "" {
+		err = errors.New("task already has an alias")
+		return
+	}
+
+	alias = random.String(32)
+	task.Alias = alias
+	p.aliases[alias] = task
+	return
+}
+
 // nolint: gocyclo
 func (p *TaskPool) Run() {
 	ticker := time.NewTicker(5 * time.Second)
@@ -124,6 +156,7 @@ func (p *TaskPool) Run() {
 			}
 
 			delete(p.RunningTasks, t.Task.ID)
+			delete(p.aliases, t.Alias)
 		}
 	}(p.resourceLocker)
 

@@ -41,6 +41,8 @@ type TaskRunner struct {
 
 	statusListeners []task_logger.StatusListener
 	logListeners    []task_logger.LogListener
+
+	Alias string
 }
 
 func (t *TaskRunner) AddStatusListener(l task_logger.StatusListener) {
