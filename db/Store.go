@@ -75,6 +75,37 @@ type IntegrationExtractorChildReferrers struct {
 	Integrations []ObjectReferrer `json:"integrations"`
 }
 
+func containsStr(arr []string, str string) bool {
+	for _, a := range arr {
+		if a == str {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *RetrieveQueryParams) Validate(props ObjectProps) error {
+
+	if p.Offset > 0 && p.Count <= 0 {
+		return &ValidationError{"offset cannot be without limit"}
+	}
+
+	if p.Count < 0 {
+		return &ValidationError{"count must be positive"}
+	}
+
+	if p.Offset < 0 {
+		return &ValidationError{"offset must be positive"}
+	}
+
+	if p.SortBy != "" {
+		if !containsStr(props.SortableColumns, p.SortBy) {
+			return &ValidationError{"invalid sort column"}
+		}
+	}
+	return nil
+}
+
 func (f *OwnershipFilter) GetOwnerID(ownership ObjectProps) *int {
 	switch ownership.ReferringColumnSuffix {
 	case "template_id":
@@ -425,6 +456,7 @@ var UserProps = ObjectProps{
 	Type:              reflect.TypeOf(User{}),
 	PrimaryColumnName: "id",
 	IsGlobal:          true,
+	SortableColumns:   []string{"name", "username", "email", "role"},
 }
 
 var SessionProps = ObjectProps{

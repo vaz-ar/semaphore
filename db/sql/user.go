@@ -133,6 +133,12 @@ func (d *SqlDb) GetProjectUser(projectID, userID int) (db.ProjectUser, error) {
 }
 
 func (d *SqlDb) GetProjectUsers(projectID int, params db.RetrieveQueryParams) (users []db.UserWithProjectRole, err error) {
+
+	err = params.Validate(db.UserProps)
+	if err != nil {
+		return
+	}
+
 	q := squirrel.Select("u.*").
 		Column("pu.role").
 		From("project__user as pu").
@@ -202,7 +208,15 @@ func (d *SqlDb) GetUserCount() (count int, err error) {
 }
 
 func (d *SqlDb) GetUsers(params db.RetrieveQueryParams) (users []db.User, err error) {
-	query, args, err := getSqlForTable("user", params)
+	q := squirrel.Select("*").From("`user`")
+
+	q, err = getQueryForParams(q, "", db.UserProps, params)
+
+	if err != nil {
+		return
+	}
+
+	query, args, err := q.ToSql()
 
 	if err != nil {
 		return
