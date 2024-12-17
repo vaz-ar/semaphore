@@ -452,11 +452,19 @@ export default {
         responseType: 'json',
       })).data;
 
-      this.inventory = (await axios({
-        keys: 'get',
-        url: `/api/project/${this.projectId}/inventory`,
-        responseType: 'json',
-      })).data;
+      this.inventory = [
+        ...(await axios({
+          keys: 'get',
+          url: `/api/project/${this.projectId}/inventory?app=${this.app}&template_id=${this.itemId}`,
+          responseType: 'json',
+        })).data,
+
+        ...(await axios({
+          keys: 'get',
+          url: `/api/project/${this.projectId}/inventory?app=${this.app}`,
+          responseType: 'json',
+        })).data,
+      ];
 
       this.environment = (await axios({
         keys: 'get',

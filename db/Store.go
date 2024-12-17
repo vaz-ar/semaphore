@@ -75,7 +75,7 @@ type IntegrationExtractorChildReferrers struct {
 	Integrations []ObjectReferrer `json:"integrations"`
 }
 
-func (f OwnershipFilter) GetOwnerID(ownership ObjectProps) *int {
+func (f *OwnershipFilter) GetOwnerID(ownership ObjectProps) *int {
 	switch ownership.ReferringColumnSuffix {
 	case "template_id":
 		return f.TemplateID
@@ -83,6 +83,15 @@ func (f OwnershipFilter) GetOwnerID(ownership ObjectProps) *int {
 		return f.EnvironmentID
 	default:
 		return nil
+	}
+}
+
+func (f *OwnershipFilter) SetOwnerID(ownership ObjectProps, ownerID int) {
+	switch ownership.ReferringColumnSuffix {
+	case "template_id":
+		f.TemplateID = &ownerID
+	case "environment_id":
+		f.EnvironmentID = &ownerID
 	}
 }
 
