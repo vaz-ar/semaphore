@@ -38,12 +38,19 @@ func ObjectToJSON(obj interface{}) *string {
 	return &str
 }
 
+type OwnershipFilter struct {
+	WithoutOwnerOnly bool
+	TemplateID       *int
+	EnvironmentID    *int
+}
+
 type RetrieveQueryParams struct {
 	Offset       int
 	Count        int
 	SortBy       string
 	SortInverted bool
 	Filter       string
+	Ownership    OwnershipFilter
 }
 
 type ObjectReferrer struct {
@@ -68,6 +75,17 @@ type IntegrationExtractorChildReferrers struct {
 	Integrations []ObjectReferrer `json:"integrations"`
 }
 
+func (f OwnershipFilter) GetOwnerID(ownership ObjectProps) *int {
+	switch ownership.ReferringColumnSuffix {
+	case "template_id":
+		return f.TemplateID
+	case "environment_id":
+		return f.EnvironmentID
+	default:
+		return nil
+	}
+}
+
 // ObjectProps describe database entities.
 // It mainly used for NoSQL implementations (currently BoltDB) to preserve same
 // data structure of different implementations and easy change it if required.
@@ -80,6 +98,7 @@ type ObjectProps struct {
 	SortableColumns       []string
 	DefaultSortingColumn  string
 	SortInverted          bool // sort from high to low object ID by default. It is useful for some NoSQL implementations.
+	Ownerships            []*ObjectProps
 }
 
 var ErrNotFound = errors.New("no rows in result set")
@@ -350,6 +369,7 @@ var InventoryProps = ObjectProps{
 	ReferringColumnSuffix: "inventory_id",
 	SortableColumns:       []string{"name"},
 	DefaultSortingColumn:  "name",
+	Ownerships:            []*ObjectProps{&TemplateProps},
 }
 
 var RepositoryProps = ObjectProps{
@@ -369,12 +389,6 @@ var TemplateProps = ObjectProps{
 	DefaultSortingColumn:  "name",
 }
 
-var ScheduleProps = ObjectProps{
-	TableName:         "project__schedule",
-	Type:              reflect.TypeOf(Schedule{}),
-	PrimaryColumnName: "id",
-}
-
 var ProjectUserProps = ObjectProps{
 	TableName:         "project__user",
 	Type:              reflect.TypeOf(ProjectUser{}),
@@ -388,6 +402,13 @@ var ProjectProps = ObjectProps{
 	ReferringColumnSuffix: "project_id",
 	DefaultSortingColumn:  "name",
 	IsGlobal:              true,
+}
+
+var ScheduleProps = ObjectProps{
+	TableName:         "project__schedule",
+	Type:              reflect.TypeOf(Schedule{}),
+	PrimaryColumnName: "id",
+	Ownerships:        []*ObjectProps{&ProjectProps},
 }
 
 var UserProps = ObjectProps{
@@ -520,8 +541,8 @@ func ValidateInventory(store Store, inventory *Inventory) (err error) {
 		return
 	}
 
-	if inventory.HolderID != nil {
-		_, err = store.GetTemplate(inventory.ProjectID, *inventory.HolderID)
+	if inventory.TemplateID != nil {
+		_, err = store.GetTemplate(inventory.ProjectID, *inventory.TemplateID)
 	}
 
 	return

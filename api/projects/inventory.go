@@ -56,7 +56,9 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 
 	project := context.Get(r, "project").(db.Project)
 
-	inventories, err := helpers.Store(r).GetInventories(project.ID, helpers.QueryParams(r.URL))
+	params := helpers.QueryParams(r.URL)
+	params.Ownership.WithoutOwnerOnly = true
+	inventories, err := helpers.Store(r).GetInventories(project.ID, params)
 
 	if err != nil {
 		helpers.WriteError(w, err)

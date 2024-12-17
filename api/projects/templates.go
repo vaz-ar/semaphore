@@ -5,9 +5,9 @@ import (
 	"github.com/semaphoreui/semaphore/util"
 	"net/http"
 
+	"github.com/gorilla/context"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
-	"github.com/gorilla/context"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -93,11 +93,11 @@ func AddTemplate(w http.ResponseWriter, r *http.Request) {
 
 		if newTemplate.InventoryID == nil {
 			inv, err = helpers.Store(r).CreateInventory(db.Inventory{
-				Name:      newTemplate.Name + " - default",
-				ProjectID: project.ID,
-				HolderID:  &newTemplate.ID,
-				Type:      db.InventoryTerraformWorkspace,
-				Inventory: "default",
+				Name:       newTemplate.Name + " - default",
+				ProjectID:  project.ID,
+				TemplateID: &newTemplate.ID,
+				Type:       db.InventoryTerraformWorkspace,
+				Inventory:  "default",
 			})
 
 			if err != nil {
@@ -115,7 +115,7 @@ func AddTemplate(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			inv.HolderID = &newTemplate.ID
+			inv.TemplateID = &newTemplate.ID
 			err = helpers.Store(r).UpdateInventory(inv)
 		}
 

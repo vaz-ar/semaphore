@@ -389,6 +389,30 @@ func apply(
 			return
 		}
 
+		if len(props.Ownerships) > 0 {
+
+			ownershipMatched := true
+
+			for _, ownership := range props.Ownerships {
+				if params.Ownership.WithoutOwnerOnly {
+					if f, ok := getReferredValue(*ownership, obj); ok && !f.IsZero() {
+						ownershipMatched = false
+						break
+					}
+				} else {
+					ownerID := params.Ownership.GetOwnerID(*ownership)
+					if ownerID != nil && !isObjectReferredBy(*ownership, intObjectID(*ownerID), obj) {
+						ownershipMatched = false
+						break
+					}
+				}
+			}
+
+			if !ownershipMatched {
+				continue
+			}
+		}
+
 		if filter != nil && !filter(obj) {
 			continue
 		}
@@ -780,18 +804,41 @@ func (d *BoltDb) getObjectRefsFrom(projectID int, objProps db.ObjectProps, objID
 	return
 }
 
-func isObjectReferredBy(props db.ObjectProps, objID objectID, referringObj interface{}) bool {
+func getReferredValue(props db.ObjectProps, referringObj interface{}) (f reflect.Value, ok bool) {
 	if props.ReferringColumnSuffix == "" {
-		return false
+		ok = false
+		return
 	}
 
 	fieldName, err := getFieldNameByTagSuffix(reflect.TypeOf(referringObj), "db", props.ReferringColumnSuffix)
 
 	if err != nil {
+		ok = false
+		return
+	}
+
+	f = reflect.ValueOf(referringObj).FieldByName(fieldName)
+	ok = true
+	return
+}
+
+func isObjectReferredBy(props db.ObjectProps, objID objectID, referringObj interface{}) bool {
+	f, ok := getReferredValue(props, referringObj)
+	if !ok {
 		return false
 	}
 
-	f := reflect.ValueOf(referringObj).FieldByName(fieldName)
+	//if props.ReferringColumnSuffix == "" {
+	//	return false
+	//}
+	//
+	//fieldName, err := getFieldNameByTagSuffix(reflect.TypeOf(referringObj), "db", props.ReferringColumnSuffix)
+	//
+	//if err != nil {
+	//	return false
+	//}
+	//
+	//f := reflect.ValueOf(referringObj).FieldByName(fieldName)
 
 	if f.IsZero() {
 		return false

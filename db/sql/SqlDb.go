@@ -210,6 +210,23 @@ func (d *SqlDb) makeObjectsQuery(projectID int, props db.ObjectProps, params db.
 		q = q.Where("pe.project_id=?", projectID)
 	}
 
+	if len(props.Ownerships) > 0 {
+		for _, ownership := range props.Ownerships {
+			if params.Ownership.WithoutOwnerOnly {
+				q = q.Where(squirrel.Eq{
+					"pe." + string(ownership.ReferringColumnSuffix): nil,
+				})
+			} else {
+				ownerID := params.Ownership.GetOwnerID(*ownership)
+				if ownerID != nil {
+					q = q.Where(squirrel.Eq{
+						"pe." + string(ownership.ReferringColumnSuffix): *ownerID,
+					})
+				}
+			}
+		}
+	}
+
 	orderDirection := "ASC"
 	if params.SortInverted {
 		orderDirection = "DESC"

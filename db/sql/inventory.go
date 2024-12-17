@@ -35,7 +35,7 @@ func (d *SqlDb) UpdateInventory(inventory db.Inventory) error {
 		inventory.SSHKeyID,
 		inventory.Inventory,
 		inventory.BecomeKeyID,
-		inventory.HolderID,
+		inventory.TemplateID,
 		inventory.RepositoryID,
 		inventory.ID)
 
@@ -53,7 +53,7 @@ func (d *SqlDb) CreateInventory(inventory db.Inventory) (newInventory db.Invento
 		inventory.SSHKeyID,
 		inventory.Inventory,
 		inventory.BecomeKeyID,
-		inventory.HolderID,
+		inventory.TemplateID,
 		inventory.RepositoryID)
 
 	if err != nil {
