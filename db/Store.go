@@ -179,7 +179,7 @@ type Store interface {
 
 	GetInventory(projectID int, inventoryID int) (Inventory, error)
 	GetInventoryRefs(projectID int, inventoryID int) (ObjectReferrers, error)
-	GetInventories(projectID int, params RetrieveQueryParams) ([]Inventory, error)
+	GetInventories(projectID int, params RetrieveQueryParams, types []InventoryType) ([]Inventory, error)
 	UpdateInventory(inventory Inventory) error
 	CreateInventory(inventory Inventory) (Inventory, error)
 	DeleteInventory(projectID int, inventoryID int) error

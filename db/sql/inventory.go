@@ -1,6 +1,9 @@
 package sql
 
-import "github.com/semaphoreui/semaphore/db"
+import (
+	"github.com/Masterminds/squirrel"
+	"github.com/semaphoreui/semaphore/db"
+)
 
 func (d *SqlDb) GetInventory(projectID int, inventoryID int) (inventory db.Inventory, err error) {
 	err = d.getObject(projectID, db.InventoryProps, inventoryID, &inventory)
@@ -12,9 +15,15 @@ func (d *SqlDb) GetInventory(projectID int, inventoryID int) (inventory db.Inven
 	return
 }
 
-func (d *SqlDb) GetInventories(projectID int, params db.RetrieveQueryParams) ([]db.Inventory, error) {
+func (d *SqlDb) GetInventories(projectID int, params db.RetrieveQueryParams, types []db.InventoryType) ([]db.Inventory, error) {
 	var inventories []db.Inventory
-	err := d.getObjects(projectID, db.InventoryProps, params, nil, &inventories)
+	err := d.getObjects(projectID, db.InventoryProps, params, func(builder squirrel.SelectBuilder) squirrel.SelectBuilder {
+		if len(types) == 0 {
+			return builder
+		}
+
+		return builder.Where("type in (?)", types)
+	}, &inventories)
 	return inventories, err
 }
 

@@ -58,7 +58,22 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 
 	params := helpers.QueryParamsWithOwner(r.URL, db.InventoryProps)
 
-	inventories, err := helpers.Store(r).GetInventories(project.ID, params)
+	app := r.URL.Query().Get("app")
+
+	var types []db.InventoryType
+
+	var err error
+
+	if app != "" {
+		types, err = db.TemplateApp(app).InventoryTypes()
+	}
+
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	inventories, err := helpers.Store(r).GetInventories(project.ID, params, types)
 
 	if err != nil {
 		helpers.WriteError(w, err)

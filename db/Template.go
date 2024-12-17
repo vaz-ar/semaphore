@@ -24,6 +24,19 @@ const (
 	AppPulumi     TemplateApp = "pulumi"
 )
 
+func (t TemplateApp) InventoryTypes() ([]InventoryType, error) {
+	switch t {
+	case AppAnsible:
+		return []InventoryType{InventoryStatic, InventoryStaticYaml, InventoryFile}, nil
+	case AppTerraform:
+		return []InventoryType{InventoryTerraformWorkspace}, nil
+	case AppTofu:
+		return []InventoryType{InventoryTofuWorkspace}, nil
+	default:
+		return nil, &ValidationError{"unsupported app"}
+	}
+}
+
 func (t TemplateApp) IsTerraform() bool {
 	return t == AppTerraform || t == AppTofu
 }
