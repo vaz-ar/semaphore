@@ -118,6 +118,11 @@ func (d *SqlDb) UpdateTemplate(template db.Template) error {
 
 func (d *SqlDb) GetTemplates(projectID int, filter db.TemplateFilter, params db.RetrieveQueryParams) (templates []db.Template, err error) {
 
+	pp, err := params.Validate(db.TemplateProps)
+	if err != nil {
+		return
+	}
+
 	templates = []db.Template{}
 
 	type templateWithLastTask struct {
@@ -163,14 +168,14 @@ func (d *SqlDb) GetTemplates(projectID int, filter db.TemplateFilter, params db.
 	}
 
 	order := "ASC"
-	if params.SortInverted {
+	if pp.SortInverted {
 		order = "DESC"
 	}
 
-	switch params.SortBy {
+	switch pp.SortBy {
 	case "name", "playbook":
 		q = q.Where("pt.project_id=?", projectID).
-			OrderBy("pt." + params.SortBy + " " + order)
+			OrderBy("pt." + pp.SortBy + " " + order)
 	case "inventory":
 		q = q.LeftJoin("project__inventory pi ON (pt.inventory_id = pi.id)").
 			Where("pt.project_id=?", projectID).

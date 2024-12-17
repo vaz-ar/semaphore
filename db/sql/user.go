@@ -134,7 +134,7 @@ func (d *SqlDb) GetProjectUser(projectID, userID int) (db.ProjectUser, error) {
 
 func (d *SqlDb) GetProjectUsers(projectID int, params db.RetrieveQueryParams) (users []db.UserWithProjectRole, err error) {
 
-	err = params.Validate(db.UserProps)
+	pp, err := params.Validate(db.UserProps)
 	if err != nil {
 		return
 	}
@@ -146,13 +146,13 @@ func (d *SqlDb) GetProjectUsers(projectID int, params db.RetrieveQueryParams) (u
 		Where("pu.project_id=?", projectID)
 
 	sortDirection := "ASC"
-	if params.SortInverted {
+	if pp.SortInverted {
 		sortDirection = "DESC"
 	}
 
-	switch params.SortBy {
+	switch pp.SortBy {
 	case "name", "username", "email":
-		q = q.OrderBy("u." + params.SortBy + " " + sortDirection)
+		q = q.OrderBy("u." + pp.SortBy + " " + sortDirection)
 	case "role":
 		q = q.OrderBy("pu.role " + sortDirection)
 	default:

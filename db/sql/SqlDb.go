@@ -35,31 +35,31 @@ var dbAssets embed.FS
 
 func getQueryForParams(q squirrel.SelectBuilder, prefix string, props db.ObjectProps, params db.RetrieveQueryParams) (res squirrel.SelectBuilder, err error) {
 
-	err = params.Validate(props)
+	pp, err := params.Validate(props)
 	if err != nil {
 		return
 	}
 
 	orderDirection := "ASC"
-	if params.SortInverted {
+	if pp.SortInverted {
 		orderDirection = "DESC"
 	}
 
 	orderColumn := props.DefaultSortingColumn
-	if params.SortBy != "" {
-		orderColumn = params.SortBy
+	if pp.SortBy != "" {
+		orderColumn = pp.SortBy
 	}
 
 	if orderColumn != "" {
 		q = q.OrderBy(prefix + orderColumn + " " + orderDirection)
 	}
 
-	if params.Count > 0 {
-		q = q.Limit(uint64(params.Count))
+	if pp.Count > 0 {
+		q = q.Limit(uint64(pp.Count))
 	}
 
-	if params.Offset > 0 {
-		q = q.Offset(uint64(params.Offset))
+	if pp.Offset > 0 {
+		q = q.Offset(uint64(pp.Offset))
 	}
 
 	res = q

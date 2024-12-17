@@ -84,26 +84,32 @@ func containsStr(arr []string, str string) bool {
 	return false
 }
 
-func (p *RetrieveQueryParams) Validate(props ObjectProps) error {
+func (p *RetrieveQueryParams) Validate(props ObjectProps) (res RetrieveQueryParams, err error) {
 
 	if p.Offset > 0 && p.Count <= 0 {
-		return &ValidationError{"offset cannot be without limit"}
+		err = &ValidationError{"offset cannot be without limit"}
+		return
 	}
 
 	if p.Count < 0 {
-		return &ValidationError{"count must be positive"}
+		err = &ValidationError{"count must be positive"}
+		return
 	}
 
 	if p.Offset < 0 {
-		return &ValidationError{"offset must be positive"}
+		err = &ValidationError{"offset must be positive"}
+		return
 	}
 
 	if p.SortBy != "" {
 		if !containsStr(props.SortableColumns, p.SortBy) {
-			return &ValidationError{"invalid sort column"}
+			err = &ValidationError{"invalid sort column"}
+			return
 		}
 	}
-	return nil
+
+	res = *p
+	return
 }
 
 func (f *OwnershipFilter) GetOwnerID(ownership ObjectProps) *int {
@@ -425,7 +431,7 @@ var TemplateProps = ObjectProps{
 	Type:                  reflect.TypeOf(Template{}),
 	PrimaryColumnName:     "id",
 	ReferringColumnSuffix: "template_id",
-	SortableColumns:       []string{"name"},
+	SortableColumns:       []string{"name", "playbook", "inventory", "environment", "repository"},
 	DefaultSortingColumn:  "name",
 }
 
