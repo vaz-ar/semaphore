@@ -103,8 +103,14 @@
           <v-btn @click="askDeleteItem(item.id)">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
-          <v-btn @click="itemApp = getAppByType(item.type); editItem(item.id)">
+          <v-btn
+            @click="itemApp = getAppByType(item.type); editItem(item.id)"
+            v-if="!['tofu', 'terraform'].includes(getAppByType(item.type))"
+          >
             <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+          <v-btn v-else>
+            <v-icon>mdi-connection</v-icon>
           </v-btn>
         </v-btn-toggle>
       </template>

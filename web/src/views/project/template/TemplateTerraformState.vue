@@ -1,5 +1,13 @@
 <template>
   <div v-if="inventories != null">
+
+    <YesNoDialog
+      :title="$t('deleteInventory')"
+      :text="$t('askDeleteInv')"
+      v-model="deleteInventoryDialog"
+      @yes="deleteInventory()"
+    />
+
     <EditDialog
       v-model="inventoryDialog"
       :save-button-text="$t('create')"
@@ -18,6 +26,26 @@
           :type="`${template.app}-workspace`"
           @save="onSave"
           @error="onError"
+          :need-save="needSave"
+          :need-reset="needReset"
+        />
+      </template>
+    </EditDialog>
+
+    <EditDialog
+      v-model="attachInventoryDialog"
+      :save-button-text="$t('Attach')"
+      :icon="getAppIcon(template.app)"
+      :icon-color="getAppColor(template.app)"
+      :max-width="450"
+      title="Choose workspace to attach"
+      @save="onAttachInventory"
+    >
+      <template v-slot:form="{ onSave, needSave, needReset }">
+        <InventorySelectForm
+          :app="template.app"
+          :project-id="template.project_id"
+          @save="onSave"
           :need-save="needSave"
           :need-reset="needReset"
         />
@@ -69,7 +97,7 @@
               </v-list-item-icon>
               <v-list-item-title>New workspace</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="inventoryDialog = true">
+            <v-list-item @click="attachInventoryDialog = true">
               <v-list-item-icon>
                 <v-icon>mdi-connection</v-icon>
               </v-list-item-icon>
@@ -102,7 +130,7 @@
           class="mb-2"
           color="error"
           :disabled="inventoryId === template.inventory_id"
-          @click="deleteInventory()"
+          @click="deleteInventoryDialog = true;"
         >
           Delete
         </v-btn>
@@ -169,6 +197,8 @@ import TerraformInventoryForm from '@/components/TerraformInventoryForm.vue';
 import EditDialog from '@/components/EditDialog.vue';
 import { APP_INVENTORY_TITLE } from '@/lib/constants';
 import AppsMixin from '@/components/AppsMixin';
+import YesNoDialog from '@/components/YesNoDialog.vue';
+import InventorySelectForm from '@/components/InventorySelectForm.vue';
 
 export default {
   mixins: [AppsMixin],
@@ -178,7 +208,13 @@ export default {
     },
   },
 
-  components: { EditDialog, TerraformInventoryForm, TerraformStateView },
+  components: {
+    InventorySelectForm,
+    YesNoDialog,
+    EditDialog,
+    TerraformInventoryForm,
+    TerraformStateView,
+  },
 
   props: {
     template: Object,
@@ -192,6 +228,8 @@ export default {
       inventories: null,
       inventoryDialog: null,
       inventoryId: null,
+      deleteInventoryDialog: null,
+      attachInventoryDialog: null,
     };
   },
 
@@ -234,6 +272,15 @@ export default {
     async onNewInventory(e) {
       await this.loadInventories();
       this.inventoryId = e.item.id;
+    },
+
+    async onAttachInventory(e) {
+      await axios({
+        method: 'post',
+        url: `/api/project/${this.template.project_id}/templates/${this.template.id}/inventory/${e.inventoryId}/attach`,
+      });
+      await this.loadInventories();
+      this.inventoryId = e.inventoryId;
     },
 
     async loadInventories() {
