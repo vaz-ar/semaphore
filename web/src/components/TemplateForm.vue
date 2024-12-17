@@ -165,7 +165,7 @@
         <v-select
           v-model="item.inventory_id"
           :label="fieldLabel('inventory')"
-          :items="appInventory"
+          :items="inventory"
           item-value="id"
           item-text="name"
           outlined
@@ -311,7 +311,6 @@ import TemplateVaults from '@/components/TemplateVaults.vue';
 import {
   TEMPLATE_TYPE_ICONS,
   TEMPLATE_TYPE_TITLES,
-  APP_INVENTORY_TYPES,
 } from '@/lib/constants';
 import AppFieldsMixin from '@/components/AppFieldsMixin';
 import SurveyVars from './SurveyVars';
@@ -411,9 +410,6 @@ export default {
         && this.views != null;
     },
 
-    appInventory() {
-      return this.inventory.filter((i) => (APP_INVENTORY_TYPES[this.app] || []).includes(i.type));
-    },
   },
 
   methods: {
@@ -477,6 +473,7 @@ export default {
         url: `/api/project/${this.projectId}/templates`,
         responseType: 'json',
       })).data;
+
       const builds = [];
       const deploys = [];
       template.forEach((t) => {

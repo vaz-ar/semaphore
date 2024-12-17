@@ -140,7 +140,7 @@ export default {
 
   data() {
     return {
-      apps: ['ansible', 'terraform', 'tofu'],
+      apps: ['ansible'],
       itemApp: '',
     };
   },

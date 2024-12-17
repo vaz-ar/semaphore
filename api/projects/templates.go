@@ -92,11 +92,20 @@ func AddTemplate(w http.ResponseWriter, r *http.Request) {
 		var inv db.Inventory
 
 		if newTemplate.InventoryID == nil {
+			var inventoryType db.InventoryType
+
+			if invTypes, err2 := newTemplate.App.InventoryTypes(); err2 == nil {
+				inventoryType = invTypes[0]
+			} else {
+				helpers.WriteError(w, err2)
+				return
+			}
+
 			inv, err = helpers.Store(r).CreateInventory(db.Inventory{
-				Name:       newTemplate.Name + " - default",
+				Name:       "default",
 				ProjectID:  project.ID,
 				TemplateID: &newTemplate.ID,
-				Type:       db.InventoryTerraformWorkspace,
+				Type:       inventoryType,
 				Inventory:  "default",
 			})
 
