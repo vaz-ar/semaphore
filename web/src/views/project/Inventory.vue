@@ -11,17 +11,7 @@
       @save="loadItems"
     >
       <template v-slot:form="{ onSave, onError, needSave, needReset }">
-        <TerraformInventoryForm
-          v-if="['terraform', 'tofu'].includes(itemApp)"
-          :project-id="projectId"
-          :item-id="itemId"
-          @save="onSave"
-          @error="onError"
-          :need-save="needSave"
-          :need-reset="needReset"
-        />
         <InventoryForm
-          v-else
           :project-id="projectId"
           :item-id="itemId"
           @save="onSave"
@@ -125,7 +115,6 @@
 <script>
 import ItemListPageBase from '@/components/ItemListPageBase';
 import InventoryForm from '@/components/InventoryForm.vue';
-import TerraformInventoryForm from '@/components/TerraformInventoryForm.vue';
 import { APP_INVENTORY_TITLE } from '@/lib/constants';
 import AppsMixin from '@/components/AppsMixin';
 
@@ -136,7 +125,7 @@ export default {
     },
   },
   mixins: [ItemListPageBase, AppsMixin],
-  components: { TerraformInventoryForm, InventoryForm },
+  components: { InventoryForm },
 
   data() {
     return {

@@ -94,7 +94,7 @@
           $route.params.viewId ? `/views/${$route.params.viewId}` : ''
         }/templates/${item.id}/state`"
       >
-        Workspace
+        Workspaces
       </v-tab>
     </v-tabs>
 

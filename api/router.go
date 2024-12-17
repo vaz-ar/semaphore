@@ -320,6 +320,9 @@ func Route() *mux.Router {
 	projectTmplManagement.HandleFunc("/{template_id}/tasks/last", projects.GetLastTasks).Methods("GET")
 	projectTmplManagement.HandleFunc("/{template_id}/schedules", projects.GetTemplateSchedules).Methods("GET")
 	projectTmplManagement.HandleFunc("/{template_id}/stats", projects.GetTaskStats).Methods("GET")
+	projectTmplManagement.HandleFunc("/{template_id}/inventory", projects.AttachInventory).Methods("POST")
+	projectTmplManagement.HandleFunc("/{template_id}/inventory/{inventory_id}", projects.DetachInventory).Methods("DELETE")
+	projectTmplManagement.HandleFunc("/{template_id}/default_inventory", projects.SetTemplateInventory).Methods("PUT")
 
 	projectTaskManagement := projectUserAPI.PathPrefix("/tasks").Subrouter()
 	projectTaskManagement.Use(projects.GetTaskMiddleware)

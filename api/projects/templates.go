@@ -228,3 +228,15 @@ func RemoveTemplate(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func SetTemplateInventory(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func AttachInventory(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func DetachInventory(w http.ResponseWriter, r *http.Request) {
+
+}
