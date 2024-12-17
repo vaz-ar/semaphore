@@ -26,11 +26,18 @@
 
     <div class="px-4 py-3">
 
-      <div class="mb-8">
-        <v-btn-toggle v-model="inventoryId" v-if="inventories.length > 0" mandatory>
+      <div class="mb-6">
+        <v-btn-toggle
+          v-model="inventoryId"
+          v-if="inventories.length > 0"
+          mandatory
+          style="overflow: auto"
+          class="mb-2"
+        >
           <v-btn v-for="inv in inventories" :key="inv.id" :value="inv.id">
             {{ inv.inventory }}
             <v-icon
+              dark
               v-if="inv.id === template.inventory_id"
               class="ml-1"
               color="success"
@@ -41,14 +48,40 @@
 
         <span v-else>No workspaces.</span>
 
-        <v-btn large icon class="ml-2" @click="inventoryDialog = true">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+        <v-menu offset-y>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              color="primary"
+              dark
+              fab
+              small
+              class="ml-2"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon dark>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item @click="inventoryDialog = true">
+              <v-list-item-icon>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>New workspace</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="inventoryDialog = true">
+              <v-list-item-icon>
+                <v-icon>mdi-connection</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title >Attach existing workspace</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
 
       <div class="mb-6" v-if="inventories.length > 0">
         <v-btn
-          class="mr-4"
+          class="mr-4 mb-2"
           :disabled="inventoryId === template.inventory_id"
           color="success"
           @click="setDefaultInventory()"
@@ -58,7 +91,7 @@
 
         <v-btn
           color="primary"
-          class="mr-4"
+          class="mr-4 mb-2"
           :disabled="inventoryId === template.inventory_id"
           @click="detachInventory()"
         >
@@ -66,6 +99,7 @@
         </v-btn>
 
         <v-btn
+          class="mb-2"
           color="error"
           :disabled="inventoryId === template.inventory_id"
           @click="deleteInventory()"
@@ -81,9 +115,10 @@
         style="border-radius: 0; margin-left: -16px; margin-right: -16px;"
         v-if="!premiumFeatures.terraform_backend"
       >
-        Terraform/OpenTofu HTTP backend available only in <b>PRO</b> version.
+        <span class="mr-2">
+          Terraform/OpenTofu HTTP backend available only in <b>PRO</b> version.
+        </span>
         <v-btn
-          class="ml-2"
           color="hsl(348deg, 86%, 61%)"
           href="https://semaphoreui.com/pro"
         >Upgrade
