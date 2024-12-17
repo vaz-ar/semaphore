@@ -107,6 +107,7 @@
       :environment="environment"
       :repositories="repositories"
       :premium-features="premiumFeatures"
+      @update-template="loadData"
     ></router-view>
   </div>
 </template>

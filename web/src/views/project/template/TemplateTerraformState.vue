@@ -7,7 +7,7 @@
       :icon-color="getAppColor(template.app)"
       :title="`${$t('nnew')} ${APP_INVENTORY_TITLE[template.app]}`"
       :max-width="450"
-      @save="loadAliases"
+      @save="onNewInventory"
     >
       <template v-slot:form="{ onSave, onError, needSave, needReset }">
         <TerraformInventoryForm
@@ -27,7 +27,7 @@
     <div class="px-4 py-3">
 
       <div class="mb-8">
-        <v-btn-toggle v-model="inventoryId" v-if="inventories.length > 0">
+        <v-btn-toggle v-model="inventoryId" v-if="inventories.length > 0" mandatory>
           <v-btn v-for="inv in inventories" :key="inv.id" :value="inv.id">
             {{ inv.inventory }}
             <v-icon
@@ -51,15 +51,24 @@
           class="mr-4"
           :disabled="inventoryId === template.inventory_id"
           color="success"
-        >Make default
+          @click="setDefaultInventory()"
+        >
+          Make default
         </v-btn>
 
-        <!--        <v-btn color="primary" class="mr-4">-->
-        <!--          Detach-->
-        <!--        </v-btn>-->
+        <v-btn
+          color="primary"
+          class="mr-4"
+          :disabled="inventoryId === template.inventory_id"
+          @click="detachInventory()"
+        >
+          Detach
+        </v-btn>
+
         <v-btn
           color="error"
           :disabled="inventoryId === template.inventory_id"
+          @click="deleteInventory()"
         >
           Delete
         </v-btn>
@@ -154,24 +163,56 @@ export default {
   async created() {
     this.inventoryId = this.template.inventory_id;
 
-    this.inventories = (await axios({
-      url: `/api/project/${this.template.project_id}/inventory?template_id=${this.template.id}`,
-      responseType: 'json',
-    })).data;
-
-    if (
-      (this.inventoryId == null
-      || !this.inventories.some((inv) => inv.id === this.inventoryId))
-      && this.inventories.length > 0) {
-      this.inventoryId = this.inventories[0].id;
-    }
-
+    await this.loadInventories();
     await this.loadAliases();
   },
 
   methods: {
     deleteState(id) {
       console.log(id);
+    },
+
+    async setDefaultInventory() {
+      await axios({
+        method: 'post',
+        url: `/api/project/${this.template.project_id}/templates/${this.template.id}/inventory/${this.inventoryId}/set_default`,
+      });
+      this.$emit('update-template', {});
+    },
+
+    async detachInventory() {
+      await axios({
+        method: 'post',
+        url: `/api/project/${this.template.project_id}/templates/${this.template.id}/inventory/${this.inventoryId}/detach`,
+      });
+      await this.loadInventories();
+    },
+
+    async deleteInventory() {
+      await axios({
+        method: 'delete',
+        url: `/api/project/${this.template.project_id}/inventory/${this.inventoryId}`,
+      });
+      await this.loadInventories();
+    },
+
+    async onNewInventory(e) {
+      await this.loadInventories();
+      this.inventoryId = e.item.id;
+    },
+
+    async loadInventories() {
+      this.inventories = (await axios({
+        url: `/api/project/${this.template.project_id}/inventory?template_id=${this.template.id}`,
+        responseType: 'json',
+      })).data;
+
+      if (
+        (this.inventoryId == null
+          || !this.inventories.some((inv) => inv.id === this.inventoryId))
+        && this.inventories.length > 0) {
+        this.inventoryId = this.inventories[0].id;
+      }
     },
 
     async loadAliases() {
