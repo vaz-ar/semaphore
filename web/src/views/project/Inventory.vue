@@ -177,6 +177,7 @@ export default {
         method: 'post',
         url: `/api/project/${this.projectId}/templates/${templateId}/inventory/${this.itemId}/attach`,
       });
+      await this.loadItems();
     },
 
     getAppByType(type) {

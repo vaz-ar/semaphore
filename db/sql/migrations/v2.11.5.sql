@@ -20,4 +20,4 @@ create table project__terraform_inventory_state(
   foreign key (`inventory_id`) references project__inventory(`id`) on delete cascade
 );
 
-alter table `project__inventory` add `template_id` int null references project__template(`id`);
+alter table `project__inventory` change `holder_id` `template_id` int
