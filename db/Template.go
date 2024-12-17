@@ -37,6 +37,19 @@ func (t TemplateApp) InventoryTypes() ([]InventoryType, error) {
 	}
 }
 
+func (t TemplateApp) HasInventoryType(inventoryType InventoryType) bool {
+	types, err := t.InventoryTypes()
+	if err != nil {
+		return false
+	}
+	for _, typ := range types {
+		if typ == inventoryType {
+			return true
+		}
+	}
+	return false
+}
+
 func (t TemplateApp) IsTerraform() bool {
 	return t == AppTerraform || t == AppTofu
 }

@@ -230,13 +230,68 @@ func RemoveTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetTemplateInventory(w http.ResponseWriter, r *http.Request) {
+	tpl := context.Get(r, "template").(db.Template)
+	inv := context.Get(r, "inventory").(db.Inventory)
 
+	if !tpl.App.HasInventoryType(inv.Type) {
+		helpers.WriteErrorStatus(w, "Inventory type is not supported for this template", http.StatusBadRequest)
+		return
+	}
+
+	if tpl.App.IsTerraform() && (inv.TemplateID == nil || *inv.TemplateID != tpl.ID) {
+		helpers.WriteErrorStatus(w, "Inventory is not attached to this template", http.StatusBadRequest)
+		return
+	}
+
+	tpl.InventoryID = &inv.ID
+	err := helpers.Store(r).UpdateTemplate(tpl)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func AttachInventory(w http.ResponseWriter, r *http.Request) {
+	tpl := context.Get(r, "template").(db.Template)
+	inv := context.Get(r, "inventory").(db.Inventory)
 
+	if inv.TemplateID != nil {
+		helpers.WriteErrorStatus(w, "Inventory is already attached to another template", http.StatusBadRequest)
+		return
+	}
+
+	if !tpl.App.HasInventoryType(inv.Type) {
+		helpers.WriteErrorStatus(w, "Inventory type is not supported for this template", http.StatusBadRequest)
+		return
+	}
+
+	inv.TemplateID = &tpl.ID
+	err := helpers.Store(r).UpdateInventory(inv)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func DetachInventory(w http.ResponseWriter, r *http.Request) {
+	tpl := context.Get(r, "template").(db.Template)
+	inv := context.Get(r, "inventory").(db.Inventory)
 
+	if inv.TemplateID == nil || *inv.TemplateID != tpl.ID {
+		helpers.WriteErrorStatus(w, "Inventory is not attached to this template", http.StatusBadRequest)
+		return
+	}
+
+	inv.TemplateID = nil
+	err := helpers.Store(r).UpdateInventory(inv)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
