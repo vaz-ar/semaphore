@@ -24,6 +24,32 @@ const (
 	AppPulumi     TemplateApp = "pulumi"
 )
 
+func (t TemplateApp) InventoryTypes() ([]InventoryType, error) {
+	switch t {
+	case AppAnsible:
+		return []InventoryType{InventoryStatic, InventoryStaticYaml, InventoryFile}, nil
+	case AppTerraform:
+		return []InventoryType{InventoryTerraformWorkspace}, nil
+	case AppTofu:
+		return []InventoryType{InventoryTofuWorkspace}, nil
+	default:
+		return nil, &ValidationError{"unsupported app"}
+	}
+}
+
+func (t TemplateApp) HasInventoryType(inventoryType InventoryType) bool {
+	types, err := t.InventoryTypes()
+	if err != nil {
+		return false
+	}
+	for _, typ := range types {
+		if typ == inventoryType {
+			return true
+		}
+	}
+	return false
+}
+
 func (t TemplateApp) IsTerraform() bool {
 	return t == AppTerraform || t == AppTofu
 }
@@ -59,6 +85,7 @@ type TemplateFilter struct {
 	ViewID          *int
 	BuildTemplateID *int
 	AutorunOnly     bool
+	App             *TemplateApp
 }
 
 // Template is a user defined model that is used to run a task

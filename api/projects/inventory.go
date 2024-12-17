@@ -56,7 +56,24 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 
 	project := context.Get(r, "project").(db.Project)
 
-	inventories, err := helpers.Store(r).GetInventories(project.ID, helpers.QueryParams(r.URL))
+	params := helpers.QueryParamsWithOwner(r.URL, db.InventoryProps)
+
+	app := r.URL.Query().Get("app")
+
+	var types []db.InventoryType
+
+	var err error
+
+	if app != "" {
+		types, err = db.TemplateApp(app).InventoryTypes()
+	}
+
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	inventories, err := helpers.Store(r).GetInventories(project.ID, params, types)
 
 	if err != nil {
 		helpers.WriteError(w, err)
@@ -84,7 +101,11 @@ func AddInventory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch inventory.Type {
-	case db.InventoryStatic, db.InventoryStaticYaml, db.InventoryFile, db.InventoryTerraformWorkspace:
+	case db.InventoryStatic,
+		db.InventoryStaticYaml,
+		db.InventoryFile,
+		db.InventoryTofuWorkspace,
+		db.InventoryTerraformWorkspace:
 		break
 	default:
 		helpers.WriteJSON(w, http.StatusBadRequest, map[string]string{

@@ -38,12 +38,19 @@ func ObjectToJSON(obj interface{}) *string {
 	return &str
 }
 
+type OwnershipFilter struct {
+	WithoutOwnerOnly bool
+	TemplateID       *int
+	EnvironmentID    *int
+}
+
 type RetrieveQueryParams struct {
 	Offset       int
 	Count        int
 	SortBy       string
 	SortInverted bool
 	Filter       string
+	Ownership    OwnershipFilter
 }
 
 type ObjectReferrer struct {
@@ -68,6 +75,63 @@ type IntegrationExtractorChildReferrers struct {
 	Integrations []ObjectReferrer `json:"integrations"`
 }
 
+func containsStr(arr []string, str string) bool {
+	for _, a := range arr {
+		if a == str {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *RetrieveQueryParams) Validate(props ObjectProps) (res RetrieveQueryParams, err error) {
+
+	if p.Offset > 0 && p.Count <= 0 {
+		err = &ValidationError{"offset cannot be without limit"}
+		return
+	}
+
+	if p.Count < 0 {
+		err = &ValidationError{"count must be positive"}
+		return
+	}
+
+	if p.Offset < 0 {
+		err = &ValidationError{"offset must be positive"}
+		return
+	}
+
+	if p.SortBy != "" {
+		if !containsStr(props.SortableColumns, p.SortBy) {
+			err = &ValidationError{"invalid sort column"}
+			return
+		}
+	}
+
+	res = *p
+	return
+}
+
+func (f *OwnershipFilter) GetOwnerID(ownership ObjectProps) *int {
+	switch ownership.ReferringColumnSuffix {
+	case "template_id":
+		return f.TemplateID
+	case "environment_id":
+		return f.EnvironmentID
+	default:
+		return nil
+	}
+}
+
+func (f *OwnershipFilter) SetOwnerID(ownership ObjectProps, ownerID int) {
+	switch ownership.ReferringColumnSuffix {
+	case "template_id":
+		f.TemplateID = &ownerID
+	case "environment_id":
+		f.EnvironmentID = &ownerID
+	}
+}
+
 // ObjectProps describe database entities.
 // It mainly used for NoSQL implementations (currently BoltDB) to preserve same
 // data structure of different implementations and easy change it if required.
@@ -80,6 +144,7 @@ type ObjectProps struct {
 	SortableColumns       []string
 	DefaultSortingColumn  string
 	SortInverted          bool // sort from high to low object ID by default. It is useful for some NoSQL implementations.
+	Ownerships            []*ObjectProps
 }
 
 var ErrNotFound = errors.New("no rows in result set")
@@ -151,7 +216,7 @@ type Store interface {
 
 	GetInventory(projectID int, inventoryID int) (Inventory, error)
 	GetInventoryRefs(projectID int, inventoryID int) (ObjectReferrers, error)
-	GetInventories(projectID int, params RetrieveQueryParams) ([]Inventory, error)
+	GetInventories(projectID int, params RetrieveQueryParams, types []InventoryType) ([]Inventory, error)
 	UpdateInventory(inventory Inventory) error
 	CreateInventory(inventory Inventory) (Inventory, error)
 	DeleteInventory(projectID int, inventoryID int) error
@@ -350,6 +415,7 @@ var InventoryProps = ObjectProps{
 	ReferringColumnSuffix: "inventory_id",
 	SortableColumns:       []string{"name"},
 	DefaultSortingColumn:  "name",
+	Ownerships:            []*ObjectProps{&TemplateProps},
 }
 
 var RepositoryProps = ObjectProps{
@@ -365,14 +431,8 @@ var TemplateProps = ObjectProps{
 	Type:                  reflect.TypeOf(Template{}),
 	PrimaryColumnName:     "id",
 	ReferringColumnSuffix: "template_id",
-	SortableColumns:       []string{"name"},
+	SortableColumns:       []string{"name", "playbook", "inventory", "environment", "repository"},
 	DefaultSortingColumn:  "name",
-}
-
-var ScheduleProps = ObjectProps{
-	TableName:         "project__schedule",
-	Type:              reflect.TypeOf(Schedule{}),
-	PrimaryColumnName: "id",
 }
 
 var ProjectUserProps = ObjectProps{
@@ -390,11 +450,19 @@ var ProjectProps = ObjectProps{
 	IsGlobal:              true,
 }
 
+var ScheduleProps = ObjectProps{
+	TableName:         "project__schedule",
+	Type:              reflect.TypeOf(Schedule{}),
+	PrimaryColumnName: "id",
+	Ownerships:        []*ObjectProps{&ProjectProps},
+}
+
 var UserProps = ObjectProps{
 	TableName:         "user",
 	Type:              reflect.TypeOf(User{}),
 	PrimaryColumnName: "id",
 	IsGlobal:          true,
+	SortableColumns:   []string{"name", "username", "email", "role"},
 }
 
 var SessionProps = ObjectProps{
@@ -520,8 +588,8 @@ func ValidateInventory(store Store, inventory *Inventory) (err error) {
 		return
 	}
 
-	if inventory.HolderID != nil {
-		_, err = store.GetTemplate(inventory.ProjectID, *inventory.HolderID)
+	if inventory.TemplateID != nil {
+		_, err = store.GetTemplate(inventory.ProjectID, *inventory.TemplateID)
 	}
 
 	return

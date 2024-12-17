@@ -2027,7 +2027,7 @@ paths:
           type: string
           format: name
           description: sorting name
-          x-example: 'db-deploy'
+          x-example: name
         - name: order
           in: query
           required: true

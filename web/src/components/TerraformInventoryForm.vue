@@ -12,33 +12,12 @@
     >{{ formError }}</v-alert>
 
     <v-text-field
-      v-model="item.name"
-      label="Display name"
-      :rules="[v => !!v || $t('name_required')]"
-      required
-      :disabled="formSaving"
-    ></v-text-field>
-
-    <v-text-field
       v-model="item.inventory"
       label="Workspace name"
       :rules="[v => !!v || $t('path_required')]"
       required
       :disabled="formSaving"
     ></v-text-field>
-
-    <v-alert
-        dense
-        text
-        class="mt-4"
-        type="info"
-        v-if="item.type === 'static'"
-    >
-      {{ $t('staticInventoryExample') }}
-      <pre style="font-size: 14px;">[website]
-172.18.8.40
-172.18.8.41</pre>
-    </v-alert>
   </v-form>
 </template>
 <style>
@@ -52,30 +31,18 @@ import axios from 'axios';
 export default {
   mixins: [ItemFormBase],
 
+  props: {
+    namePrefix: String,
+    type: String,
+    templateId: Number,
+  },
+
   components: {
   },
 
   data() {
     return {
-      cmOptions: {
-        tabSize: 2,
-        mode: 'text/x-ini',
-        lineNumbers: true,
-        line: true,
-        lint: true,
-        indentWithTabs: false,
-      },
       keys: null,
-      inventoryTypes: [{
-        id: 'static',
-        name: 'Static',
-      }, {
-        id: 'static-yaml',
-        name: 'Static YAML',
-      }, {
-        id: 'file',
-        name: 'File',
-      }],
     };
   },
 
@@ -105,8 +72,10 @@ export default {
         noneKey = await this.getNoneKey();
       }
 
-      this.item.type = 'terraform-workspace';
+      this.item.name = this.namePrefix + this.item.inventory;
+      this.item.type = this.type;
       this.item.ssh_key_id = noneKey.id;
+      this.item.template_id = this.templateId;
     },
     getItemsUrl() {
       return `/api/project/${this.projectId}/inventory`;

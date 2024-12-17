@@ -33,13 +33,37 @@ create table ` + "`migrations`" + ` (
 //go:embed migrations/*.sql
 var dbAssets embed.FS
 
-func containsStr(arr []string, str string) bool {
-	for _, a := range arr {
-		if a == str {
-			return true
-		}
+func getQueryForParams(q squirrel.SelectBuilder, prefix string, props db.ObjectProps, params db.RetrieveQueryParams) (res squirrel.SelectBuilder, err error) {
+
+	pp, err := params.Validate(props)
+	if err != nil {
+		return
 	}
-	return false
+
+	orderDirection := "ASC"
+	if pp.SortInverted {
+		orderDirection = "DESC"
+	}
+
+	orderColumn := props.DefaultSortingColumn
+	if pp.SortBy != "" {
+		orderColumn = pp.SortBy
+	}
+
+	if orderColumn != "" {
+		q = q.OrderBy(prefix + orderColumn + " " + orderDirection)
+	}
+
+	if pp.Count > 0 {
+		q = q.Limit(uint64(pp.Count))
+	}
+
+	if pp.Offset > 0 {
+		q = q.Offset(uint64(pp.Offset))
+	}
+
+	res = q
+	return
 }
 
 func handleRollbackError(err error) {
@@ -202,41 +226,51 @@ func (d *SqlDb) getObject(projectID int, props db.ObjectProps, objectID int, obj
 	return
 }
 
-func (d *SqlDb) makeObjectsQuery(projectID int, props db.ObjectProps, params db.RetrieveQueryParams) squirrel.SelectBuilder {
-	q := squirrel.Select("*").
+func (d *SqlDb) makeObjectsQuery(projectID int, props db.ObjectProps, params db.RetrieveQueryParams) (q squirrel.SelectBuilder, err error) {
+
+	q = squirrel.Select("*").
 		From("`" + props.TableName + "` pe")
 
 	if !props.IsGlobal {
 		q = q.Where("pe.project_id=?", projectID)
 	}
 
-	orderDirection := "ASC"
-	if params.SortInverted {
-		orderDirection = "DESC"
+	if len(props.Ownerships) > 0 {
+		for _, ownership := range props.Ownerships {
+			if params.Ownership.WithoutOwnerOnly {
+				q = q.Where(squirrel.Eq{
+					"pe." + string(ownership.ReferringColumnSuffix): nil,
+				})
+			} else {
+				ownerID := params.Ownership.GetOwnerID(*ownership)
+				if ownerID != nil {
+					q = q.Where(squirrel.Eq{
+						"pe." + string(ownership.ReferringColumnSuffix): *ownerID,
+					})
+				}
+			}
+		}
 	}
 
-	orderColumn := props.DefaultSortingColumn
-	if containsStr(props.SortableColumns, params.SortBy) {
-		orderColumn = params.SortBy
-	}
+	q, err = getQueryForParams(q, "pe.", props, params)
 
-	if orderColumn != "" {
-		q = q.OrderBy("pe." + orderColumn + " " + orderDirection)
-	}
+	//if params.Count > 0 {
+	//	q = q.Limit(uint64(params.Count))
+	//}
+	//
+	//if params.Offset > 0 {
+	//	q = q.Offset(uint64(params.Offset))
+	//}
 
-	if params.Count > 0 {
-		q = q.Limit(uint64(params.Count))
-	}
-
-	if params.Offset > 0 {
-		q = q.Offset(uint64(params.Offset))
-	}
-
-	return q
+	return
 }
 
 func (d *SqlDb) getObjects(projectID int, props db.ObjectProps, params db.RetrieveQueryParams, prepare func(squirrel.SelectBuilder) squirrel.SelectBuilder, objects interface{}) (err error) {
-	q := d.makeObjectsQuery(projectID, props, params)
+	q, err := d.makeObjectsQuery(projectID, props, params)
+
+	if err != nil {
+		return
+	}
 
 	if prepare != nil {
 		q = prepare(q)
@@ -327,34 +361,6 @@ func (d *SqlDb) Connect(token string) {
 	d.sql.AddTableWithName(db.Template{}, "project__template").SetKeys(true, "id")
 	d.sql.AddTableWithName(db.User{}, "user").SetKeys(true, "id")
 	d.sql.AddTableWithName(db.Session{}, "session").SetKeys(true, "id")
-}
-
-func getSqlForTable(tableName string, p db.RetrieveQueryParams) (string, []interface{}, error) {
-	if p.Offset > 0 && p.Count <= 0 {
-		return "", nil, fmt.Errorf("offset cannot be without limit")
-	}
-
-	q := squirrel.Select("*").
-		From("`" + tableName + "`")
-
-	if p.SortBy != "" {
-		sortDirection := "ASC"
-		if p.SortInverted {
-			sortDirection = "DESC"
-		}
-
-		q = q.OrderBy(p.SortBy + " " + sortDirection)
-	}
-
-	if p.Offset > 0 || p.Count > 0 {
-		q = q.Offset(uint64(p.Offset))
-	}
-
-	if p.Count > 0 {
-		q = q.Limit(uint64(p.Count))
-	}
-
-	return q.ToSql()
 }
 
 func (d *SqlDb) getObjectRefs(projectID int, objectProps db.ObjectProps, objectID int) (refs db.ObjectReferrers, err error) {
@@ -497,18 +503,10 @@ func (d *SqlDb) getObjectsByReferrer(referrerID int, referringObjectProps db.Obj
 		q = q.Where("pe."+referringColumn+"=?", referrerID)
 	}
 
-	orderDirection := "ASC"
-	if params.SortInverted {
-		orderDirection = "DESC"
-	}
+	q, err = getQueryForParams(q, "pe.", props, params)
 
-	orderColumn := props.DefaultSortingColumn
-	if containsStr(props.SortableColumns, params.SortBy) {
-		orderColumn = params.SortBy
-	}
-
-	if orderColumn != "" {
-		q = q.OrderBy("pe." + orderColumn + " " + orderDirection)
+	if err != nil {
+		return
 	}
 
 	query, args, err := q.ToSql()
@@ -577,22 +575,6 @@ func InsertTemplateFromType(typeInstance interface{}) (string, []interface{}) {
 	return fields + " values " + values, args
 }
 
-func AddParams(params db.RetrieveQueryParams, q *squirrel.SelectBuilder, props db.ObjectProps) {
-	orderDirection := "ASC"
-	if params.SortInverted {
-		orderDirection = "DESC"
-	}
-
-	orderColumn := props.DefaultSortingColumn
-	if containsStr(props.SortableColumns, params.SortBy) {
-		orderColumn = params.SortBy
-	}
-
-	if orderColumn != "" {
-		q.OrderBy("t." + orderColumn + " " + orderDirection)
-	}
-}
-
 func (d *SqlDb) GetObject(props db.ObjectProps, ID int) (object interface{}, err error) {
 	query, args, err := squirrel.Select("t.*").
 		From(props.TableName + " as t").
@@ -638,7 +620,11 @@ func (d *SqlDb) GetObjectsByForeignKeyQuery(props db.ObjectProps, foreignID int,
 		From(props.TableName+" as t").
 		Where(foreignProps.ReferringColumnSuffix+"=?", foreignID)
 
-	AddParams(params, &q, props)
+	q, err = getQueryForParams(q, "t.", props, params)
+
+	if err != nil {
+		return
+	}
 
 	query, args, err := q.
 		OrderBy("t.id").

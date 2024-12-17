@@ -94,8 +94,7 @@
           $route.params.viewId ? `/views/${$route.params.viewId}` : ''
         }/templates/${item.id}/state`"
       >
-        State
-        <v-icon class="ml-1" large color="hsl(348deg, 86%, 61%)">mdi-professional-hexagon</v-icon>
+        Workspaces
       </v-tab>
     </v-tabs>
 
@@ -108,6 +107,7 @@
       :environment="environment"
       :repositories="repositories"
       :premium-features="premiumFeatures"
+      @update-template="loadData"
     ></router-view>
   </div>
 </template>

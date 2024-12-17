@@ -126,7 +126,6 @@ import ItemFormBase from '@/components/ItemFormBase';
 import axios from 'axios';
 import TaskParamsForm from '@/components/TaskParamsForm.vue';
 import ArgsPicker from '@/components/ArgsPicker.vue';
-import { APP_INVENTORY_TYPES } from '@/lib/constants';
 import AppFieldsMixin from '@/components/AppFieldsMixin';
 
 export default {
@@ -278,9 +277,9 @@ export default {
 
       this.inventory = (await axios({
         keys: 'get',
-        url: `/api/project/${this.projectId}/inventory`,
+        url: `/api/project/${this.projectId}/inventory?app=${this.app}&template_id=${this.templateId}`,
         responseType: 'json',
-      })).data.filter((i) => (APP_INVENTORY_TYPES[this.app] || []).includes(i.type));
+      }));
 
       if (this.item.build_task_id == null
         && this.buildTasks.length > 0
