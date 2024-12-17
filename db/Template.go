@@ -85,6 +85,7 @@ type TemplateFilter struct {
 	ViewID          *int
 	BuildTemplateID *int
 	AutorunOnly     bool
+	App             *TemplateApp
 }
 
 // Template is a user defined model that is used to run a task

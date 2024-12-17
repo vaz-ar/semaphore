@@ -39,7 +39,7 @@
       :icon-color="getAppColor(template.app)"
       :max-width="450"
       title="Choose workspace to attach"
-      @save="onAttachInventory"
+      @save="attachInventory($event.itemId)"
     >
       <template v-slot:form="{ onSave, needSave, needReset }">
         <InventorySelectForm
@@ -274,13 +274,13 @@ export default {
       this.inventoryId = e.item.id;
     },
 
-    async onAttachInventory(e) {
+    async attachInventory(inventoryId) {
       await axios({
         method: 'post',
-        url: `/api/project/${this.template.project_id}/templates/${this.template.id}/inventory/${e.inventoryId}/attach`,
+        url: `/api/project/${this.template.project_id}/templates/${this.template.id}/inventory/${inventoryId}/attach`,
       });
       await this.loadInventories();
-      this.inventoryId = e.inventoryId;
+      this.inventoryId = inventoryId;
     },
 
     async loadInventories() {

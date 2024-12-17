@@ -1,5 +1,26 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div v-if="items != null">
+
+    <EditDialog
+      v-model="attachInventoryDialog"
+      :save-button-text="$t('Attach')"
+      :icon="getAppIcon(itemApp)"
+      :icon-color="getAppColor(itemApp)"
+      :max-width="450"
+      title="Choose workspace to attach"
+      @save="attachInventory($event.itemId)"
+    >
+      <template v-slot:form="{ onSave, needSave, needReset }">
+        <TemplateSelectForm
+          :app="itemApp"
+          :project-id="projectId"
+          @save="onSave"
+          :need-save="needSave"
+          :need-reset="needReset"
+        />
+      </template>
+    </EditDialog>
+
     <EditDialog
       expandable
       v-model="editDialog"
@@ -109,7 +130,14 @@
           >
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
-          <v-btn v-else>
+          <v-btn
+            v-else
+            @click="
+              itemId = item.id;
+              itemApp = getAppByType(item.type);
+              attachInventoryDialog = true;
+            "
+          >
             <v-icon>mdi-connection</v-icon>
           </v-btn>
         </v-btn-toggle>
@@ -123,6 +151,8 @@ import ItemListPageBase from '@/components/ItemListPageBase';
 import InventoryForm from '@/components/InventoryForm.vue';
 import { APP_INVENTORY_TITLE } from '@/lib/constants';
 import AppsMixin from '@/components/AppsMixin';
+import axios from 'axios';
+import TemplateSelectForm from '@/components/TemplateSelectForm.vue';
 
 export default {
   computed: {
@@ -131,16 +161,24 @@ export default {
     },
   },
   mixins: [ItemListPageBase, AppsMixin],
-  components: { InventoryForm },
+  components: { TemplateSelectForm, InventoryForm },
 
   data() {
     return {
       apps: ['ansible'],
       itemApp: '',
+      attachInventoryDialog: null,
     };
   },
 
   methods: {
+    async attachInventory(templateId) {
+      await axios({
+        method: 'post',
+        url: `/api/project/${this.projectId}/templates/${templateId}/inventory/${this.itemId}/attach`,
+      });
+    },
+
     getAppByType(type) {
       switch (type) {
         case 'tofu-workspace':

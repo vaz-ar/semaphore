@@ -13,10 +13,10 @@
     </v-alert>
 
     <v-select
-      :rules="[v => !!v || $t('inventory_required')]"
+      :rules="[v => !!v || $t('template_required')]"
       :items="items"
       v-model="itemId"
-      label="Workspace"
+      label="Template"
       item-value="id"
       item-text="name"
     />
@@ -73,7 +73,7 @@ export default {
       try {
         this.items = (await axios({
           method: 'get',
-          url: `/api/project/${this.projectId}/inventory?app=${this.app}`,
+          url: `/api/project/${this.projectId}/templates?app=${this.app}`,
           responseType: 'json',
         })).data;
       } catch (err) {

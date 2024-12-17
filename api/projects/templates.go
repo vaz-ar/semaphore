@@ -52,8 +52,12 @@ func GetTemplateRefs(w http.ResponseWriter, r *http.Request) {
 // GetTemplates returns all templates for a project in a sort order
 func GetTemplates(w http.ResponseWriter, r *http.Request) {
 	project := context.Get(r, "project").(db.Project)
-
-	templates, err := helpers.Store(r).GetTemplates(project.ID, db.TemplateFilter{}, helpers.QueryParams(r.URL))
+	filter := db.TemplateFilter{}
+	if r.URL.Query().Get("app") != "" {
+		app := db.TemplateApp(r.URL.Query().Get("app"))
+		filter.App = &app
+	}
+	templates, err := helpers.Store(r).GetTemplates(project.ID, filter, helpers.QueryParams(r.URL))
 
 	if err != nil {
 		helpers.WriteError(w, err)

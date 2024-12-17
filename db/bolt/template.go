@@ -48,6 +48,9 @@ func (d *BoltDb) GetTemplates(projectID int, filter db.TemplateFilter, params db
 	var ftr = func(tpl interface{}) bool {
 		template := tpl.(db.Template)
 		var res = true
+		if filter.App != nil {
+			res = res && template.App == *filter.App
+		}
 		if filter.ViewID != nil {
 			res = res && template.ViewID != nil && *template.ViewID == *filter.ViewID
 		}
