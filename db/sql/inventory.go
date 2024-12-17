@@ -22,7 +22,7 @@ func (d *SqlDb) GetInventories(projectID int, params db.RetrieveQueryParams, typ
 			return builder
 		}
 
-		return builder.Where("type in (?)", types)
+		return builder.Where(squirrel.Eq{"type": types})
 	}, &inventories)
 	return inventories, err
 }
