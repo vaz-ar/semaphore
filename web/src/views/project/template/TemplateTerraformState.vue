@@ -173,7 +173,9 @@
         </v-btn>
       </v-alert>
 
-      <div v-for="alias of (aliases || [])" :key="alias.id">
+      <div class="mb-3 pl-1" v-if="(aliases || []).length === 0">There is no aliases.</div>
+
+      <div v-else v-for="alias of (aliases || [])" :key="alias.id">
         <code class="mr-2">{{ alias.url }}</code>
         <v-btn
           icon
@@ -244,6 +246,12 @@ export default {
   props: {
     template: Object,
     premiumFeatures: Object,
+  },
+
+  watch: {
+    async inventoryId() {
+      await this.loadAliases();
+    },
   },
 
   data() {
@@ -327,7 +335,7 @@ export default {
     async loadAliases() {
       try {
         this.aliases = (await axios({
-          url: `/api/project/${this.template.project_id}/inventory/${this.template.inventory_id}/terraform/aliases`,
+          url: `/api/project/${this.template.project_id}/inventory/${this.inventoryId}/terraform/aliases`,
           responseType: 'json',
         })).data;
       } catch {
@@ -338,7 +346,7 @@ export default {
     async deleteAlias(alias) {
       await axios({
         method: 'delete',
-        url: `/api/project/${this.template.project_id}/inventory/${this.template.inventory_id}/terraform/aliases/${alias}`,
+        url: `/api/project/${this.template.project_id}/inventory/${this.inventoryId}/terraform/aliases/${alias}`,
       });
       await this.loadAliases();
     },
