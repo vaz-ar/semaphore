@@ -68,7 +68,7 @@ func TestUnmarshalObject(t *testing.T) {
 	"last_name": "Gukov",
 	"password": "9347502348723"
 }`
-	err := unmarshalObject([]byte(data), &test1)
+	err := unmarshalObject([]byte(data), &test1, nil)
 	require.NoError(t, err)
 
 	assert.Equal(t, "Denis", test1.FirstName)
