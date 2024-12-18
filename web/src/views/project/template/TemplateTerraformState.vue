@@ -244,6 +244,7 @@
           style="max-width: 400px"
         >
           <TerraformStateView
+            class="mb-1"
             :project-id="template.project_id"
             :inventory-id="inventoryId"
             :state-id="item.id"

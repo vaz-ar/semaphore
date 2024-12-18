@@ -5,7 +5,7 @@
             border-radius: 10px;
             overflow: auto;
             font-size: 14px;
-            max-height: 300px;
+            max-height: 400px;
             margin-top: 5px;"
          class="pa-2"
     >{{ state.state }}</pre>
