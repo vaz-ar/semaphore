@@ -20,7 +20,6 @@
         />
       </template>
     </EditDialog>
-
     <YesNoDialog
       :title="$t('deleteInventory')"
       :text="$t('askDeleteInv')"
