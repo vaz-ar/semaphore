@@ -227,7 +227,7 @@
       </template>
 
       <template v-slot:item.created="{ item }">
-        {{ item.start | formatDate }}
+        {{ item.created | formatDate }}
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -241,6 +241,7 @@
       <template v-slot:expanded-item="{ headers, item }">
         <td
           :colspan="headers.length"
+          style="max-width: 400px"
         >
           <TerraformStateView
             :project-id="template.project_id"

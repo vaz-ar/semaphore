@@ -1,10 +1,15 @@
 <template>
-  <div v-if="state">
-    <pre>
-      <code>{{ state.state }}</code>
-    </pre>
-  </div>
-  <div v-else-if="error" class="text-center">{{ error.message }}</div>
+    <pre v-if="state" style="white-space: pre-wrap;
+            background: gray;
+            color: white;
+            border-radius: 10px;
+            overflow: auto;
+            font-size: 14px;
+            max-height: 300px;
+            margin-top: 5px;"
+         class="pa-2"
+    >{{ state.state }}</pre>
+    <div v-else-if="error" class="text-center">{{ error.message }}</div>
 </template>
 
 <script>
