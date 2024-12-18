@@ -277,15 +277,28 @@ export default {
 
       this.inventory = (await axios({
         keys: 'get',
-        url: `/api/project/${this.projectId}/inventory?app=${this.app}&template_id=${this.templateId}`,
+        url: this.getInventoryUrl(),
         responseType: 'json',
-      }));
+      })).data;
 
       if (this.item.build_task_id == null
         && this.buildTasks.length > 0
         && this.buildTasks.length > 0) {
         this.item.build_task_id = this.buildTasks[0].id;
       }
+    },
+
+    getInventoryUrl() {
+      let res = `/api/project/${this.projectId}/inventory?app=${this.app}`;
+      switch (this.app) {
+        case 'terraform':
+        case 'tofu':
+          res += `&template_id=${this.templateId}`;
+          break;
+        default:
+          break;
+      }
+      return res;
     },
 
     getItemsUrl() {
