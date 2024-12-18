@@ -457,6 +457,10 @@ func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (
 		return
 	}
 
+	if t.Template.App.IsTerraform() && alias != "" {
+		environmentVariables = append(environmentVariables, "TF_HTTP_ADDRESS="+util.GetPublicAliasURL("terraform", alias))
+	}
+
 	err = t.prepareRun(&environmentVariables, params)
 	if err != nil {
 		return err
@@ -470,9 +474,6 @@ func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (
 		args, inputs, err = t.getPlaybookArgs(username, incomingVersion)
 	case db.AppTerraform, db.AppTofu:
 		args, err = t.getTerraformArgs(username, incomingVersion)
-		if alias != "" {
-			environmentVariables = append(environmentVariables, "TF_HTTP_ADDRESS="+util.GetPublicAliasURL("terraform", alias))
-		}
 	default:
 		args, err = t.getShellArgs(username, incomingVersion)
 	}
