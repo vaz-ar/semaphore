@@ -3,15 +3,15 @@
 
     <EditDialog
       v-model="editDialog"
-      :save-button-text="alias === 'new' ? $t('create') : $t('save')"
-      :title="`${alias === 'new' ? $t('nnew') : $t('edit')} Key`"
+      :save-button-text="aliasId === 'new' ? $t('create') : $t('save')"
+      :title="`${aliasId === 'new' ? $t('nnew') : $t('edit')} Key`"
       :max-width="450"
       @save="loadAliases()"
     >
       <template v-slot:form="{ onSave, onError, needSave, needReset }">
         <TerraformAliasForm
           :project-id="template.project_id"
-          :item-id="alias"
+          :item-id="aliasId"
           :inventory-id="template.inventory_id"
           @save="onSave"
           @error="onError"
@@ -20,6 +20,7 @@
         />
       </template>
     </EditDialog>
+
     <YesNoDialog
       :title="$t('deleteInventory')"
       :text="$t('askDeleteInv')"
@@ -198,6 +199,7 @@
     </div>
 
     <TerraformStateView
+      class="pl-4 pt-4"
       v-if="premiumFeatures.terraform_backend"
       :project-id="template.project_id"
       :inventory-id="template.inventory_id"
@@ -253,7 +255,7 @@ export default {
       inventoryId: null,
       deleteInventoryDialog: null,
       attachInventoryDialog: null,
-      alias: null,
+      aliasId: null,
       editDialog: null,
     };
   },
@@ -357,12 +359,12 @@ export default {
     },
 
     editAlias(alias) {
-      this.alias = alias;
+      this.aliasId = alias;
       this.editDialog = true;
     },
 
     async addAlias() {
-      this.alias = 'new';
+      this.aliasId = 'new';
       this.editDialog = true;
     },
   },
