@@ -222,7 +222,7 @@ func (d *BoltDb) getObject(bucketID int, props db.ObjectProps, objectID objectID
 			return db.ErrNotFound
 		}
 
-		return unmarshalObject(str, object)
+		return unmarshalObject(str, object, props.SelectColumns)
 	})
 
 	return
@@ -318,7 +318,7 @@ func createObjectType(t reflect.Type) reflect.Type {
 	return reflect.StructOf(fields)
 }
 
-func unmarshalObject(data []byte, obj interface{}) error {
+func unmarshalObject(data []byte, obj interface{}, fields []string) error {
 	newType := createObjectType(reflect.TypeOf(obj))
 	ptr := reflect.New(newType).Interface()
 
@@ -331,8 +331,26 @@ func unmarshalObject(data []byte, obj interface{}) error {
 
 	objValue := reflect.ValueOf(obj).Elem()
 
-	for i := 0; i < newType.NumField(); i++ {
-		objValue.Field(i).Set(value.Field(i))
+	needFieldFilter := len(fields) > 0
+
+	if needFieldFilter {
+		fieldMap := make(map[string]struct{}, len(fields))
+		for _, field := range fields {
+			fieldMap[field] = struct{}{}
+		}
+
+		for i := 0; i < newType.NumField(); i++ {
+			fieldName := newType.Field(i).Tag.Get("json")
+			if _, exists := fieldMap[fieldName]; !exists {
+				continue
+			}
+
+			objValue.Field(i).Set(value.Field(i))
+		}
+	} else {
+		for i := 0; i < newType.NumField(); i++ {
+			objValue.Field(i).Set(value.Field(i))
+		}
 	}
 
 	return nil
@@ -382,7 +400,7 @@ func apply(
 
 		tmp := reflect.New(objType)
 		ptr := tmp.Interface()
-		err = unmarshalObject(v, ptr)
+		err = unmarshalObject(v, ptr, props.SelectColumns)
 		obj := reflect.ValueOf(ptr).Elem().Interface()
 
 		if err != nil {

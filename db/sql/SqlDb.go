@@ -228,8 +228,12 @@ func (d *SqlDb) getObject(projectID int, props db.ObjectProps, objectID int, obj
 
 func (d *SqlDb) makeObjectsQuery(projectID int, props db.ObjectProps, params db.RetrieveQueryParams) (q squirrel.SelectBuilder, err error) {
 
-	q = squirrel.Select("*").
-		From("`" + props.TableName + "` pe")
+	columns := []string{"*"}
+	if len(props.SelectColumns) > 0 {
+		columns = props.SortableColumns
+	}
+
+	q = squirrel.Select(columns...).From("`" + props.TableName + "` pe")
 
 	if !props.IsGlobal {
 		q = q.Where("pe.project_id=?", projectID)
@@ -265,7 +269,13 @@ func (d *SqlDb) makeObjectsQuery(projectID int, props db.ObjectProps, params db.
 	return
 }
 
-func (d *SqlDb) getObjects(projectID int, props db.ObjectProps, params db.RetrieveQueryParams, prepare func(squirrel.SelectBuilder) squirrel.SelectBuilder, objects interface{}) (err error) {
+func (d *SqlDb) getObjects(
+	projectID int,
+	props db.ObjectProps,
+	params db.RetrieveQueryParams,
+	prepare func(squirrel.SelectBuilder) squirrel.SelectBuilder,
+	objects interface{},
+) (err error) {
 	q, err := d.makeObjectsQuery(projectID, props, params)
 
 	if err != nil {
@@ -491,11 +501,21 @@ func (d *SqlDb) getObjectByReferrer(referrerID int, referringObjectProps db.Obje
 	return
 }
 
-func (d *SqlDb) getObjectsByReferrer(referrerID int, referringObjectProps db.ObjectProps, props db.ObjectProps, params db.RetrieveQueryParams, objects interface{}) (err error) {
+func (d *SqlDb) getObjectsByReferrer(
+	referrerID int,
+	referringObjectProps db.ObjectProps,
+	props db.ObjectProps,
+	params db.RetrieveQueryParams,
+	objects interface{},
+) (err error) {
 	var referringColumn = referringObjectProps.ReferringColumnSuffix
 
-	q := squirrel.Select("*").
-		From(props.TableName + " pe")
+	columns := []string{"*"}
+	if len(props.SelectColumns) > 0 {
+		columns = props.SelectColumns
+	}
+
+	q := squirrel.Select(columns...).From(props.TableName + " pe")
 
 	if props.IsGlobal {
 		q = q.Where("pe." + referringColumn + " is null")

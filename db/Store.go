@@ -145,6 +145,7 @@ type ObjectProps struct {
 	DefaultSortingColumn  string
 	SortInverted          bool // sort from high to low object ID by default. It is useful for some NoSQL implementations.
 	Ownerships            []*ObjectProps
+	SelectColumns         []string
 }
 
 var ErrNotFound = errors.New("no rows in result set")
