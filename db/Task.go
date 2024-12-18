@@ -73,7 +73,7 @@ type Task struct {
 	Params MapStringAnyField `db:"params" json:"params"`
 }
 
-func (task *Task) GetParams(target interface{}) (err error) {
+func (task *Task) FillParams(target interface{}) (err error) {
 	content, err := json.Marshal(task.Params)
 	if err != nil {
 		return
@@ -159,7 +159,7 @@ func (task *Task) ValidateNewTask(template Template) error {
 		params = &DefaultTaskParams{}
 	}
 
-	return task.GetParams(params)
+	return task.FillParams(params)
 }
 
 func (task *TaskWithTpl) Fill(d Store) error {

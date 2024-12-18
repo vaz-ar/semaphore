@@ -243,7 +243,7 @@ func (t *LocalJob) getTerraformArgs(username string, incomingVersion *string) (a
 	}
 
 	var params db.TerraformTaskParams
-	err = t.Task.GetParams(&params)
+	err = t.Task.FillParams(&params)
 	if err != nil {
 		return
 	}
@@ -339,7 +339,7 @@ func (t *LocalJob) getPlaybookArgs(username string, incomingVersion *string) (ar
 
 	var params db.AnsibleTaskParams
 
-	err = t.Task.GetParams(&params)
+	err = t.Task.FillParams(&params)
 	if err != nil {
 		return
 	}
@@ -419,6 +419,25 @@ func (t *LocalJob) getPlaybookArgs(username string, incomingVersion *string) (ar
 	return
 }
 
+func (t *LocalJob) getParams() (params interface{}, err error) {
+	switch t.Template.App {
+	case db.AppAnsible:
+		params = &db.AnsibleTaskParams{}
+	case db.AppTerraform, db.AppTofu:
+		params = &db.TerraformTaskParams{}
+	default:
+		params = &db.DefaultTaskParams{}
+	}
+
+	err = t.Task.FillParams(params)
+
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (err error) {
 
 	defer func() {
@@ -433,31 +452,7 @@ func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (
 		return
 	}
 
-	var args []string
-	var inputs map[string]string
-	var params interface{}
-
-	switch t.Template.App {
-	case db.AppAnsible:
-		args, inputs, err = t.getPlaybookArgs(username, incomingVersion)
-		params = &db.AnsibleTaskParams{}
-	case db.AppTerraform, db.AppTofu:
-		args, err = t.getTerraformArgs(username, incomingVersion)
-		params = &db.TerraformTaskParams{}
-		if alias != "" {
-			environmentVariables = append(environmentVariables, "TF_HTTP_ADDRESS="+util.GetPublicAliasURL("terraform", alias))
-		}
-	default:
-		args, err = t.getShellArgs(username, incomingVersion)
-		params = &db.DefaultTaskParams{}
-	}
-
-	if err != nil {
-		return
-	}
-
-	err = t.Task.GetParams(params)
-
+	params, err := t.getParams()
 	if err != nil {
 		return
 	}
@@ -465,6 +460,25 @@ func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (
 	err = t.prepareRun(&environmentVariables, params)
 	if err != nil {
 		return err
+	}
+
+	var args []string
+	var inputs map[string]string
+
+	switch t.Template.App {
+	case db.AppAnsible:
+		args, inputs, err = t.getPlaybookArgs(username, incomingVersion)
+	case db.AppTerraform, db.AppTofu:
+		args, err = t.getTerraformArgs(username, incomingVersion)
+		if alias != "" {
+			environmentVariables = append(environmentVariables, "TF_HTTP_ADDRESS="+util.GetPublicAliasURL("terraform", alias))
+		}
+	default:
+		args, err = t.getShellArgs(username, incomingVersion)
+	}
+
+	if err != nil {
+		return
 	}
 
 	if t.Inventory.SSHKey.Type == db.AccessKeySSH && t.Inventory.SSHKeyID != nil {
