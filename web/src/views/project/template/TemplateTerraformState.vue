@@ -1,5 +1,5 @@
 <template>
-  <div v-if="inventories != null">
+  <div v-if="inventories != null && states != null">
 
     <EditDialog
       v-model="editDialog"
@@ -12,7 +12,7 @@
         <TerraformAliasForm
           :project-id="template.project_id"
           :item-id="aliasId"
-          :inventory-id="template.inventory_id"
+          :inventory-id="inventoryId"
           @save="onSave"
           @error="onError"
           :need-save="needSave"
@@ -121,7 +121,7 @@
               <v-list-item-icon>
                 <v-icon>mdi-connection</v-icon>
               </v-list-item-icon>
-              <v-list-item-title >Attach existing workspace</v-list-item-title>
+              <v-list-item-title>Attach existing workspace</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -200,12 +200,56 @@
       </v-btn>
     </div>
 
-    <TerraformStateView
-      class="pl-4 pt-4"
+    <v-data-table
       v-if="premiumFeatures.terraform_backend"
-      :project-id="template.project_id"
-      :inventory-id="template.inventory_id"
-    />
+      :headers="headers"
+      :items="states"
+      :footer-props="{ itemsPerPageOptions: [20] }"
+      single-expand
+      show-expand
+      class="mt-0 TaskListTable"
+    >
+      <template v-slot:item.id="{ item }">
+        #{{ item.id }}
+      </template>
+
+      <template v-slot:item.task_id="{ item }">
+        <TaskLink
+          v-if="item.task_id"
+          :task-id="item.task_id"
+          :label="'#' + item.task_id"
+        />
+        <div v-else>&mdash;</div>
+      </template>
+
+      <template v-slot:item.status="{ item }">
+        <TaskStatus :status="item.status"/>
+      </template>
+
+      <template v-slot:item.created="{ item }">
+        {{ item.start | formatDate }}
+      </template>
+
+      <template v-slot:item.actions="{ item }">
+        <v-btn-toggle dense :value-comparator="() => false">
+          <v-btn @click="deleteState(item)">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+      </template>
+
+      <template v-slot:expanded-item="{ headers, item }">
+        <td
+          :colspan="headers.length"
+        >
+          <TerraformStateView
+            :project-id="template.project_id"
+            :inventory-id="inventoryId"
+            :state-id="item.id"
+          />
+        </td>
+      </template>
+    </v-data-table>
 
     <v-container v-else>
       <div style="text-align: center; color: grey;">No state available.</div>
@@ -217,7 +261,6 @@
 
 import axios from 'axios';
 import EventBus from '@/event-bus';
-import TerraformStateView from '@/components/TerraformStateView.vue';
 import TerraformInventoryForm from '@/components/TerraformInventoryForm.vue';
 import EditDialog from '@/components/EditDialog.vue';
 import { APP_INVENTORY_TITLE } from '@/lib/constants';
@@ -225,6 +268,9 @@ import AppsMixin from '@/components/AppsMixin';
 import YesNoDialog from '@/components/YesNoDialog.vue';
 import InventorySelectForm from '@/components/InventorySelectForm.vue';
 import TerraformAliasForm from '@/components/TerraformAliasForm.vue';
+import TaskStatus from '@/components/TaskStatus.vue';
+import TaskLink from '@/components/TaskLink.vue';
+import TerraformStateView from '@/components/TerraformStateView.vue';
 
 export default {
   mixins: [AppsMixin],
@@ -235,12 +281,14 @@ export default {
   },
 
   components: {
+    TerraformStateView,
+    TaskLink,
+    TaskStatus,
     TerraformAliasForm,
     InventorySelectForm,
     YesNoDialog,
     EditDialog,
     TerraformInventoryForm,
-    TerraformStateView,
   },
 
   props: {
@@ -251,13 +299,14 @@ export default {
   watch: {
     async inventoryId() {
       await this.loadAliases();
+      await this.loadStates();
     },
   },
 
   data() {
     return {
       aliases: [],
-      state: null,
+      states: null,
       inventories: null,
       inventoryDialog: null,
       inventoryId: null,
@@ -265,6 +314,28 @@ export default {
       attachInventoryDialog: null,
       aliasId: null,
       editDialog: null,
+      headers: [
+        {
+          text: 'ID',
+          value: 'id',
+          sortable: false,
+        },
+        {
+          text: this.$i18n.t('taskId'),
+          value: 'task_id',
+          sortable: false,
+        },
+        {
+          text: this.$i18n.t('created'),
+          value: 'created',
+          sortable: false,
+        },
+        {
+          value: 'actions',
+          sortable: false,
+          width: '0%',
+        },
+      ],
     };
   },
 
@@ -273,6 +344,7 @@ export default {
 
     await this.loadInventories();
     await this.loadAliases();
+    await this.loadStates();
   },
 
   methods: {
@@ -316,6 +388,10 @@ export default {
       });
       await this.loadInventories();
       this.inventoryId = inventoryId;
+    },
+
+    async loadStates() {
+      this.states = (await axios.get(`/api/project/${this.template.project_id}/inventory/${this.inventoryId}/terraform/states`)).data;
     },
 
     async loadInventories() {

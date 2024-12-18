@@ -4,7 +4,7 @@
       <code>{{ state.state }}</code>
     </pre>
   </div>
-  <div v-else-if="error">{{ error.message }}</div>
+  <div v-else-if="error" class="text-center">{{ error.message }}</div>
 </template>
 
 <script>
@@ -14,6 +14,7 @@ export default {
   props: {
     projectId: Number,
     inventoryId: Number,
+    stateId: Number,
   },
 
   data() {
@@ -25,7 +26,7 @@ export default {
 
   async created() {
     try {
-      this.state = (await axios.get(`/api/project/${this.projectId}/inventory/${this.inventoryId}/terraform/states/latest`)).data;
+      this.state = (await axios.get(`/api/project/${this.projectId}/inventory/${this.inventoryId}/terraform/states/${this.stateId}`)).data;
     } catch (e) {
       if (e.response.status === 404) {
         this.error = {
