@@ -1,6 +1,26 @@
 <template>
   <div v-if="inventories != null">
 
+    <EditDialog
+      v-model="editDialog"
+      :save-button-text="alias === 'new' ? $t('create') : $t('save')"
+      :title="`${alias === 'new' ? $t('nnew') : $t('edit')} Key`"
+      :max-width="450"
+      @save="loadAliases()"
+    >
+      <template v-slot:form="{ onSave, onError, needSave, needReset }">
+        <TerraformAliasForm
+          :project-id="template.project_id"
+          :item-id="alias"
+          :inventory-id="template.inventory_id"
+          @save="onSave"
+          @error="onError"
+          :need-save="needSave"
+          :need-reset="needReset"
+        />
+      </template>
+    </EditDialog>
+
     <YesNoDialog
       :title="$t('deleteInventory')"
       :text="$t('askDeleteInv')"
@@ -180,6 +200,8 @@
 
     <TerraformStateView
       v-if="premiumFeatures.terraform_backend"
+      :project-id="template.project_id"
+      :inventory-id="template.inventory_id"
     />
 
     <v-container v-else>
@@ -199,6 +221,7 @@ import { APP_INVENTORY_TITLE } from '@/lib/constants';
 import AppsMixin from '@/components/AppsMixin';
 import YesNoDialog from '@/components/YesNoDialog.vue';
 import InventorySelectForm from '@/components/InventorySelectForm.vue';
+import TerraformAliasForm from '@/components/TerraformAliasForm.vue';
 
 export default {
   mixins: [AppsMixin],
@@ -209,6 +232,7 @@ export default {
   },
 
   components: {
+    TerraformAliasForm,
     InventorySelectForm,
     YesNoDialog,
     EditDialog,
@@ -230,6 +254,8 @@ export default {
       inventoryId: null,
       deleteInventoryDialog: null,
       attachInventoryDialog: null,
+      alias: null,
+      editDialog: null,
     };
   },
 
@@ -300,16 +326,12 @@ export default {
     async loadAliases() {
       try {
         this.aliases = (await axios({
-          url: `/api/project/${this.template.project_id}/inventory/${this.template.id}/terraform/aliases`,
+          url: `/api/project/${this.template.project_id}/inventory/${this.template.inventory_id}/terraform/aliases`,
           responseType: 'json',
         })).data;
       } catch {
         this.aliases = null;
       }
-    },
-
-    editAlias(alias) {
-      console.log(alias);
     },
 
     async deleteAlias(alias) {
@@ -335,13 +357,14 @@ export default {
       }
     },
 
+    editAlias(alias) {
+      this.alias = alias;
+      this.editDialog = true;
+    },
+
     async addAlias() {
-      await axios({
-        method: 'post',
-        url: `/api/project/${this.template.project_id}/inventory/${this.template.inventory_id}/terraform/aliases`,
-        responseType: 'json',
-      });
-      await this.loadAliases();
+      this.alias = 'new';
+      this.editDialog = true;
     },
   },
 };
