@@ -132,6 +132,12 @@ func runService() {
 					if len(r.URL.RawQuery) > 0 {
 						target += "?" + r.URL.RawQuery
 					}
+
+					if r.Method != "GET" && r.Method != "HEAD" && r.Method != "OPTIONS" {
+						http.Error(w, "http requests forbidden", http.StatusForbidden)
+						return
+					}
+
 					http.Redirect(w, r, target, http.StatusTemporaryRedirect)
 				}))
 				if err != nil {
