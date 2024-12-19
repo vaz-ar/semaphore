@@ -112,6 +112,12 @@ type RunnerConfig struct {
 	MaxParallelTasks int `json:"max_parallel_tasks,omitempty" default:"1" env:"SEMAPHORE_RUNNER_MAX_PARALLEL_TASKS"`
 }
 
+type TLSConfig struct {
+	TLSCertFile      string `json:"tls_cert_file,omitempty" env:"SEMAPHORE_TLS_CERT_FILE"`
+	TLSKeyFile       string `json:"tls_key_file,omitempty" env:"SEMAPHORE_TLS_KEY_FILE"`
+	HTTPRedirectPort *int   `json:"http_redirect_port,omitempty" env:"SEMAPHORE_TLS_HTTP_PORT"`
+}
+
 // ConfigType mapping between Config and the json file that sets it
 type ConfigType struct {
 	MySQL    *DbConfig `json:"mysql,omitempty"`
@@ -122,7 +128,8 @@ type ConfigType struct {
 
 	// Format `:port_num` eg, :3000
 	// if : is missing it will be corrected
-	Port string `json:"port,omitempty" default:":3000" rule:"^:?([0-9]{1,5})$" env:"SEMAPHORE_PORT"`
+	Port string     `json:"port,omitempty" default:":3000" rule:"^:?([0-9]{1,5})$" env:"SEMAPHORE_PORT"`
+	TLS  *TLSConfig `json:"tls,omitempty"`
 
 	// Interface ip, put in front of the port.
 	// defaults to empty
@@ -230,6 +237,10 @@ func ConfigInit(configPath string, noConfigFile bool) {
 
 	Config = NewConfigType()
 	Config.Apps = map[string]App{}
+
+	if os.Getenv("SEMAPHORE_TLS_CERT_FILE") != "" {
+		Config.TLS = &TLSConfig{}
+	}
 
 	if !noConfigFile {
 		loadConfigFile(configPath)
