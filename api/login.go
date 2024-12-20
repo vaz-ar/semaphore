@@ -3,11 +3,11 @@ package api
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -16,13 +16,13 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/go-ldap/ldap/v3"
+	"github.com/gorilla/mux"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
 	"github.com/semaphoreui/semaphore/pkg/random"
 	"github.com/semaphoreui/semaphore/util"
-	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/go-ldap/ldap/v3"
-	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
@@ -436,7 +436,10 @@ func generateStateOauthCookie(w http.ResponseWriter) string {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 
 	b := make([]byte, 16)
-	rand.Read(b)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
 	oauthState := base64.URLEncoding.EncodeToString(b)
 	cookie := http.Cookie{Name: "oauthstate", Value: oauthState, Expires: expiration}
 	http.SetCookie(w, &cookie)
