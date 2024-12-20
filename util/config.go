@@ -237,7 +237,7 @@ func ConfigInit(configPath string, noConfigFile bool) {
 	fmt.Println("Loading config")
 
 	Config = NewConfigType()
-	//Config.Apps = map[string]App{}
+	Config.Apps = map[string]App{}
 
 	if !noConfigFile {
 		loadConfigFile(configPath)
