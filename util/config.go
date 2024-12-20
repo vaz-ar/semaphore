@@ -113,9 +113,9 @@ type RunnerConfig struct {
 }
 
 type TLSConfig struct {
-	Enabled          bool   `json:"enabled,omitempty" env:"SEMAPHORE_TLS_ENABLED"`
-	CertFile         string `json:"cert_file,omitempty" env:"SEMAPHORE_TLS_CERT_FILE"`
-	KeyFile          string `json:"key_file,omitempty" env:"SEMAPHORE_TLS_KEY_FILE"`
+	Enabled          bool   `json:"enabled" env:"SEMAPHORE_TLS_ENABLED"`
+	CertFile         string `json:"cert_file" env:"SEMAPHORE_TLS_CERT_FILE"`
+	KeyFile          string `json:"key_file" env:"SEMAPHORE_TLS_KEY_FILE"`
 	HTTPRedirectPort *int   `json:"http_redirect_port,omitempty" env:"SEMAPHORE_TLS_HTTP_REDIRECT_PORT"`
 }
 
