@@ -16,13 +16,13 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/go-ldap/ldap/v3"
+	"github.com/gorilla/mux"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
 	"github.com/semaphoreui/semaphore/pkg/random"
 	"github.com/semaphoreui/semaphore/util"
-	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/go-ldap/ldap/v3"
-	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
@@ -171,9 +171,10 @@ func createSession(w http.ResponseWriter, r *http.Request, user db.User) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:  "semaphore",
-		Value: encoded,
-		Path:  "/",
+		Name:     "semaphore",
+		Value:    encoded,
+		Path:     "/",
+		HttpOnly: true,
 	})
 }
 
@@ -317,10 +318,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 func logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:    "semaphore",
-		Value:   "",
-		Expires: time.Now().Add(24 * 7 * time.Hour * -1),
-		Path:    "/",
+		Name:     "semaphore",
+		Value:    "",
+		Expires:  time.Now().Add(24 * 7 * time.Hour * -1),
+		Path:     "/",
+		HttpOnly: true,
 	})
 
 	w.WriteHeader(http.StatusNoContent)
