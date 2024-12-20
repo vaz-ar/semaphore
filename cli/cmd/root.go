@@ -109,7 +109,7 @@ func runService() {
 	}
 
 	var err error
-	if util.Config.TLS != nil {
+	if util.Config.TLS.Enabled {
 		if util.Config.TLS.HTTPRedirectPort != nil {
 
 			go func() {
@@ -138,7 +138,7 @@ func runService() {
 						return
 					}
 
-					http.Redirect(w, r, target, http.StatusTemporaryRedirect)
+					http.Redirect(w, nil, target, http.StatusTemporaryRedirect)
 				}))
 				if err != nil {
 					log.Panic(err)

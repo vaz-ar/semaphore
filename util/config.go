@@ -113,9 +113,10 @@ type RunnerConfig struct {
 }
 
 type TLSConfig struct {
+	Enabled          bool   `json:"enabled,omitempty" env:"SEMAPHORE_TLS_ENABLED"`
 	CertFile         string `json:"cert_file,omitempty" env:"SEMAPHORE_TLS_CERT_FILE"`
 	KeyFile          string `json:"key_file,omitempty" env:"SEMAPHORE_TLS_KEY_FILE"`
-	HTTPRedirectPort *int   `json:"http_redirect_port,omitempty" env:"SEMAPHORE_TLS_HTTP_PORT"`
+	HTTPRedirectPort *int   `json:"http_redirect_port,omitempty" env:"SEMAPHORE_TLS_HTTP_REDIRECT_PORT"`
 }
 
 // ConfigType mapping between Config and the json file that sets it
@@ -236,15 +237,12 @@ func ConfigInit(configPath string, noConfigFile bool) {
 	fmt.Println("Loading config")
 
 	Config = NewConfigType()
-	Config.Apps = map[string]App{}
-
-	if os.Getenv("SEMAPHORE_TLS_CERT_FILE") != "" {
-		Config.TLS = &TLSConfig{}
-	}
+	//Config.Apps = map[string]App{}
 
 	if !noConfigFile {
 		loadConfigFile(configPath)
 	}
+
 	loadConfigEnvironment()
 	loadConfigDefaults()
 
