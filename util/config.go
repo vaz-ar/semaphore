@@ -113,8 +113,8 @@ type RunnerConfig struct {
 }
 
 type TLSConfig struct {
-	TLSCertFile      string `json:"tls_cert_file,omitempty" env:"SEMAPHORE_TLS_CERT_FILE"`
-	TLSKeyFile       string `json:"tls_key_file,omitempty" env:"SEMAPHORE_TLS_KEY_FILE"`
+	CertFile         string `json:"cert_file,omitempty" env:"SEMAPHORE_TLS_CERT_FILE"`
+	KeyFile          string `json:"key_file,omitempty" env:"SEMAPHORE_TLS_KEY_FILE"`
 	HTTPRedirectPort *int   `json:"http_redirect_port,omitempty" env:"SEMAPHORE_TLS_HTTP_PORT"`
 }
 

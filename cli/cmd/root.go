@@ -126,7 +126,7 @@ func runService() {
 					} else {
 						hostParts := strings.Split(r.Host, ":")
 						host := hostParts[0]
-						target += host + port[1:] + r.URL.Path
+						target += host + port + r.URL.Path
 					}
 
 					if len(r.URL.RawQuery) > 0 {
@@ -146,7 +146,7 @@ func runService() {
 			}()
 		}
 
-		err = http.ListenAndServeTLS(util.Config.Interface+port, util.Config.TLS.TLSCertFile, util.Config.TLS.TLSKeyFile, cropTrailingSlashMiddleware(router))
+		err = http.ListenAndServeTLS(util.Config.Interface+port, util.Config.TLS.CertFile, util.Config.TLS.KeyFile, cropTrailingSlashMiddleware(router))
 
 		if err != nil {
 			log.Panic(err)
