@@ -72,17 +72,22 @@
       </template>
     </EditDialog>
 
-    <div class="px-4 py-3">
-
+    <div class="px-4 py-3" style="max-width: 1000px; margin: auto;">
       <div class="mb-6">
         <v-btn-toggle
+          dense
           v-model="inventoryId"
           v-if="inventories.length > 0"
           mandatory
           style="overflow: auto"
           class="mb-2"
         >
-          <v-btn v-for="inv in inventories" :key="inv.id" :value="inv.id">
+          <v-btn
+            v-for="inv in inventories"
+            :key="inv.id"
+            :value="inv.id"
+            style="border-radius: 0"
+          >
             {{ inv.inventory }}
             <v-icon
               dark
@@ -103,7 +108,7 @@
               dark
               fab
               small
-              class="ml-2"
+              class="ml-3"
               v-bind="attrs"
               v-on="on"
             >
@@ -127,40 +132,57 @@
         </v-menu>
       </div>
 
-      <div class="mb-6" v-if="inventories.length > 0">
-        <v-btn
-          class="mr-4 mb-2"
-          :disabled="inventoryId === template.inventory_id"
-          color="success"
-          @click="setDefaultInventory()"
-        >
-          Make default
-        </v-btn>
+      <v-divider class="mb-6" />
 
-        <v-btn
-          color="primary"
-          class="mr-4 mb-2"
-          :disabled="inventoryId === template.inventory_id"
-          @click="detachInventory()"
-        >
-          Detach
-        </v-btn>
+      <div class="mb-6 d-flex justify-space-between align-center" v-if="inventories.length > 0">
 
-        <v-btn
-          class="mb-2"
-          color="error"
-          :disabled="inventoryId === template.inventory_id"
-          @click="deleteInventoryDialog = true;"
-        >
-          Delete
-        </v-btn>
+        <h2>{{ inventory.inventory }} workspace</h2>
+
+        <div>
+
+          <v-btn
+            class="mr-4 mb-2"
+            :disabled="inventoryId === template.inventory_id"
+            color="success"
+            @click="setDefaultInventory()"
+          >
+            Make default
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            class="mr-4 mb-2"
+            :disabled="inventoryId === template.inventory_id"
+            @click="detachInventory()"
+          >
+            Detach
+          </v-btn>
+
+          <v-btn
+            class="mb-2"
+            color="error"
+            :disabled="inventoryId === template.inventory_id"
+            @click="deleteInventoryDialog = true;"
+          >
+            Change
+          </v-btn>
+
+          <v-btn
+            class="mb-2"
+            color="error"
+            :disabled="inventoryId === template.inventory_id"
+            @click="deleteInventoryDialog = true;"
+          >
+            Delete
+          </v-btn>
+        </div>
       </div>
 
       <v-alert
         type="info"
         text
         color="hsl(348deg, 86%, 61%)"
-        style="border-radius: 0; margin-left: -16px; margin-right: -16px;"
+        style="border-radius: 0;"
         v-if="!premiumFeatures.terraform_backend"
       >
         <span class="mr-2">
@@ -300,6 +322,7 @@ export default {
 
   watch: {
     async inventoryId() {
+      this.inventory = this.inventories.find((inv) => inv.id === this.inventoryId);
       await this.loadAliases();
       await this.loadStates();
     },
@@ -309,6 +332,7 @@ export default {
     return {
       aliases: [],
       states: null,
+      inventory: null,
       inventories: null,
       inventoryDialog: null,
       inventoryId: null,
@@ -343,8 +367,8 @@ export default {
 
   async created() {
     this.inventoryId = this.template.inventory_id;
-
     await this.loadInventories();
+    this.inventory = this.inventories.find((inv) => inv.id === this.inventoryId);
     await this.loadAliases();
     await this.loadStates();
   },
