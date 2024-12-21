@@ -98,10 +98,10 @@ func AddTemplate(w http.ResponseWriter, r *http.Request) {
 		if newTemplate.InventoryID == nil {
 			var inventoryType db.InventoryType
 
-			if invTypes, err2 := newTemplate.App.InventoryTypes(); err2 == nil {
+			if invTypes := newTemplate.App.InventoryTypes(); len(invTypes) > 0 {
 				inventoryType = invTypes[0]
 			} else {
-				helpers.WriteError(w, err2)
+				helpers.WriteErrorStatus(w, "Inventory type is not supported for this template", http.StatusBadRequest)
 				return
 			}
 

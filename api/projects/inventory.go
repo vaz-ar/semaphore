@@ -62,15 +62,8 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 
 	var types []db.InventoryType
 
-	var err error
-
 	if app != "" {
-		types, err = db.TemplateApp(app).InventoryTypes()
-	}
-
-	if err != nil {
-		helpers.WriteError(w, err)
-		return
+		types = db.TemplateApp(app).InventoryTypes()
 	}
 
 	inventories, err := helpers.Store(r).GetInventories(project.ID, params, types)
@@ -184,15 +177,13 @@ func UpdateInventory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch inventory.Type {
+	case db.InventoryTerraformWorkspace, db.InventoryTofuWorkspace:
 	case db.InventoryStatic, db.InventoryStaticYaml:
-		break
 	case db.InventoryFile:
 		if !IsValidInventoryPath(inventory.Inventory) {
 			helpers.WriteErrorStatus(w, "Invalid inventory file pathname. Must be: path/to/inventory.", http.StatusBadRequest)
 			return
 		}
-	case db.InventoryTerraformWorkspace:
-		break
 	default:
 		helpers.WriteErrorStatus(w,
 			"unknown inventory type: "+string(inventory.Type),

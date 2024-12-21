@@ -40,17 +40,14 @@ func (r *bashReader) Read(p []byte) (n int, err error) {
 	return len(*r.input) + 1, nil
 }
 
-func (t *ShellApp) makeCmd(command string, args []string, environmentVars *[]string) *exec.Cmd {
+func (t *ShellApp) makeCmd(command string, args []string, environmentVars []string) *exec.Cmd {
 	cmd := exec.Command(command, args...) //nolint: gas
 	cmd.Dir = t.GetFullPath()
 
 	cmd.Env = getEnvironmentVars()
 	cmd.Env = append(cmd.Env, fmt.Sprintf("HOME=%s", util.Config.TmpPath))
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PWD=%s", cmd.Dir))
-
-	if environmentVars != nil {
-		cmd.Env = append(cmd.Env, *environmentVars...)
-	}
+	cmd.Env = append(cmd.Env, environmentVars...)
 
 	return cmd
 }
@@ -75,11 +72,11 @@ func (t *ShellApp) SetLogger(logger task_logger.Logger) task_logger.Logger {
 	return logger
 }
 
-func (t *ShellApp) InstallRequirements(environmentVars *[]string, params interface{}) error {
+func (t *ShellApp) InstallRequirements(environmentVars []string, params interface{}) error {
 	return nil
 }
 
-func (t *ShellApp) makeShellCmd(args []string, environmentVars *[]string) *exec.Cmd {
+func (t *ShellApp) makeShellCmd(args []string, environmentVars []string) *exec.Cmd {
 	var command string
 	var appArgs []string
 	switch t.App {

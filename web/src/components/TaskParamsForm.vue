@@ -85,6 +85,30 @@
           </template>
         </v-checkbox>
       </v-col>
+
+      <v-col cols="12">
+        <v-checkbox
+          class="mt-0"
+          :input-value="params.migrate_state"
+          @change="updateValue('migrate_state', $event)"
+        >
+          <template v-slot:label>
+            <div class="text-no-wrap">{{ $t('Migrate state') }} <code>-migrate-state</code></div>
+          </template>
+        </v-checkbox>
+      </v-col>
+
+      <v-col cols="12">
+        <v-checkbox
+          class="mt-0"
+          :input-value="params.reconfigure"
+          @change="updateValue('reconfigure', $event)"
+        >
+          <template v-slot:label>
+            <div class="text-no-wrap">{{ $t('Reconfigure') }} <code>-reconfigure</code></div>
+          </template>
+        </v-checkbox>
+      </v-col>
     </v-row>
   </div>
   <div v-else></div>
@@ -97,8 +121,8 @@
 <script>
 
 const APP_PARAMS = {
-  terraform: ['plan', 'auto_approve', 'destroy'],
-  tofu: ['plan', 'auto_approve', 'destroy'],
+  terraform: ['plan', 'auto_approve', 'destroy', 'migrate_state'],
+  tofu: ['plan', 'auto_approve', 'destroy', 'migrate_state', 'reconfigure'],
   ansible: ['diff', 'debug', 'dry_run'],
 };
 

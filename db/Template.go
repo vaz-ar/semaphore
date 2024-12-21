@@ -24,29 +24,28 @@ const (
 	AppPulumi     TemplateApp = "pulumi"
 )
 
-func (t TemplateApp) InventoryTypes() ([]InventoryType, error) {
+func (t TemplateApp) InventoryTypes() []InventoryType {
 	switch t {
 	case AppAnsible:
-		return []InventoryType{InventoryStatic, InventoryStaticYaml, InventoryFile}, nil
+		return []InventoryType{InventoryStatic, InventoryStaticYaml, InventoryFile}
 	case AppTerraform:
-		return []InventoryType{InventoryTerraformWorkspace}, nil
+		return []InventoryType{InventoryTerraformWorkspace}
 	case AppTofu:
-		return []InventoryType{InventoryTofuWorkspace}, nil
+		return []InventoryType{InventoryTofuWorkspace}
 	default:
-		return nil, &ValidationError{"unsupported app"}
+		return []InventoryType{}
 	}
 }
 
 func (t TemplateApp) HasInventoryType(inventoryType InventoryType) bool {
-	types, err := t.InventoryTypes()
-	if err != nil {
-		return false
-	}
+	types := t.InventoryTypes()
+
 	for _, typ := range types {
 		if typ == inventoryType {
 			return true
 		}
 	}
+
 	return false
 }
 

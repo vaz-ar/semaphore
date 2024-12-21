@@ -15,10 +15,12 @@ type DefaultTaskParams struct {
 }
 
 type TerraformTaskParams struct {
-	Plan        bool `json:"plan"`
-	Destroy     bool `json:"destroy"`
-	AutoApprove bool `json:"auto_approve"`
-	Upgrade     bool `json:"upgrade"`
+	Plan         bool `json:"plan"`
+	Destroy      bool `json:"destroy"`
+	AutoApprove  bool `json:"auto_approve"`
+	Upgrade      bool `json:"upgrade"`
+	MigrateState bool `json:"migrate_state"`
+	Reconfigure  bool `json:"reconfigure"`
 }
 
 type AnsibleTaskParams struct {

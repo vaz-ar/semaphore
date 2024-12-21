@@ -461,7 +461,7 @@ func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (
 		environmentVariables = append(environmentVariables, "TF_HTTP_ADDRESS="+util.GetPublicAliasURL("terraform", alias))
 	}
 
-	err = t.prepareRun(&environmentVariables, params)
+	err = t.prepareRun(environmentVariables, params)
 	if err != nil {
 		return err
 	}
@@ -505,7 +505,7 @@ func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (
 
 	return t.App.Run(db_lib.LocalAppRunningArgs{
 		CliArgs:         args,
-		EnvironmentVars: &environmentVariables,
+		EnvironmentVars: environmentVariables,
 		Inputs:          inputs,
 		TaskParams:      params,
 		Callback: func(p *os.Process) {
@@ -515,7 +515,7 @@ func (t *LocalJob) Run(username string, incomingVersion *string, alias string) (
 
 }
 
-func (t *LocalJob) prepareRun(environmentVars *[]string, params interface{}) error {
+func (t *LocalJob) prepareRun(environmentVars []string, params interface{}) error {
 
 	t.Log("Preparing: " + strconv.Itoa(t.Task.ID))
 
