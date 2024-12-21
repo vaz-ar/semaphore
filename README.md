@@ -13,7 +13,7 @@ If your project has grown and deploying from the terminal is no longer feasible,
 
 ## Live Demo
 
-Try the latest version of Semaphore at [https://cloud.semaphoreui.com](https://cloud.semaphoreui.com).
+Try the latest version of Semaphore at [https://portal.semaphoreui.com](https://portal.semaphoreui.com).
 
 
 ## What is Semaphore UI?
@@ -38,7 +38,7 @@ Semaphore UI allows you to:
 
 You can install Semaphore using the following methods:
 * Docker
-* SaaS ([Semaphore Cloud](https://cloud.semaphoreui.com))
+* SaaS ([Semaphore Cloud](https://portal.semaphoreui.com))
 * Deploy a VM from a marketplace (AWS, DigitalOcean, etc.)
 * Snap
 * Binary file
@@ -62,7 +62,7 @@ We recommend using the [Container Configurator](https://semaphoreui.com/install/
 
 ### SaaS
 
-We offer a SaaS solution for using Semaphore UI without installation. Check it out at [Semaphore Cloud](https://cloud.semaphoreui.com).
+We offer a SaaS solution for using Semaphore UI without installation. Check it out at [Semaphore Cloud](https://portal.semaphoreui.com).
 
 ### Deploy VM from Marketplace
 
