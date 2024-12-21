@@ -122,6 +122,7 @@ func (t *TerraformApp) init(environmentVars []string, params *db.TerraformTaskPa
 	}
 
 	cmd := t.makeCmd(t.Name, args, environmentVars)
+	cmd.Env = append(cmd.Env, keyInstallation.GetGitEnv()...)
 	t.Logger.LogCmd(cmd)
 
 	t.Logger.AddLogListener(func(new time.Time, msg string) {
