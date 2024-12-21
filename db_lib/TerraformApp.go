@@ -21,6 +21,8 @@ type TerraformApp struct {
 	reader     terraformReader
 	Name       string
 	noChanges  bool
+
+	keyInstallation db.AccessKeyInstallation
 }
 
 type terraformReaderResult int
@@ -34,7 +36,7 @@ type terraformReader struct {
 	result *terraformReaderResult
 }
 
-func (t *TerraformApp) makeCmd(command string, args []string, environmentVars *[]string) *exec.Cmd {
+func (t *TerraformApp) makeCmd(command string, args []string, environmentVars []string) *exec.Cmd {
 	cmd := exec.Command(command, args...) //nolint: gas
 	cmd.Dir = t.GetFullPath()
 
@@ -43,7 +45,7 @@ func (t *TerraformApp) makeCmd(command string, args []string, environmentVars *[
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PWD=%s", cmd.Dir))
 
 	if environmentVars != nil {
-		cmd.Env = append(cmd.Env, *environmentVars...)
+		cmd.Env = append(cmd.Env, environmentVars...)
 	}
 
 	return cmd
@@ -84,7 +86,13 @@ func (t *TerraformApp) SetLogger(logger task_logger.Logger) task_logger.Logger {
 	return logger
 }
 
-func (t *TerraformApp) init(environmentVars *[]string, params *db.TerraformTaskParams) error {
+func (t *TerraformApp) init(environmentVars []string, params *db.TerraformTaskParams) error {
+
+	keyInstallation, err := t.Inventory.SSHKey.Install(db.AccessKeyRoleGit, t.Logger)
+	if err != nil {
+		return err
+	}
+	defer keyInstallation.Destroy() //nolint: errcheck
 
 	args := []string{"init"}
 
@@ -94,7 +102,7 @@ func (t *TerraformApp) init(environmentVars *[]string, params *db.TerraformTaskP
 
 	cmd := t.makeCmd(t.Name, args, environmentVars)
 	t.Logger.LogCmd(cmd)
-	err := cmd.Start()
+	err = cmd.Start()
 	if err != nil {
 		return err
 	}
@@ -102,7 +110,7 @@ func (t *TerraformApp) init(environmentVars *[]string, params *db.TerraformTaskP
 	return cmd.Wait()
 }
 
-func (t *TerraformApp) isWorkspacesSupported(environmentVars *[]string) bool {
+func (t *TerraformApp) isWorkspacesSupported(environmentVars []string) bool {
 	cmd := t.makeCmd(string(t.Name), []string{"workspace", "list"}, environmentVars)
 	err := cmd.Run()
 	if err != nil {
@@ -112,7 +120,7 @@ func (t *TerraformApp) isWorkspacesSupported(environmentVars *[]string) bool {
 	return true
 }
 
-func (t *TerraformApp) selectWorkspace(workspace string, environmentVars *[]string) error {
+func (t *TerraformApp) selectWorkspace(workspace string, environmentVars []string) error {
 	cmd := t.makeCmd(string(t.Name), []string{"workspace", "select", "-or-create=true", workspace}, environmentVars)
 	t.Logger.LogCmd(cmd)
 	err := cmd.Start()
@@ -123,7 +131,7 @@ func (t *TerraformApp) selectWorkspace(workspace string, environmentVars *[]stri
 	return cmd.Wait()
 }
 
-func (t *TerraformApp) InstallRequirements(environmentVars *[]string, params interface{}) (err error) {
+func (t *TerraformApp) InstallRequirements(environmentVars []string, params interface{}) (err error) {
 
 	p := params.(*db.TerraformTaskParams)
 
@@ -146,7 +154,7 @@ func (t *TerraformApp) InstallRequirements(environmentVars *[]string, params int
 	return
 }
 
-func (t *TerraformApp) Plan(args []string, environmentVars *[]string, inputs map[string]string, cb func(*os.Process)) error {
+func (t *TerraformApp) Plan(args []string, environmentVars []string, inputs map[string]string, cb func(*os.Process)) error {
 	args = append([]string{"plan"}, args...)
 	cmd := t.makeCmd(t.Name, args, environmentVars)
 	t.Logger.LogCmd(cmd)
@@ -159,7 +167,7 @@ func (t *TerraformApp) Plan(args []string, environmentVars *[]string, inputs map
 	return cmd.Wait()
 }
 
-func (t *TerraformApp) Apply(args []string, environmentVars *[]string, inputs map[string]string, cb func(*os.Process)) error {
+func (t *TerraformApp) Apply(args []string, environmentVars []string, inputs map[string]string, cb func(*os.Process)) error {
 	args = append([]string{"apply", "-auto-approve"}, args...)
 	cmd := t.makeCmd(t.Name, args, environmentVars)
 	t.Logger.LogCmd(cmd)
