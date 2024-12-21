@@ -125,7 +125,8 @@ func (t *TerraformApp) init(environmentVars []string, params *db.TerraformTaskPa
 	t.Logger.LogCmd(cmd)
 
 	t.Logger.AddLogListener(func(new time.Time, msg string) {
-		if strings.Contains(msg, "Do you want to copy existing state to the new backend?") {
+		s := strings.TrimSpace(msg)
+		if strings.Contains(s, "Do you want to copy ") {
 			t.Logger.SetStatus(task_logger.TaskWaitingConfirmation)
 		} else if strings.Contains(msg, "has been successfully initialized!") {
 			t.reader.EOF = true
