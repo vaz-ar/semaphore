@@ -128,7 +128,8 @@ func (t *TerraformApp) init(environmentVars []string, params *db.TerraformTaskPa
 		s := strings.TrimSpace(msg)
 		if strings.Contains(s, "Do you want to copy ") {
 			t.Logger.SetStatus(task_logger.TaskWaitingConfirmation)
-		} else if strings.Contains(msg, "has been successfully initialized!") {
+		} else if strings.Contains(msg, "has been successfully initialized!") ||
+			strings.Contains(msg, "Error:") {
 			t.reader.EOF = true
 		}
 	})
