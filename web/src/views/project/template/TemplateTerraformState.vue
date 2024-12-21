@@ -72,7 +72,10 @@
       </template>
     </EditDialog>
 
-    <div class="px-4 py-3 CenterToScreen" style="max-width: 1000px; margin: auto;">
+    <div
+      class="px-4 py-3 CenterToScreen"
+      style="max-width: 1000px; margin: auto;"
+    >
       <div class="mb-6">
         <v-btn-toggle
           dense
@@ -222,13 +225,14 @@
     </div>
 
     <v-data-table
+      style="max-width: 1000px; margin: auto;"
       v-if="premiumFeatures.terraform_backend"
       :headers="headers"
       :items="states"
       :footer-props="{ itemsPerPageOptions: [20] }"
       single-expand
       show-expand
-      class="mt-0 TaskListTable"
+      class="mt-4 TaskListTable"
     >
       <template v-slot:item.id="{ item }">
         #{{ item.id }}
