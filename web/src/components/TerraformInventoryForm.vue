@@ -3,7 +3,7 @@
     ref="form"
     lazy-validation
     v-model="formValid"
-    v-if="item != null"
+    v-if="item != null && keys != null"
   >
     <v-alert
       :value="formError"
@@ -18,6 +18,18 @@
       required
       :disabled="formSaving"
     ></v-text-field>
+
+    <v-select
+      v-model="item.ssh_key_id"
+      label="SSH key for private modules *"
+      :rules="[v => !!v || 'Key is required']"
+      dense
+      required
+      :items="keys"
+      item-value="id"
+      item-text="name"
+      :disabled="formSaving"
+    ></v-select>
 
   </v-form>
 </template>
@@ -52,7 +64,7 @@ export default {
       method: 'get',
       url: `/api/project/${this.projectId}/keys`,
       responseType: 'json',
-    }));
+    })).data;
   },
 
   methods: {
