@@ -177,7 +177,7 @@ func (t *TerraformApp) InstallRequirements(environmentVars []string, params inte
 		workspace = t.Inventory.Inventory
 	}
 
-	if workspace == "default" && !t.isWorkspacesSupported(environmentVars) {
+	if !t.isWorkspacesSupported(environmentVars) {
 		return
 	}
 
