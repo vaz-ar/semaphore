@@ -21,8 +21,6 @@ type TerraformApp struct {
 	reader     terraformReader
 	Name       string
 	noChanges  bool
-
-	keyInstallation db.AccessKeyInstallation
 }
 
 type terraformReaderResult int
@@ -121,7 +119,7 @@ func (t *TerraformApp) isWorkspacesSupported(environmentVars []string) bool {
 }
 
 func (t *TerraformApp) selectWorkspace(workspace string, environmentVars []string) error {
-	cmd := t.makeCmd(string(t.Name), []string{"workspace", "select", "-or-create=true", workspace}, environmentVars)
+	cmd := t.makeCmd(t.Name, []string{"workspace", "select", "-or-create=true", workspace}, environmentVars)
 	t.Logger.LogCmd(cmd)
 	err := cmd.Start()
 	if err != nil {

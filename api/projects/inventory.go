@@ -62,15 +62,8 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 
 	var types []db.InventoryType
 
-	var err error
-
 	if app != "" {
-		types, err = db.TemplateApp(app).InventoryTypes()
-	}
-
-	if err != nil {
-		helpers.WriteError(w, err)
-		return
+		types = db.TemplateApp(app).InventoryTypes()
 	}
 
 	inventories, err := helpers.Store(r).GetInventories(project.ID, params, types)
