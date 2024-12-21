@@ -13,6 +13,7 @@ const (
 	TaskStartingStatus      TaskStatus = "starting"
 	TaskWaitingConfirmation TaskStatus = "waiting_confirmation"
 	TaskConfirmed           TaskStatus = "confirmed"
+	TaskRejected            TaskStatus = "rejected"
 	TaskRunningStatus       TaskStatus = "running"
 	TaskStoppingStatus      TaskStatus = "stopping"
 	TaskStoppedStatus       TaskStatus = "stopped"
@@ -57,6 +58,6 @@ type Logger interface {
 	SetStatus(status TaskStatus)
 	AddStatusListener(l StatusListener)
 	AddLogListener(l LogListener)
-	
+
 	SetCommit(hash, message string)
 }

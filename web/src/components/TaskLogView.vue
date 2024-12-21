@@ -87,30 +87,22 @@
       </div>
     </div>
 
-    <div
-      v-if="item.status === 'waiting_confirmation'"
-      class="pl-4"
-      style="
-        background: white;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 55px;
-        display: flex;
-        align-items: center;
-      "
-    >
-      Please confirm this task.
-    </div>
-
     <v-btn
-      color="warning"
-      style="position: absolute; bottom: 10px; right: 170px; width: 150px;"
+      color="success"
+      style="position: absolute; bottom: 10px; right: 250px; width: 70px;"
       v-if="item.status === 'waiting_confirmation'"
       @click="confirmTask()"
     >
-      {{ $t('confirmTask') }}
+      <v-icon>mdi-check</v-icon>
+    </v-btn>
+
+    <v-btn
+      color="warning"
+      style="position: absolute; bottom: 10px; right: 170px; width: 70px;"
+      v-if="item.status === 'waiting_confirmation'"
+      @click="rejectTask()"
+    >
+      <v-icon>mdi-close</v-icon>
     </v-btn>
 
     <v-btn
@@ -216,7 +208,15 @@ export default {
 
   computed: {
     canStop() {
-      return ['running', 'stopping', 'waiting', 'starting', 'waiting_confirmation', 'confirmed'].includes(this.item.status);
+      return [
+        'running',
+        'stopping',
+        'waiting',
+        'starting',
+        'waiting_confirmation',
+        'confirmed',
+        'rejected',
+      ].includes(this.item.status);
     },
   },
 
@@ -230,6 +230,15 @@ export default {
       await axios({
         method: 'post',
         url: `/api/project/${this.projectId}/tasks/${this.itemId}/confirm`,
+        responseType: 'json',
+        data: {},
+      });
+    },
+
+    async rejectTask() {
+      await axios({
+        method: 'post',
+        url: `/api/project/${this.projectId}/tasks/${this.itemId}/reject`,
         responseType: 'json',
         data: {},
       });

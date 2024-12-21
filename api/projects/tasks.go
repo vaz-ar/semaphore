@@ -168,6 +168,24 @@ func ConfirmTask(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func RejectTask(w http.ResponseWriter, r *http.Request) {
+	targetTask := context.Get(r, "task").(db.Task)
+	project := context.Get(r, "project").(db.Project)
+
+	if targetTask.ProjectID != project.ID {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err := helpers.TaskPool(r).RejectTask(targetTask)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func StopTask(w http.ResponseWriter, r *http.Request) {
 	targetTask := context.Get(r, "task").(db.Task)
 	project := context.Get(r, "project").(db.Project)

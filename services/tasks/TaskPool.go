@@ -245,6 +245,18 @@ func (p *TaskPool) ConfirmTask(targetTask db.Task) error {
 	return nil
 }
 
+func (p *TaskPool) RejectTask(targetTask db.Task) error {
+	tsk := p.GetTask(targetTask.ID)
+
+	if tsk == nil { // task not active, but exists in database
+		return fmt.Errorf("task is not active")
+	}
+
+	tsk.SetStatus(task_logger.TaskRejected)
+
+	return nil
+}
+
 func (p *TaskPool) StopTask(targetTask db.Task, forceStop bool) error {
 	tsk := p.GetTask(targetTask.ID)
 	if tsk == nil { // task not active, but exists in database
