@@ -98,12 +98,10 @@ func (t *TerraformApp) init(environmentVars []string, params *db.TerraformTaskPa
 		args = append(args, "-upgrade")
 	}
 
-	if params.MigrateState {
-		args = append(args, "-migrate-state")
-	}
-
 	if params.Reconfigure {
 		args = append(args, "-reconfigure")
+	} else {
+		args = append(args, "-migrate-state")
 	}
 
 	cmd := t.makeCmd(t.Name, args, environmentVars)
