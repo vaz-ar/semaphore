@@ -4,6 +4,7 @@ name: Dev
   push:
     branches:
       - develop
+      - 2-11-stable
   pull_request:
     branches:
       - develop
