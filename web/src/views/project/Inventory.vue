@@ -95,7 +95,7 @@
       </v-menu>
     </v-toolbar>
 
-    <v-divider class="hidden-lg-and-down"/>
+    <v-divider />
 
     <v-data-table
       :headers="headers"
