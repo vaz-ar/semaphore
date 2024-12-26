@@ -6,14 +6,21 @@
       <v-spacer></v-spacer>
     </v-toolbar>
 
-    <div class="project-settings-form">
-      <div style="height: 300px;">
-        <RestoreProjectForm item-id="new" ref="editForm" @save="onSave" />
-      </div>
+    <v-divider />
 
-      <div class="text-right">
-        <v-btn color="primary" @click="restoreProject()">{{ $t('restore') }}</v-btn>
-      </div>
+    <div
+      style="margin: auto; max-width: 600px; padding: 0 16px;"
+      class="CenterToScreen"
+    >
+        <div class="project-settings-form">
+        <div style="height: 300px;">
+            <RestoreProjectForm item-id="new" ref="editForm" @save="onSave" />
+        </div>
+
+        <div class="text-right">
+            <v-btn color="primary" @click="restoreProject()">{{ $t('restore') }}</v-btn>
+        </div>
+        </div>
     </div>
 
   </div>
