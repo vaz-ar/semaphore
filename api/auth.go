@@ -1,15 +1,69 @@
 package api
 
 import (
+	"errors"
+	"github.com/gorilla/context"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
 	"github.com/semaphoreui/semaphore/util"
-	"github.com/gorilla/context"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 	"time"
 )
+
+// nolint: gocyclo
+func verityTotp(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func getSession(r *http.Request) (*db.Session, bool) {
+	// fetch session from cookie
+	cookie, err := r.Cookie("semaphore")
+	if err != nil {
+		//w.WriteHeader(http.StatusUnauthorized)
+		return nil, false
+	}
+
+	value := make(map[string]interface{})
+	if err = util.Cookie.Decode("semaphore", cookie.Value, &value); err != nil {
+		//w.WriteHeader(http.StatusUnauthorized)
+		return nil, false
+	}
+
+	user, ok := value["user"]
+	sessionVal, okSession := value["session"]
+	if !ok || !okSession {
+		//w.WriteHeader(http.StatusUnauthorized)
+		return nil, false
+	}
+
+	userID := user.(int)
+	sessionID := sessionVal.(int)
+
+	// fetch session
+	session, err := helpers.Store(r).GetSession(userID, sessionID)
+
+	if err != nil {
+		//w.WriteHeader(http.StatusUnauthorized)
+		return nil, false
+	}
+
+	if time.Since(session.LastActive).Hours() > 7*24 {
+		// more than week old unused session
+		// destroy.
+		if err = helpers.Store(r).ExpireSession(userID, sessionID); err != nil {
+			// it is internal error, it doesn't concern the user
+			log.Error(err)
+		}
+
+		//w.WriteHeader(http.StatusUnauthorized)
+		return nil, false
+	}
+
+	return &session, true
+
+}
 
 func authenticationHandler(w http.ResponseWriter, r *http.Request) bool {
 	var userID int
@@ -20,7 +74,7 @@ func authenticationHandler(w http.ResponseWriter, r *http.Request) bool {
 		token, err := helpers.Store(r).GetAPIToken(strings.Replace(authHeader, "bearer ", "", 1))
 
 		if err != nil {
-			if err != db.ErrNotFound {
+			if !errors.Is(err, db.ErrNotFound) {
 				log.Error(err)
 			}
 
@@ -30,50 +84,19 @@ func authenticationHandler(w http.ResponseWriter, r *http.Request) bool {
 
 		userID = token.UserID
 	} else {
-		// fetch session from cookie
-		cookie, err := r.Cookie("semaphore")
-		if err != nil {
+		session, ok := getSession(r)
+
+		if !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			return false
 		}
 
-		value := make(map[string]interface{})
-		if err = util.Cookie.Decode("semaphore", cookie.Value, &value); err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
+		if !session.IsVerified() {
+			helpers.WriteErrorStatus(w, "TOTP_REQUIRED", http.StatusUnauthorized)
 			return false
 		}
 
-		user, ok := value["user"]
-		sessionVal, okSession := value["session"]
-		if !ok || !okSession {
-			w.WriteHeader(http.StatusUnauthorized)
-			return false
-		}
-
-		userID = user.(int)
-		sessionID := sessionVal.(int)
-
-		// fetch session
-		session, err := helpers.Store(r).GetSession(userID, sessionID)
-
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			return false
-		}
-
-		if time.Since(session.LastActive).Hours() > 7*24 {
-			// more than week old unused session
-			// destroy.
-			if err := helpers.Store(r).ExpireSession(userID, sessionID); err != nil {
-				// it is internal error, it doesn't concern the user
-				log.Error(err)
-			}
-
-			w.WriteHeader(http.StatusUnauthorized)
-			return false
-		}
-
-		if err := helpers.Store(r).TouchSession(userID, sessionID); err != nil {
+		if err := helpers.Store(r).TouchSession(userID, session.ID); err != nil {
 			log.Error(err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return false
@@ -82,7 +105,7 @@ func authenticationHandler(w http.ResponseWriter, r *http.Request) bool {
 
 	user, err := helpers.Store(r).GetUser(userID)
 	if err != nil {
-		if err != db.ErrNotFound {
+		if !errors.Is(err, db.ErrNotFound) {
 			// internal error
 			log.Error(err)
 		}

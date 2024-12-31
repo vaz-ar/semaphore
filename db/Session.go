@@ -22,3 +22,10 @@ type Session struct {
 	VerificationMethod SessionVerificationMethod `db:"verification_method" json:"verification_method"`
 	Verified           bool                      `db:"verified" json:"verified"`
 }
+
+func (s *Session) IsVerified() bool {
+	if s.VerificationMethod == SessionVerificationNone {
+		return true
+	}
+	return s.Verified
+}
