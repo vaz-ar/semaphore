@@ -1,4 +1,4 @@
-create table user_totp(
+create table user__totp(
   `id` integer primary key autoincrement,
   `user_id` int NOT NULL,
   `secret` varchar(200) NOT NULL,

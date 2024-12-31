@@ -89,8 +89,8 @@ func tryFindLDAPUser(username, password string) (*db.User, error) {
 	}
 
 	// Bind as the user
-	userdn := sr.Entries[0].DN
-	if err = l.Bind(userdn, password); err != nil {
+	userDN := sr.Entries[0].DN
+	if err = l.Bind(userDN, password); err != nil {
 		return nil, err
 	}
 
@@ -207,6 +207,10 @@ func loginByLDAP(store db.Store, ldapUser db.User) (user db.User, err error) {
 		user, err = store.CreateUserWithoutPassword(ldapUser)
 	}
 
+	if err != nil {
+		return
+	}
+
 	if !user.External {
 		err = db.ErrNotFound
 		return
@@ -302,8 +306,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		switch err.(type) {
-		case *db.ValidationError:
+		var validationError *db.ValidationError
+		switch {
+		case errors.As(err, &validationError):
 			// TODO: Return more informative error code.
 		}
 
