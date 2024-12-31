@@ -6,3 +6,6 @@ create table user__totp(
   unique (`user_id`),
   foreign key (`user_id`) references task(`id`) on delete cascade
 );
+
+alter table `session` add column verification_method int not null default 0;
+alter table `session` add column verified boolean not null default false;
