@@ -6,8 +6,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 
-	"github.com/semaphoreui/semaphore/util"
 	"github.com/gorilla/context"
+	"github.com/semaphoreui/semaphore/util"
 )
 
 type minimalUser struct {
@@ -175,6 +175,44 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	if err := helpers.Store(r).DeleteUser(user.ID); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func enableTotp(w http.ResponseWriter, r *http.Request) {
+	user := context.Get(r, "_user").(db.User)
+	if user.Totp != nil {
+		helpers.WriteErrorStatus(w, "TOTP already enabled", http.StatusBadRequest)
+		return
+	}
+
+	_, err := helpers.Store(r).AddTotpVerification(user.ID, "")
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func disableTotp(w http.ResponseWriter, r *http.Request) {
+	user := context.Get(r, "_user").(db.User)
+	if user.Totp == nil {
+		helpers.WriteErrorStatus(w, "TOTP not enabled", http.StatusBadRequest)
+		return
+	}
+
+	totpID, err := helpers.GetIntParam("totp_id", w, r)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	err = helpers.Store(r).DeleteTotpVerification(user.ID, totpID)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)

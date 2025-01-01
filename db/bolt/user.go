@@ -217,7 +217,7 @@ func (d *BoltDb) GetAllAdmins() (users []db.User, err error) {
 	return
 }
 
-func (d *BoltDb) AddUserTotpVerification(userID int, secret string) (totp db.UserTotp, err error) {
+func (d *BoltDb) AddTotpVerification(userID int, secret string) (totp db.UserTotp, err error) {
 
 	current := make([]db.UserTotp, 0)
 	err = d.getObjects(userID, db.UserTotpProps, db.RetrieveQueryParams{}, nil, current)

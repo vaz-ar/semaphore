@@ -261,7 +261,7 @@ func (d *SqlDb) GetAllAdmins() (users []db.User, err error) {
 	return
 }
 
-func (d *SqlDb) AddUserTotpVerification(userID int, secret string) (totp db.UserTotp, err error) {
+func (d *SqlDb) AddTotpVerification(userID int, secret string) (totp db.UserTotp, err error) {
 
 	totp.UserID = userID
 	totp.Secret = secret
