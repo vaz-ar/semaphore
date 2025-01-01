@@ -276,7 +276,7 @@ type Store interface {
 	UpdateUser(user UserWithPwd) error
 	SetUserPassword(userID int, password string) error
 	AddUserTotpVerification(userID int, secret string) (UserTotp, error)
-	DeleteTotpVerification(userID int) error
+	DeleteTotpVerification(userID int, totpID int) error
 
 	GetUser(userID int) (User, error)
 	GetUserByLoginOrEmail(login string, email string) (User, error)
@@ -532,6 +532,12 @@ var TemplateVaultProps = ObjectProps{
 	Type:                  reflect.TypeOf(TemplateVault{}),
 	PrimaryColumnName:     "id",
 	ReferringColumnSuffix: "template_id",
+}
+
+var UserTotpProps = ObjectProps{
+	TableName:         "user__totp",
+	Type:              reflect.TypeOf(UserTotp{}),
+	PrimaryColumnName: "id",
 }
 
 func (p ObjectProps) GetReferringFieldsFrom(t reflect.Type) (fields []string, err error) {

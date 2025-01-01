@@ -287,7 +287,7 @@ func (d *SqlDb) AddUserTotpVerification(userID int, secret string) (totp db.User
 	return
 }
 
-func (d *SqlDb) DeleteTotpVerification(userID int) error {
-	_, err := d.exec("delete from user__totp where user_id=?", userID)
+func (d *SqlDb) DeleteTotpVerification(userID int, totpID int) error {
+	_, err := d.exec("delete from user__totp where user_id=? and id = ?", userID, totpID)
 	return err
 }
