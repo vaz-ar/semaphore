@@ -82,9 +82,15 @@ func verifySession(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
 		user := context.Get(r, "user").(*db.User)
 		if !totp.Validate(body.Passcode, user.Totp.Secret) {
 			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		if err := helpers.Store(r).VerifySession(session.UserID, session.ID); err != nil {
+			helpers.WriteError(w, err)
+			return
 		}
 	case db.SessionVerificationNone:
 		w.WriteHeader(http.StatusNoContent)

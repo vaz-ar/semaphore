@@ -2,6 +2,7 @@ package sql
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/Masterminds/squirrel"
 	"github.com/semaphoreui/semaphore/db"
 	"golang.org/x/crypto/bcrypt"
@@ -186,16 +187,30 @@ func (d *SqlDb) DeleteProjectUser(projectID, userID int) error {
 }
 
 // GetUser retrieves a user from the database by ID
-func (d *SqlDb) GetUser(userID int) (db.User, error) {
-	var user db.User
+func (d *SqlDb) GetUser(userID int) (user db.User, err error) {
 
-	err := d.selectOne(&user, "select * from `user` where id=?", userID)
+	err = d.selectOne(&user, "select * from `user` where id=?", userID)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		err = db.ErrNotFound
 	}
 
-	return user, err
+	if err != nil {
+		return
+	}
+
+	var totp db.UserTotp
+	err = d.selectOne(&totp, "select * from `user__totp` where user_id=?", userID)
+
+	if err != nil {
+		user.Totp = &totp
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		err = nil
+	}
+
+	return
 }
 
 func (d *SqlDb) GetUserCount() (count int, err error) {
@@ -244,4 +259,35 @@ func (d *SqlDb) GetAllAdmins() (users []db.User, err error) {
 	_, err = d.selectAll(&users, "select * from `user` where `admin` = true")
 
 	return
+}
+
+func (d *SqlDb) AddUserTotpVerification(userID int, secret string) (totp db.UserTotp, err error) {
+
+	totp.UserID = userID
+	totp.Secret = secret
+	totp.Created = db.GetParsedTime(time.Now().UTC())
+
+	res, err := d.exec(
+		"insert into user__totp (user_id, secret, created) values (?, ?, ?)",
+		totp.UserID,
+		totp.Secret,
+		totp.Created)
+
+	if err != nil {
+		return
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return
+	}
+
+	totp.ID = int(id)
+
+	return
+}
+
+func (d *SqlDb) DeleteTotpVerification(userID int) error {
+	_, err := d.exec("delete from user__totp where user_id=?", userID)
+	return err
 }
