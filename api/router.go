@@ -82,7 +82,7 @@ func Route() *mux.Router {
 	publicAPIRouter.Use(StoreMiddleware, JSONMiddleware)
 
 	publicAPIRouter.HandleFunc("/auth/login", login).Methods("GET", "POST")
-	publicAPIRouter.HandleFunc("/auth/verify/totp", verityTotp).Methods("GET", "POST")
+	publicAPIRouter.HandleFunc("/auth/verify", verifySession).Methods("GET", "POST")
 
 	publicAPIRouter.HandleFunc("/auth/logout", logout).Methods("POST")
 	publicAPIRouter.HandleFunc("/auth/oidc/{provider}/login", oidcLogin).Methods("GET")

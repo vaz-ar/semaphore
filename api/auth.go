@@ -10,12 +10,9 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/pquerna/otp/totp"
 )
-
-// nolint: gocyclo
-func verityTotp(w http.ResponseWriter, r *http.Request) {
-
-}
 
 func getSession(r *http.Request) (*db.Session, bool) {
 	// fetch session from cookie
@@ -63,6 +60,38 @@ func getSession(r *http.Request) (*db.Session, bool) {
 
 	return &session, true
 
+}
+
+type totpRequestBody struct {
+	Passcode string `json:"passcode"`
+}
+
+// nolint: gocyclo
+func verifySession(w http.ResponseWriter, r *http.Request) {
+	session, ok := getSession(r)
+
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	switch session.VerificationMethod {
+	case db.SessionVerificationTotp:
+		var body totpRequestBody
+		if !helpers.Bind(w, r, &body) {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		user := context.Get(r, "user").(*db.User)
+		if !totp.Validate(body.Passcode, user.Totp.Secret) {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+	case db.SessionVerificationNone:
+		w.WriteHeader(http.StatusNoContent)
+		return
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 func authenticationHandler(w http.ResponseWriter, r *http.Request) bool {
