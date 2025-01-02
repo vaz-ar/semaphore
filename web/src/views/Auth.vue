@@ -91,6 +91,8 @@
 
         <h3 class="text-center mb-8">{{ $t('semaphore') }}</h3>
 
+        <h3 v-if="verification" class="text-center mb-3 mt-0">Two-step verification</h3>
+
         <v-alert
           :value="signInError != null"
           color="error"
@@ -99,15 +101,24 @@
         </v-alert>
 
         <div v-if="verification">
+
+          <div class="text-center mb-2">
+            Open the two-step verification app on your mobile device to get your verification code.
+          </div>
           <v-otp-input
             v-model="verificationCode"
             length="6"
-            type="number"
             @finish="verify()"
           ></v-otp-input>
-        </div>
-        <div v-else>
 
+          <v-divider class="my-6" />
+
+          <div class="text-center">
+            <a @click="signOut()">{{ $t('Return to login') }}</a>
+          </div>
+        </div>
+
+        <div v-else>
           <v-text-field
             v-model="username"
             v-bind:label='$t("username")'
@@ -225,6 +236,17 @@ export default {
   },
 
   methods: {
+    async signOut() {
+      (await axios({
+        method: 'post',
+        url: '/api/auth/logout',
+        responseType: 'json',
+      }));
+
+      const { location } = document;
+      document.location = location;
+    },
+
     makePasswordExample() {
       let pwd = '';
       const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
