@@ -179,22 +179,36 @@ export default {
 
       oidcProviders: [],
       loginWithPassword: null,
+
+      verification: null,
+      verificationMethod: null,
     };
   },
 
   async created() {
-    if (await this.isAuthenticated()) {
-      document.location = document.baseURI;
-      return;
+    const { status, verificationMethod } = await this.getAuthenticationStatus();
+
+    switch (status) {
+      case 'authenticated':
+        document.location = document.baseURI;
+        break;
+      case 'unauthenticated':
+        await axios({
+          method: 'get',
+          url: '/api/auth/login',
+          responseType: 'json',
+        }).then((resp) => {
+          this.oidcProviders = resp.data.oidc_providers;
+          this.loginWithPassword = resp.data.login_with_password;
+        });
+        break;
+      case 'unverified':
+        this.verification = true;
+        this.verificationMethod = verificationMethod;
+        break;
+      default:
+        throw new Error(`Unknown authentication status: ${status}`);
     }
-    await axios({
-      method: 'get',
-      url: '/api/auth/login',
-      responseType: 'json',
-    }).then((resp) => {
-      this.oidcProviders = resp.data.oidc_providers;
-      this.loginWithPassword = resp.data.login_with_password;
-    });
   },
 
   methods: {
@@ -208,7 +222,7 @@ export default {
       return pwd;
     },
 
-    async isAuthenticated() {
+    async getAuthenticationStatus() {
       try {
         await axios({
           method: 'get',
@@ -217,12 +231,24 @@ export default {
         });
       } catch (err) {
         if (err.response.status === 401) {
-          return false;
+          switch (err.response.body.error) {
+            case 'TOTP_REQUIRED':
+              return {
+                status: 'unverified',
+                verificationMethod: 'totp',
+              };
+            default:
+              return { status: 'unauthenticated' };
+          }
         }
         throw err;
       }
 
-      return true;
+      return { status: 'authenticated' };
+    },
+
+    async verify() {
+      // TODO: verify
     },
 
     async signIn() {

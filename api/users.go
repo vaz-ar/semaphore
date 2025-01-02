@@ -192,7 +192,6 @@ func totpQr(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Add("Content-Type", "image/png")
-
 	_, err = w.Write(png)
 }
 

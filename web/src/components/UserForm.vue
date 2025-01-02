@@ -105,6 +105,7 @@ export default {
             url: `/api/users/${this.itemId}/2fas/totp`,
             responseType: 'json',
           })).data;
+          this.totpQrUrl = `/api/users/${this.item.id}/2fas/totp/${this.item.totp.id}/qr`;
         }
       } else if (this.item.totp != null) {
         await axios({
@@ -113,6 +114,7 @@ export default {
           responseType: 'json',
         });
         this.item.totp = null;
+        this.totpQrUrl = null;
       }
     },
   },
@@ -120,6 +122,7 @@ export default {
   methods: {
     afterLoadData() {
       this.totpEnabled = this.item.totp != null;
+      this.totpQrUrl = `/api/users/${this.item.id}/2fas/totp/${this.item.totp.id}/qr`;
     },
 
     getItemsUrl() {

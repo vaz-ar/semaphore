@@ -200,7 +200,7 @@ func (d *SqlDb) GetUser(userID int) (user db.User, err error) {
 	}
 
 	var totp db.UserTotp
-	err = d.selectOne(&totp, "select * from `user__totp` where user_id=?", userID)
+	err = d.selectOne(&totp, "select * from `user__totp` where user_id=?", user.ID)
 
 	if err == nil {
 		user.Totp = &totp
@@ -242,14 +242,29 @@ func (d *SqlDb) GetUsers(params db.RetrieveQueryParams) (users []db.User, err er
 	return
 }
 
-func (d *SqlDb) GetUserByLoginOrEmail(login string, email string) (existingUser db.User, err error) {
+func (d *SqlDb) GetUserByLoginOrEmail(login string, email string) (user db.User, err error) {
 	err = d.selectOne(
-		&existingUser,
+		&user,
 		d.PrepareQuery("select * from `user` where email=? or username=?"),
 		email, login)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		err = db.ErrNotFound
+	}
+
+	if err != nil {
+		return
+	}
+
+	var totp db.UserTotp
+	err = d.selectOne(&totp, "select * from `user__totp` where user_id=?", user.ID)
+
+	if err == nil {
+		user.Totp = &totp
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		err = nil
 	}
 
 	return
