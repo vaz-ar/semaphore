@@ -49,27 +49,79 @@
       :disabled="item.external || formSaving"
     ></v-text-field>
 
-    <v-checkbox
-      v-model="item.admin"
-      :label="$t('adminUser')"
-      v-if="isAdmin"
-    ></v-checkbox>
+    <v-row>
+      <v-col>
+        <v-checkbox
+          v-model="item.admin"
+          :label="$t('adminUser')"
+          v-if="isAdmin"
+        ></v-checkbox>
+      </v-col>
+      <v-col>
+        <v-checkbox
+          v-model="item.alert"
+          :label="$t('sendAlerts')"
+        ></v-checkbox>
+      </v-col>
+    </v-row>
+
+    <v-divider class="mb-4" />
+
+    <h4>2FA</h4>
 
     <v-checkbox
-      v-model="item.alert"
-      :label="$t('sendAlerts')"
+      v-model="totpEnabled"
+      label="Time-based one-time password"
     ></v-checkbox>
+
+    <v-img v-if="totpQrUrl" :src="totpQrUrl" />
+
   </v-form>
 </template>
 <script>
 import ItemFormBase from '@/components/ItemFormBase';
+import axios from 'axios';
 
 export default {
   props: {
     isAdmin: Boolean,
   },
+
   mixins: [ItemFormBase],
+
+  data() {
+    return {
+      totpEnabled: false,
+      totpQrUrl: null,
+    };
+  },
+
+  watch: {
+    async totpEnabled(val) {
+      if (val) {
+        if (this.item.totp == null) {
+          this.item.totp = (await axios({
+            method: 'post',
+            url: `/api/users/${this.itemId}/2fas/totp`,
+            responseType: 'json',
+          })).data;
+        }
+      } else if (this.item.totp != null) {
+        await axios({
+          method: 'delete',
+          url: `/api/users/${this.itemId}/2fas/totp/${this.item.totp.id}`,
+          responseType: 'json',
+        });
+        this.item.totp = null;
+      }
+    },
+  },
+
   methods: {
+    afterLoadData() {
+      this.totpEnabled = this.item.totp != null;
+    },
+
     getItemsUrl() {
       return '/api/users';
     },

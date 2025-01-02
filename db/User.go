@@ -20,10 +20,10 @@ type User struct {
 }
 
 type UserTotp struct {
-	ID      int       `db:"id"`
-	Created time.Time `db:"created"`
-	UserID  int       `db:"user_id"`
-	Secret  string    `db:"secret"`
+	ID      int       `db:"id" json:"id"`
+	Created time.Time `db:"created" json:"created"`
+	UserID  int       `db:"user_id" json:"user_id"`
+	URL     string    `db:"url" json:"url"`
 }
 
 type UserWithProjectRole struct {

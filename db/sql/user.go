@@ -202,7 +202,7 @@ func (d *SqlDb) GetUser(userID int) (user db.User, err error) {
 	var totp db.UserTotp
 	err = d.selectOne(&totp, "select * from `user__totp` where user_id=?", userID)
 
-	if err != nil {
+	if err == nil {
 		user.Totp = &totp
 	}
 
@@ -248,7 +248,7 @@ func (d *SqlDb) GetUserByLoginOrEmail(login string, email string) (existingUser 
 		d.PrepareQuery("select * from `user` where email=? or username=?"),
 		email, login)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		err = db.ErrNotFound
 	}
 
@@ -261,16 +261,16 @@ func (d *SqlDb) GetAllAdmins() (users []db.User, err error) {
 	return
 }
 
-func (d *SqlDb) AddTotpVerification(userID int, secret string) (totp db.UserTotp, err error) {
+func (d *SqlDb) AddTotpVerification(userID int, url string) (totp db.UserTotp, err error) {
 
 	totp.UserID = userID
-	totp.Secret = secret
+	totp.URL = url
 	totp.Created = db.GetParsedTime(time.Now().UTC())
 
 	res, err := d.exec(
-		"insert into user__totp (user_id, secret, created) values (?, ?, ?)",
+		"insert into user__totp (user_id, url, created) values (?, ?, ?)",
 		totp.UserID,
-		totp.Secret,
+		totp.URL,
 		totp.Created)
 
 	if err != nil {

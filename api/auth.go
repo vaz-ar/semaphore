@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"github.com/gorilla/context"
+	"github.com/pquerna/otp"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
 	"github.com/semaphoreui/semaphore/util"
@@ -84,14 +85,23 @@ func verifySession(w http.ResponseWriter, r *http.Request) {
 		}
 
 		user := context.Get(r, "user").(*db.User)
-		if !totp.Validate(body.Passcode, user.Totp.Secret) {
-			w.WriteHeader(http.StatusBadRequest)
+		key, err := otp.NewKeyFromURL(user.Totp.URL)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 
-		if err := helpers.Store(r).VerifySession(session.UserID, session.ID); err != nil {
+		if !totp.Validate(body.Passcode, key.Secret()) {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = helpers.Store(r).VerifySession(session.UserID, session.ID)
+		if err != nil {
 			helpers.WriteError(w, err)
 			return
 		}
+
 	case db.SessionVerificationNone:
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -130,6 +140,8 @@ func authenticationHandler(w http.ResponseWriter, r *http.Request) bool {
 			helpers.WriteErrorStatus(w, "TOTP_REQUIRED", http.StatusUnauthorized)
 			return false
 		}
+
+		userID = session.UserID
 
 		if err := helpers.Store(r).TouchSession(userID, session.ID); err != nil {
 			log.Error(err)

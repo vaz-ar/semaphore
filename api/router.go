@@ -173,8 +173,9 @@ func Route() *mux.Router {
 	userPasswordAPI := authenticatedAPI.PathPrefix("/users/{user_id}").Subrouter()
 	userPasswordAPI.Use(getUserMiddleware)
 	userPasswordAPI.Path("/password").HandlerFunc(updateUserPassword).Methods("POST")
-	userPasswordAPI.Path("/totp").HandlerFunc(enableTotp).Methods("POST")
-	userPasswordAPI.Path("/totp/{totp_id}").HandlerFunc(disableTotp).Methods("DELETE")
+	userPasswordAPI.Path("/2fas/totp").HandlerFunc(enableTotp).Methods("POST")
+	userPasswordAPI.Path("/2fas/totp/{totp_id}/qr").HandlerFunc(totpQr).Methods("GET")
+	userPasswordAPI.Path("/2fas/totp/{totp_id}").HandlerFunc(disableTotp).Methods("DELETE")
 
 	projectGet := authenticatedAPI.Path("/project/{project_id}").Subrouter()
 	projectGet.Use(projects.ProjectMiddleware)

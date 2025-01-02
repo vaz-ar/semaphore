@@ -1,9 +1,11 @@
 package api
 
 import (
+	"github.com/pquerna/otp/totp"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
 	log "github.com/sirupsen/logrus"
+	"github.com/skip2/go-qrcode"
 	"net/http"
 
 	"github.com/gorilla/context"
@@ -180,6 +182,20 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func totpQr(w http.ResponseWriter, r *http.Request) {
+	user := context.Get(r, "_user").(db.User)
+
+	png, err := qrcode.Encode(user.Totp.URL, qrcode.Medium, 256)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	w.Header().Add("Content-Type", "image/png")
+
+	_, err = w.Write(png)
+}
+
 func enableTotp(w http.ResponseWriter, r *http.Request) {
 	user := context.Get(r, "_user").(db.User)
 	if user.Totp != nil {
@@ -187,7 +203,17 @@ func enableTotp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := helpers.Store(r).AddTotpVerification(user.ID, "")
+	key, err := totp.Generate(totp.GenerateOpts{
+		Issuer:      "Semaphore",
+		AccountName: user.Email,
+	})
+
+	if err != nil {
+		http.Error(w, "Error generating key", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = helpers.Store(r).AddTotpVerification(user.ID, key.URL())
 	if err != nil {
 		helpers.WriteError(w, err)
 		return
