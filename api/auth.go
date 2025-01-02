@@ -84,7 +84,12 @@ func verifySession(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		user := context.Get(r, "user").(*db.User)
+		user, err := helpers.Store(r).GetUser(session.UserID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		key, err := otp.NewKeyFromURL(user.Totp.URL)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

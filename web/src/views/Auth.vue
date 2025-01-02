@@ -98,59 +98,71 @@
         >{{ signInError }}
         </v-alert>
 
-        <v-text-field
-          v-model="username"
-          v-bind:label='$t("username")'
-          :rules="[v => !!v || $t('username_required')]"
-          required
-          :disabled="signInProcess"
-          v-if="loginWithPassword"
-        ></v-text-field>
+        <div v-if="verification">
+          <v-otp-input
+            v-model="verificationCode"
+            length="6"
+            type="number"
+            @finish="verify()"
+          ></v-otp-input>
+        </div>
+        <div v-else>
 
-        <v-text-field
-          v-model="password"
-          :label="$t('password')"
-          :rules="[v => !!v || $t('password_required')]"
-          type="password"
-          required
-          :disabled="signInProcess"
-          @keyup.enter.native="signIn"
-          style="margin-bottom: 20px;"
-          v-if="loginWithPassword"
-        ></v-text-field>
+          <v-text-field
+            v-model="username"
+            v-bind:label='$t("username")'
+            :rules="[v => !!v || $t('username_required')]"
+            required
+            :disabled="signInProcess"
+            v-if="loginWithPassword"
+          ></v-text-field>
 
-        <v-btn
-          color="primary"
-          @click="signIn"
-          :disabled="signInProcess"
-          block
-          v-if="loginWithPassword"
-        >
-          {{ $t('signIn') }}
-        </v-btn>
+          <v-text-field
+            v-model="password"
+            :label="$t('password')"
+            :rules="[v => !!v || $t('password_required')]"
+            type="password"
+            required
+            :disabled="signInProcess"
+            @keyup.enter.native="signIn"
+            style="margin-bottom: 20px;"
+            v-if="loginWithPassword"
+          ></v-text-field>
 
-        <v-btn
-          v-for="provider in oidcProviders"
-          :color="provider.color || 'secondary'"
-          dark
-          class="mt-2"
-          @click="oidcSignIn(provider.id)"
-          block
-          :key="provider.id"
-        >
-          <v-icon
-            left
-            dark
-            v-if="provider.icon"
+          <v-btn
+            color="primary"
+            @click="signIn"
+            :disabled="signInProcess"
+            block
+            v-if="loginWithPassword"
           >
-            mdi-{{ provider.icon }}
-          </v-icon>
+            {{ $t('signIn') }}
+          </v-btn>
 
-          {{ provider.name }}
-        </v-btn>
+          <v-btn
+            v-for="provider in oidcProviders"
+            :color="provider.color || 'secondary'"
+            dark
+            class="mt-2"
+            @click="oidcSignIn(provider.id)"
+            block
+            :key="provider.id"
+          >
+            <v-icon
+              left
+              dark
+              v-if="provider.icon"
+            >
+              mdi-{{ provider.icon }}
+            </v-icon>
 
-        <div class="text-center mt-6" v-if="loginWithPassword">
-          <a @click="loginHelpDialog = true">{{ $t('dontHaveAccountOrCantSignIn') }}</a>
+            {{ provider.name }}
+          </v-btn>
+
+          <div class="text-center mt-6" v-if="loginWithPassword">
+            <a @click="loginHelpDialog = true">{{ $t('dontHaveAccountOrCantSignIn') }}</a>
+          </div>
+
         </div>
       </v-form>
     </v-container>
@@ -181,6 +193,7 @@ export default {
       loginWithPassword: null,
 
       verification: null,
+      verificationCode: null,
       verificationMethod: null,
     };
   },
@@ -231,7 +244,7 @@ export default {
         });
       } catch (err) {
         if (err.response.status === 401) {
-          switch (err.response.body.error) {
+          switch (err.response.data.error) {
             case 'TOTP_REQUIRED':
               return {
                 status: 'unverified',
@@ -248,7 +261,32 @@ export default {
     },
 
     async verify() {
-      // TODO: verify
+      this.signInError = null;
+
+      if (!this.$refs.signInForm.validate()) {
+        return;
+      }
+
+      this.signInProcess = true;
+      try {
+        await axios({
+          method: 'post',
+          url: '/api/auth/verify',
+          responseType: 'json',
+          data: {
+            passcode: this.verificationCode,
+          },
+        });
+        document.location = document.baseURI + window.location.search;
+      } catch (err) {
+        if (err.response.status === 401) {
+          this.signInError = this.$t('incorrectUsrPwd');
+        } else {
+          this.signInError = getErrorMessage(err);
+        }
+      } finally {
+        this.signInProcess = false;
+      }
     },
 
     async signIn() {
