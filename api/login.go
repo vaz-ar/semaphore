@@ -89,8 +89,8 @@ func tryFindLDAPUser(username, password string) (*db.User, error) {
 	}
 
 	// Bind as the user
-	userdn := sr.Entries[0].DN
-	if err = l.Bind(userdn, password); err != nil {
+	userDN := sr.Entries[0].DN
+	if err = l.Bind(userDN, password); err != nil {
 		return nil, err
 	}
 
@@ -150,13 +150,24 @@ func tryFindLDAPUser(username, password string) (*db.User, error) {
 // createSession creates session for passed user and stores session details
 // in cookies.
 func createSession(w http.ResponseWriter, r *http.Request, user db.User) {
+	var verificationMethod db.SessionVerificationMethod
+	verified := false
+	switch {
+	case user.Totp != nil:
+		verificationMethod = db.SessionVerificationTotp
+	default:
+		verificationMethod = db.SessionVerificationNone
+		verified = true
+	}
 	newSession, err := helpers.Store(r).CreateSession(db.Session{
-		UserID:     user.ID,
-		Created:    time.Now(),
-		LastActive: time.Now(),
-		IP:         r.Header.Get("X-Real-IP"),
-		UserAgent:  r.Header.Get("user-agent"),
-		Expired:    false,
+		UserID:             user.ID,
+		Created:            time.Now(),
+		LastActive:         time.Now(),
+		IP:                 r.Header.Get("X-Real-IP"),
+		UserAgent:          r.Header.Get("user-agent"),
+		Expired:            false,
+		VerificationMethod: verificationMethod,
+		Verified:           verified,
 	})
 
 	if err != nil {
@@ -205,6 +216,10 @@ func loginByLDAP(store db.Store, ldapUser db.User) (user db.User, err error) {
 
 	if errors.Is(err, db.ErrNotFound) {
 		user, err = store.CreateUserWithoutPassword(ldapUser)
+	}
+
+	if err != nil {
+		return
 	}
 
 	if !user.External {
@@ -302,8 +317,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		switch err.(type) {
-		case *db.ValidationError:
+		var validationError *db.ValidationError
+		switch {
+		case errors.As(err, &validationError):
 			// TODO: Return more informative error code.
 		}
 

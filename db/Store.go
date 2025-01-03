@@ -275,6 +275,9 @@ type Store interface {
 	// Pwd should be present of you want update user password. Empty Pwd ignored.
 	UpdateUser(user UserWithPwd) error
 	SetUserPassword(userID int, password string) error
+	AddTotpVerification(userID int, url string) (UserTotp, error)
+	DeleteTotpVerification(userID int, totpID int) error
+
 	GetUser(userID int) (User, error)
 	GetUserByLoginOrEmail(login string, email string) (User, error)
 
@@ -323,6 +326,7 @@ type Store interface {
 	CreateSession(session Session) (Session, error)
 	ExpireSession(userID int, sessionID int) error
 	TouchSession(userID int, sessionID int) error
+	VerifySession(userID int, sessionID int) error
 
 	CreateTask(task Task, maxTasks int) (Task, error)
 	UpdateTask(task Task) error
@@ -528,6 +532,12 @@ var TemplateVaultProps = ObjectProps{
 	Type:                  reflect.TypeOf(TemplateVault{}),
 	PrimaryColumnName:     "id",
 	ReferringColumnSuffix: "template_id",
+}
+
+var UserTotpProps = ObjectProps{
+	TableName:         "user__totp",
+	Type:              reflect.TypeOf(UserTotp{}),
+	PrimaryColumnName: "id",
 }
 
 func (p ObjectProps) GetReferringFieldsFrom(t reflect.Type) (fields []string, err error) {

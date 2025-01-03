@@ -216,3 +216,31 @@ func (d *BoltDb) GetAllAdmins() (users []db.User, err error) {
 	}, &users)
 	return
 }
+
+func (d *BoltDb) AddTotpVerification(userID int, url string) (totp db.UserTotp, err error) {
+
+	current := make([]db.UserTotp, 0)
+	err = d.getObjects(userID, db.UserTotpProps, db.RetrieveQueryParams{}, nil, current)
+
+	if len(current) > 0 {
+		err = fmt.Errorf("already exists")
+		return
+	}
+
+	totp.UserID = userID
+	totp.URL = url
+	totp.Created = db.GetParsedTime(time.Now().UTC())
+
+	newTotp, err := d.createObject(userID, db.UserTotpProps, totp)
+
+	if err != nil {
+		return
+	}
+
+	totp = newTotp.(db.UserTotp)
+	return
+}
+
+func (d *BoltDb) DeleteTotpVerification(userID int, totpID int) error {
+	return d.deleteObject(userID, db.UserTotpProps, intObjectID(totpID), nil)
+}
