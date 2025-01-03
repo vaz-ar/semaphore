@@ -234,13 +234,13 @@ func enableTotp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = helpers.Store(r).AddTotpVerification(user.ID, key.URL())
+	newTotp, err := helpers.Store(r).AddTotpVerification(user.ID, key.URL())
 	if err != nil {
 		helpers.WriteError(w, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	helpers.WriteJSON(w, http.StatusOK, newTotp)
 }
 
 func disableTotp(w http.ResponseWriter, r *http.Request) {

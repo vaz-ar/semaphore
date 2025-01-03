@@ -69,19 +69,23 @@
 
     <h4>2FA</h4>
 
-    <v-checkbox
+    <v-switch
       v-model="totpEnabled"
       label="Time-based one-time password"
-    ></v-checkbox>
+    ></v-switch>
 
     <img
       v-if="totpQrUrl"
       :src="totpQrUrl"
+      width="276"
+      height="276"
       style="
         aspect-ratio: 1;
-        border-radius: 6px;
+        border-radius: 10px;
         display: block;
         margin: 0 auto 10px auto;
+        border: 10px solid white;
+        background-color: white;
       "
       alt="QR code"
     />
@@ -115,7 +119,7 @@ export default {
             url: `/api/users/${this.itemId}/2fas/totp`,
             responseType: 'json',
           })).data;
-          this.totpQrUrl = `/api/users/${this.item.id}/2fas/totp/${this.item.totp.id}/qr`;
+          this.totpQrUrl = `/api/users/${this.itemId}/2fas/totp/${this.item.totp.id}/qr`;
         }
       } else if (this.item.totp != null) {
         await axios({
@@ -131,8 +135,10 @@ export default {
 
   methods: {
     afterLoadData() {
-      this.totpEnabled = this.item.totp != null;
-      this.totpQrUrl = `/api/users/${this.item.id}/2fas/totp/${this.item.totp.id}/qr`;
+      if (this.item.totp != null) {
+        this.totpEnabled = true;
+        this.totpQrUrl = `/api/users/${this.itemId}/2fas/totp/${this.item.totp.id}/qr`;
+      }
     },
 
     getItemsUrl() {
