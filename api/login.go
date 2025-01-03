@@ -3,12 +3,12 @@ package api
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -455,7 +455,10 @@ func generateStateOauthCookie(w http.ResponseWriter) string {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 
 	b := make([]byte, 16)
-	rand.Read(b)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
 	oauthState := base64.URLEncoding.EncodeToString(b)
 	cookie := http.Cookie{Name: "oauthstate", Value: oauthState, Expires: expiration}
 	http.SetCookie(w, &cookie)
