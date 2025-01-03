@@ -5,6 +5,7 @@
       save-button-text="Save"
       :title="$t('editUser')"
       @save="loadItems()"
+      :hide-buttons="hideEditDialogButtons"
     >
       <template v-slot:form="{ onSave, onError, needSave, needReset }">
         <UserForm
@@ -15,6 +16,8 @@
           :need-save="needSave"
           :need-reset="needReset"
           :is-admin="true"
+          @hide-action-buttons="hideEditDialogButtons = true"
+          @show-action-buttons="hideEditDialogButtons = false"
         />
       </template>
     </EditDialog>
@@ -101,6 +104,12 @@ export default {
     YesNoDialog,
     UserForm,
     EditDialog,
+  },
+
+  data() {
+    return {
+      hideEditDialogButtons: false,
+    };
   },
 
   methods: {
