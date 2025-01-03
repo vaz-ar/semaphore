@@ -183,9 +183,10 @@ func createSession(w http.ResponseWriter, r *http.Request, user db.User) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:  "semaphore",
-		Value: encoded,
-		Path:  "/",
+		Name:     "semaphore",
+		Value:    encoded,
+		Path:     "/",
+		HttpOnly: true,
 	})
 }
 
@@ -334,10 +335,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 func logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:    "semaphore",
-		Value:   "",
-		Expires: time.Now().Add(24 * 7 * time.Hour * -1),
-		Path:    "/",
+		Name:     "semaphore",
+		Value:    "",
+		Expires:  time.Now().Add(24 * 7 * time.Hour * -1),
+		Path:     "/",
+		HttpOnly: true,
 	})
 
 	w.WriteHeader(http.StatusNoContent)
