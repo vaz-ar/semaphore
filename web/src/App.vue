@@ -55,6 +55,7 @@
       :title="$t('editUser')"
       v-if="user"
       event-name="i-user"
+      :hide-buttons="hideUserDialogButtons"
     >
       <template v-slot:form="{ onSave, onError, needSave, needReset }">
         <UserForm
@@ -65,6 +66,8 @@
           :need-save="needSave"
           :need-reset="needReset"
           :is-admin="user.admin"
+          @hide-action-buttons="hideUserDialogButtons = true"
+          @show-action-buttons="hideUserDialogButtons = false"
         />
       </template>
     </EditDialog>
@@ -835,6 +838,7 @@ export default {
       newProjectDialog: null,
       newProjectType: '',
       userDialog: null,
+      hideUserDialogButtons: false,
       passwordDialog: null,
       restoreProjectDialog: null,
       restoreProjectResult: null,

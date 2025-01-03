@@ -85,13 +85,12 @@
         <img
           v-if="totpQrUrl"
           :src="totpQrUrl"
-          width="276"
-          height="276"
           style="
+        width: 100%;
         aspect-ratio: 1;
-        border-radius: 10px;
+        border-radius: 4px;
         display: block;
-        margin: 0 auto 20px auto;
+        margin: 0 auto 10px auto;
         border: 10px solid white;
         background-color: white;
       "
