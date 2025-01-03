@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/mdp/qrterminal/v3"
 	"github.com/pquerna/otp/totp"
 	"github.com/spf13/cobra"
 	"os"
@@ -62,7 +63,17 @@ var totpEnableCmd = &cobra.Command{
 			panic(err)
 		}
 
+		fmt.Println()
 		fmt.Println(totp.URL)
+		fmt.Println()
+		qrterminal.GenerateWithConfig(totp.URL, qrterminal.Config{
+			Writer:    os.Stdout,
+			Level:     qrterminal.L,
+			BlackChar: qrterminal.BLACK,
+			WhiteChar: qrterminal.WHITE,
+			QuietZone: 2,
+		})
+		fmt.Println()
 	},
 }
 
@@ -85,11 +96,15 @@ var totpDisableCmd = &cobra.Command{
 			panic(err)
 		}
 
-		if user.Totp != nil {
-			fmt.Println("TOTP already enabled")
+		if user.Totp == nil {
+			fmt.Println("TOTP not enabled")
 			os.Exit(1)
 		}
 
+		err = store.DeleteTotpVerification(user.ID, user.Totp.ID)
+		if err != nil {
+			panic(err)
+		}
 	},
 }
 
@@ -114,8 +129,17 @@ var totpShowCmd = &cobra.Command{
 		if user.Totp == nil {
 			fmt.Println("TOTP disabled")
 		} else {
+			fmt.Println()
 			fmt.Println(user.Totp.URL)
+			fmt.Println()
+			qrterminal.GenerateWithConfig(user.Totp.URL, qrterminal.Config{
+				Writer:    os.Stdout,
+				Level:     qrterminal.L,
+				BlackChar: qrterminal.BLACK,
+				WhiteChar: qrterminal.WHITE,
+				QuietZone: 2,
+			})
+			fmt.Println()
 		}
-
 	},
 }

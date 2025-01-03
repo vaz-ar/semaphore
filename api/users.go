@@ -1,11 +1,13 @@
 package api
 
 import (
+	"bytes"
+	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 	"github.com/semaphoreui/semaphore/api/helpers"
 	"github.com/semaphoreui/semaphore/db"
 	log "github.com/sirupsen/logrus"
-	"github.com/skip2/go-qrcode"
+	"image/png"
 	"net/http"
 
 	"github.com/gorilla/context"
@@ -185,14 +187,34 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 func totpQr(w http.ResponseWriter, r *http.Request) {
 	user := context.Get(r, "_user").(db.User)
 
-	png, err := qrcode.Encode(user.Totp.URL, qrcode.Medium, 256)
+	key, err := otp.NewKeyFromURL(user.Totp.URL)
 	if err != nil {
 		helpers.WriteError(w, err)
 		return
 	}
 
+	image, err := key.Image(256, 256)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+
+	var buf bytes.Buffer
+	err = png.Encode(&buf, image)
+	if err != nil {
+		helpers.WriteError(w, err)
+		return
+	}
+	pngBytes := buf.Bytes()
+
+	//pngBytes, err := qrcode.Encode(user.Totp.URL, qrcode.Medium, 256)
+	//if err != nil {
+	//	helpers.WriteError(w, err)
+	//	return
+	//}
+
 	w.Header().Add("Content-Type", "image/png")
-	_, err = w.Write(png)
+	_, err = w.Write(pngBytes)
 }
 
 func enableTotp(w http.ResponseWriter, r *http.Request) {
