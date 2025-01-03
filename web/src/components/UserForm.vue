@@ -74,7 +74,17 @@
       label="Time-based one-time password"
     ></v-checkbox>
 
-    <v-img v-if="totpQrUrl" :src="totpQrUrl" />
+    <img
+      v-if="totpQrUrl"
+      :src="totpQrUrl"
+      style="
+        aspect-ratio: 1;
+        border-radius: 6px;
+        display: block;
+        margin: 0 auto 10px auto;
+      "
+      alt="QR code"
+    />
 
   </v-form>
 </template>

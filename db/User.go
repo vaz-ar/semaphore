@@ -16,7 +16,7 @@ type User struct {
 	External bool      `db:"external" json:"external"`
 	Alert    bool      `db:"alert" json:"alert"`
 
-	Totp *UserTotp `json:"totp,omitempty"`
+	Totp *UserTotp `db:"-" json:"totp,omitempty"`
 }
 
 type UserTotp struct {
