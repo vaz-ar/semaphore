@@ -240,7 +240,7 @@
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title>{{ $t('newProject') }}</v-list-item-title>
+            <v-list-item-title>{{ $t('newProject2') }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -248,7 +248,7 @@
       <v-list class="pt-0" v-if="!project">
         <v-list-item key="new_project" :to="`/project/restore`">
           <v-list-item-icon>
-            <v-icon>mdi-plus</v-icon>
+            <v-icon>mdi-restore</v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
