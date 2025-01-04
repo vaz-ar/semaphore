@@ -214,7 +214,7 @@ export default {
 
     switch (status) {
       case 'authenticated':
-        document.location = document.baseURI;
+        document.location = document.baseURI + window.location.search;
         break;
       case 'unauthenticated':
         await axios({
